@@ -1,0 +1,375 @@
+<html>
+    <div id='main' style='position: absolute; text-align: center; background-color: rgb(203, 233, 255); overflow: auto;'></div>
+    <div id='sideBar'>
+        <input id='searchType' type='text' value='name'>
+        <input id='searchField' type='text' placeholder='Search...' onkeyup='search()'>
+        <div id='sidebarArrow' onclick='fullScreenSidebar(this, true)'></div>
+        <div id='searchFieldCards'></div>
+        <div id='searchParameters'></div>
+    </div>
+</html>
+<style>
+    body {
+        font-family: sans-serif;
+        margin: 0%;
+        overflow: hidden;
+        /* background-image: url('https://images.pokemontcg.io/xy12/98.png'); */
+        /* background-color: #ffe367; */
+    }
+    #sidebar {
+        position: absolute;
+        margin-left: -40%;
+        width: 40%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        transition: 0.5s;
+        transition-delay: 0.15s;
+    }
+    #sidebar:hover {
+        margin-left: 0%;
+        transition-delay: 0s;
+    }
+    #sidebarArrow {
+        position: absolute;
+        margin-left: 100%;
+        width: 1.5cm;
+        height: 100%;
+        background-color: rgba(0, 0, 76, 0.6);
+    }
+    #searchType {
+        position: absolute;
+        width: 2cm;
+        height: 1.5cm;
+        box-sizing: border-box;
+        font-size: 0.75cm;
+        z-index: 1001;
+        opacity: 80%;
+        color: black;
+        background-color: white;
+        text-align: center;
+    }
+    #searchField {
+        position: absolute;
+        margin-left: 2cm;
+        width: calc(100% - 2cm);
+        height: 1.5cm;
+        box-sizing: border-box;
+        padding-inline-start: 0.75cm;
+        font-size: 0.75cm;
+        z-index: 1001;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    #searchFieldCards {
+        position: absolute;
+        height: 100%;
+        text-align: center;
+        overflow: auto;
+        opacity: 100%;
+    }
+    #searchParameters {
+        position: absolute;
+        width: 100%;
+        height: 50%;
+        z-index: 1001;
+        bottom: calc(-50% + 1.5cm);
+        background-color: rgba(0, 0, 0, 0.6);
+        transition: 0.5s;
+        transition-delay: 0.15s;
+        overflow: auto;
+    }
+    .setSymbol {
+        margin: 0.25cm;
+        width: 1cm; 
+        height:1cm;
+    }
+    #searchParameters:hover {
+        bottom: 0%;
+        transition-delay: 0s;
+    }
+    .card {
+        position: relative;
+        transition: transform 0.25s, z-index 0.25s;
+    }
+    .card:hover {
+        transform: scale(2);
+        z-index: 999;
+        transition: transform 0.25s, z-index 0s;
+    }
+    .focusedCard {
+        margin: auto;
+        position: fixed;
+        top: 0; left: 0; bottom: 0; right: 0%;
+        height: 90%; 
+        width: 90%; 
+        object-fit: contain
+    }
+    #focused {
+        width: 200%;
+        height: 200%;
+        position: fixed;
+        z-index: 1025;
+        background-color: rgba(0, 0, 0, 0.6);
+        top: -50%; left: -50%;
+    }
+    .fadeIn {
+        animation: fadeIn 0.15s;
+    }
+    .fadeOut {
+        animation: fadeOut 0.15s;
+        pointer-events: none;
+    }
+    @keyframes fadeIn {from {opacity: 0;} to {opacity: 1;}}
+    @keyframes fadeOut {from {opacity: 1;} to {opacity: 0;}}
+</style>
+<script>
+    const cardWidth = 6.3
+    const cardHeight = 8.8
+    const mainDiv = document.getElementById('main')
+    const searchFieldCards = document.getElementById('searchFieldCards');
+    const sideBarDiv = document.getElementById('sideBar')
+    const searchParametersDiv = document.getElementById('searchParameters')
+    populateSearchParameters()
+
+    Object.assign(mainDiv.style,{
+            'margin-top': '1.5cm',
+            'margin-left': '1.5cm',
+            'padding-top': cardHeight/4+'cm',
+            'padding-left': cardWidth/4+'cm',
+            'padding-right': cardWidth/4+'cm',
+            'width': `calc(100% - 3cm - ${cardWidth/2}cm)`,
+            'height': `calc(100% - 3cm - ${cardHeight/4}cm)`
+        })
+
+
+    Object.assign(searchFieldCards.style,{
+            'padding-top': cardHeight/4+'cm',
+            'padding-left': cardWidth/4+'cm',
+            'padding-right': cardWidth/4+'cm',
+            'width': `calc(100% - ${cardWidth/2}cm)`
+        })
+
+    function createElement (type, innerHTML, attributes) {
+        var elem = document.createElement(type)
+        elem.innerHTML = innerHTML
+        for (let attr in attributes) {
+            elem.setAttribute(attr, attributes[attr])
+        }
+        return elem
+    }
+
+    async function populateSearchParameters () {
+        const response = await fetch('https://api.pokemontcg.io/v1/sets')
+        const json = await response.json()
+        sets = json['sets']
+        symbols = []
+        for (i=0; i<sets.length; i++) {
+            // console.log(sets[i]['symbolUrl'])
+            symbols.unshift([sets[i]['symbolUrl'], sets[i]['code']])
+        }
+        for (i=0; i<symbols.length; i++) {
+            searchParametersDiv.appendChild(
+                createElement('div', null, {
+                    'style': 'display: inline-block'
+                })
+            ).appendChild(
+                createElement('img', null, {
+                    'class': 'setSymbol',
+                    'src': symbols[i][0],
+                    'id': symbols[i][1],
+                    'onclick': 'hilightButton(this, true)'
+                })
+            )
+        }
+    }
+
+    function hilightButton (elem, hilight) {
+        if (hilight == true) {
+            Object.assign(elem.parentNode.style,{
+                'background-color': 'rgba(0, 255, 0, 0.6)',
+            })
+            elem.setAttribute('onclick', 'hilightButton(this, false)')
+            elem.classList.add('highlightedSetButton')
+            search()
+        }
+        else {
+            Object.assign(elem.parentNode.style,{
+                'background-color': '',
+            })
+            elem.setAttribute('onclick', 'hilightButton(this, true)')
+            elem.classList.remove('highlightedSetButton')
+            search()
+        }
+    }
+
+    function fullScreenSidebar (elem, fullScreen) {
+        if (fullScreen == true) {
+            Object.assign(sideBar.style,{
+                'width': 'calc(100% - 1.5cm)',
+                'margin-left': '0%'
+            })
+            elem.setAttribute('onclick', 'fullScreenSidebar(this, false)')
+        }
+        if (fullScreen == false) {
+            sideBarDiv.style = ''
+            elem.setAttribute('onclick', 'fullScreenSidebar(this, true)')
+        }
+    }
+
+    function createCard(cardData, width, height, hiRes, properties) {
+        properties['style'] = `width:${width}cm; height:${height}cm;`
+        properties['class'] = 'card'
+
+        for (const item in cardData) {
+            if (typeof cardData[item] === 'string') {
+                properties[item] = cardData[item]
+            }
+            else {
+                properties[item] = JSON.stringify(cardData[item])
+            }
+            if ((item == 'imageUrl' && hiRes === false) || (item == 'imageUrlHiRes' && hiRes === true)) {
+                properties['src'] = cardData[item]
+            }
+        }
+        return createElement('img', null, properties)
+    }
+
+    function addCard(card) {
+        clone = card.cloneNode(true)
+        clone.setAttribute('oncontextmenu', 'event.preventDefault(); onCardClick(this)')
+        clone.setAttribute('onclick', 'this.remove()')
+        console.log(clone)
+        mainDiv.appendChild(clone)
+    }
+
+    function fadeOut (element) {
+        element.classList.add('fadeOut')
+        setTimeout(function () {
+            if (element) {
+                element.remove()
+            }
+        }, 150)
+    }
+
+    async function fetchCards (url) {
+        const response = await fetch(url)
+        const json = await response.json()
+        return json['cards']
+    }
+
+    var previousSearch = {
+        'searchType': null,
+        'searchText': null,
+        'setCode': null
+    }
+
+
+    var cooldown = false
+    var callSearch = false
+    async function search () {
+        callSearch = false
+        if (cooldown == true) {
+            callSearch = true
+            return
+        }
+        else {
+            // console.log('TIMEOUT BEGINS')
+            cooldown = true
+            setTimeout(() => {
+                    // console.log('TIMEOUT ENDS')
+                    cooldown = false
+                    if (callSearch == true) {
+                        search()
+                        callSearch = false
+                    }
+                }, 1000);
+        }
+
+
+        const searchType = document.getElementById('searchType').value
+        const searchText = document.getElementById('searchField').value.replace(/ /g, '%20')
+        const setButtons = document.getElementsByClassName('highlightedSetButton')
+        var setCode = ''
+        if (setButtons.length > 0) {
+            setCode = `${setCode}&setCode=${setButtons[0].id}`
+            if (setButtons.length > 1) {
+                for (i=1; i<setButtons.length; i++) {
+                    setCode = `${setCode}|${setButtons[i].id}`
+                }
+            } 
+        }
+
+        if (previousSearch['searchType'] === searchType && previousSearch['searchText'] === searchText && previousSearch['setCode'] === setCode) {
+            return
+        }
+        else if (searchText == '' && setCode == '') {
+            while (searchFieldCards.firstChild) {
+                searchFieldCards.removeChild(searchFieldCards.firstChild);
+            }
+            return
+        }
+        else {
+            previousSearch = [searchType, searchText]
+        }
+
+        var url = `https://api.pokemontcg.io/v1/cards?pageSize=1000&${searchType}=${searchText}${setCode}`
+        
+        console.log(`Fetching ${url}`)
+        var cardData = await fetchCards(url)
+        cardData = cardData.sort(function(a, b) {return a.number - b.number})
+
+        while (searchFieldCards.firstChild) {
+            searchFieldCards.removeChild(searchFieldCards.firstChild);
+        }
+
+        for (i=0; i<Math.min(cardData.length, 1000); i++) {
+            const card = cardData[i]
+            const newCard = createCard(card, cardWidth/2, cardHeight/2, false, {'onclick': 'addCard(this);', 'oncontextmenu': 'event.preventDefault(); onCardClick(this)'})
+            searchFieldCards.append(newCard)
+        }
+
+        //add padding to bottom of scrollable
+        searchFieldCards.appendChild(
+            createElement('div', null, {
+                'style': `width:100%; height:${cardHeight/2}cm;`
+            })
+        )
+    }
+
+    function onCardClick (data) {
+        console.log(data)
+
+        //create focused
+        var focused = mainDiv.appendChild(
+            createElement('div', null, {
+                'id': 'focused',
+                'onclick': 'fadeOut(this)',
+                'class': 'fadeIn'
+            })
+        )
+        
+        //create low res image
+        focused.appendChild(
+            createElement('img', null, {
+                'importance': 'high',
+                'id': 'lowResFocused',
+                'style': 'z-index:1027',
+                'class': 'focusedCard',
+                'src': data.getAttribute('imageurl')
+            })
+        )
+
+        //create high res image
+        focused.appendChild(
+            createElement('img', null, {
+                'importance': 'high',
+                'id': 'hiResFocused',
+                'style': 'z-index:1026',
+                'class': 'focusedCard',
+                'onload': "if(document.getElementById('lowResFocused')){document.getElementById('lowResFocused').remove()}",
+                'src': data.getAttribute('imageurlhires')
+            })
+        )
+    }
+</script>
