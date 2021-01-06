@@ -13,16 +13,14 @@
         font-family: sans-serif;
         margin: 0%;
         overflow: hidden;
-        /* background-image: url('https://images.pokemontcg.io/xy12/98.png'); */
-        /* background-color: #ffe367; */
     }
     #sidebar {
         position: absolute;
-        margin-left: -40%;
         width: 40%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
+        margin-left: -40%;
         z-index: 1000;
+        background-color: rgba(0, 0, 0, 0.6);
         transition: 0.5s;
         transition-delay: 0.15s;
     }
@@ -32,48 +30,48 @@
     }
     #sidebarArrow {
         position: absolute;
-        margin-left: 100%;
         width: 1.5cm;
         height: 100%;
+        margin-left: 100%;
         background-color: rgba(0, 0, 76, 0.6);
     }
     #searchType {
         position: absolute;
-        width: 1.5cm;
+        width: 3cm;
         height: 1.5cm;
-        box-sizing: border-box;
         font-size: 0.75cm;
         z-index: 1001;
         opacity: 80%;
         color: black;
         background-color: white;
+        box-sizing: border-box;
         text-align: center;
     }
     #searchField {
         position: absolute;
-        margin-left: 1.5cm;
-        width: calc(100% - 1.5cm);
+        width: calc(100% - 3cm);
         height: 1.5cm;
-        box-sizing: border-box;
+        margin-left: 3cm;
         padding-inline-start: 0.75cm;
         font-size: 0.75cm;
         z-index: 1001;
         color: white;
         background-color: rgba(0, 0, 0, 0.6);
+        box-sizing: border-box;
     }
     #searchFieldCards {
         position: absolute;
         height: 100%;
+        opacity: 100%;
         text-align: center;
         overflow: auto;
-        opacity: 100%;
     }
     #searchParameters {
         position: absolute;
         width: 100%;
         height: 50%;
-        z-index: 1001;
         bottom: calc(-50% + 1.5cm);
+        z-index: 1001;
         background-color: rgba(0, 0, 0, 0.6);
         transition: 0.5s;
         transition-delay: 0.15s;
@@ -82,7 +80,7 @@
     .setSymbol {
         margin: 0.25cm;
         width: 1cm; 
-        height:1cm;
+        height: 1cm;
     }
     #searchParameters:hover {
         bottom: 0%;
@@ -90,28 +88,37 @@
     }
     .card {
         position: relative;
-        transition: transform 0.25s, z-index 0.25s;
+        display: inline-block;
+        border-radius: 0.15cm;
+        transition: transform 0.25s, z-index 0.25s, box-shadow 0.25s;
+        background: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/4f7705ec-8c49-4eed-a56e-c21f3985254c/dah43cy-a8e121cb-934a-40f6-97c7-fa2d77130dd5.png/v1/fill/w_759,h_1053,strp/pokemon_card_backside_in_high_resolution_by_atomicmonkeytcg_dah43cy-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3siaGVpZ2h0IjoiPD0xNDIwIiwicGF0aCI6IlwvZlwvNGY3NzA1ZWMtOGM0OS00ZWVkLWE1NmUtYzIxZjM5ODUyNTRjXC9kYWg0M2N5LWE4ZTEyMWNiLTkzNGEtNDBmNi05N2M3LWZhMmQ3NzEzMGRkNS5wbmciLCJ3aWR0aCI6Ijw9MTAyNCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.6Au-hxTt7FuZ5paCMWMJrAiCi-ClaG35bEG2TgGg0VE');
+        background-size: contain;
     }
     .card:hover {
         transform: scale(2);
         z-index: 999;
-        transition: transform 0.25s, z-index 0s;
+        transition: transform 0.25s, z-index 0s, box-shadow 0.25s;
+        box-shadow: 1em 1em 1em rgba(0, 0, 0, 0.6);
     }
     .focusedCard {
-        margin: auto;
         position: fixed;
-        top: 0; left: 0; bottom: 0; right: 0%;
-        height: 90%; 
-        width: 90%; 
+        height: 90%;
+        width: 90%;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0%;
+        margin: auto;
         object-fit: contain
     }
     #focused {
+        position: fixed;
         width: 200%;
         height: 200%;
-        position: fixed;
+        top: -50%;
+        left: -50%;
         z-index: 1025;
         background-color: rgba(0, 0, 0, 0.6);
-        top: -50%; left: -50%;
     }
     .fadeIn {
         animation: fadeIn 0.15s;
@@ -124,31 +131,72 @@
     @keyframes fadeOut {from {opacity: 1;} to {opacity: 0;}}
 </style>
 <script>
-    const cardWidth = 6.3
-    const cardHeight = 8.8
+    //SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP
+    const cardWidth = (6.3)/2
+    const cardHeight = (8.8)/2
     const mainDiv = document.getElementById('main')
     const searchFieldCards = document.getElementById('searchFieldCards');
     const sideBarDiv = document.getElementById('sideBar')
     const searchParametersDiv = document.getElementById('searchParameters')
-    populateSearchParameters()
+    const placeholderImage = 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/4f7705ec-8c49-4eed-a56e-c21f3985254c/dah43cy-a8e121cb-934a-40f6-97c7-fa2d77130dd5.png/v1/fill/w_759,h_1053,strp/pokemon_card_backside_in_high_resolution_by_atomicmonkeytcg_dah43cy-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3siaGVpZ2h0IjoiPD0xNDIwIiwicGF0aCI6IlwvZlwvNGY3NzA1ZWMtOGM0OS00ZWVkLWE1NmUtYzIxZjM5ODUyNTRjXC9kYWg0M2N5LWE4ZTEyMWNiLTkzNGEtNDBmNi05N2M3LWZhMmQ3NzEzMGRkNS5wbmciLCJ3aWR0aCI6Ijw9MTAyNCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.6Au-hxTt7FuZ5paCMWMJrAiCi-ClaG35bEG2TgGg0VE'
+
+    //Search variables
+    var previousSearch = {
+        'searchType': null,
+        'searchText': null,
+        'setCode': null
+    }
+    var cooldown = false
+    var callSearch = false
+    //–––––––––––––––
 
     Object.assign(mainDiv.style,{
             'margin-top': '1.5cm',
             'margin-left': '1.5cm',
-            'padding-top': cardHeight/4+'cm',
-            'padding-left': cardWidth/4+'cm',
-            'padding-right': cardWidth/4+'cm',
-            'width': `calc(100% - 3cm - ${cardWidth/2}cm)`,
-            'height': `calc(100% - 3cm - ${cardHeight/4}cm)`
+            'padding-top': cardHeight/2+'cm',
+            'padding-left': cardWidth/2+'cm',
+            'padding-right': cardWidth/2+'cm',
+            'width': `calc(100% - 3cm - ${cardWidth}cm)`,
+            'height': `calc(100% - 3cm - ${cardHeight}cm)`
         })
 
 
     Object.assign(searchFieldCards.style,{
-            'padding-top': cardHeight/4+'cm',
-            'padding-left': cardWidth/4+'cm',
-            'padding-right': cardWidth/4+'cm',
-            'width': `calc(100% - ${cardWidth/2}cm)`
+            'padding-top': cardHeight/2+'cm',
+            'padding-left': cardWidth/2+'cm',
+            'padding-right': cardWidth/2+'cm',
+            'width': `calc(100% - ${cardWidth}cm)`
         })
+
+    //Populate search parameters
+    populateSearchParameters()
+    async function populateSearchParameters () {
+        const response = await fetch('https://api.pokemontcg.io/v1/sets')
+        const json = await response.json()
+        sets = json['sets']
+        symbols = []
+        for (i=0; i<sets.length; i++) {
+            symbols.unshift([sets[i]['symbolUrl'], sets[i]['code']])
+        }
+        for (i=0; i<symbols.length; i++) {
+            searchParametersDiv.appendChild(
+                createElement('div', null, {
+                    'id': symbols[i][1],
+                    'style': 'display: inline-block',
+                    'onclick': 'hilightButton(this, true)'
+                })
+            ).appendChild(
+                createElement('img', null, {
+                    'class': 'setSymbol',
+                    'src': symbols[i][0],
+                    'alt': symbols[i][1],
+                    'style': 'pointer-events: none;'
+                })
+            )
+        }
+    }
+    
+    //UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS
 
     function createElement (type, innerHTML, attributes) {
         var elem = document.createElement(type)
@@ -159,62 +207,13 @@
         return elem
     }
 
-    async function populateSearchParameters () {
-        const response = await fetch('https://api.pokemontcg.io/v1/sets')
-        const json = await response.json()
-        sets = json['sets']
-        symbols = []
-        for (i=0; i<sets.length; i++) {
-            // console.log(sets[i]['symbolUrl'])
-            symbols.unshift([sets[i]['symbolUrl'], sets[i]['code']])
-        }
-        for (i=0; i<symbols.length; i++) {
-            searchParametersDiv.appendChild(
-                createElement('div', null, {
-                    'style': 'display: inline-block'
-                })
-            ).appendChild(
-                createElement('img', null, {
-                    'class': 'setSymbol',
-                    'src': symbols[i][0],
-                    'id': symbols[i][1],
-                    'onclick': 'hilightButton(this, true)'
-                })
-            )
-        }
-    }
-
-    function hilightButton (elem, hilight) {
-        if (hilight == true) {
-            Object.assign(elem.parentNode.style,{
-                'background-color': 'rgba(0, 255, 0, 0.6)',
-            })
-            elem.setAttribute('onclick', 'hilightButton(this, false)')
-            elem.classList.add('highlightedSetButton')
-            search()
-        }
-        else {
-            Object.assign(elem.parentNode.style,{
-                'background-color': '',
-            })
-            elem.setAttribute('onclick', 'hilightButton(this, true)')
-            elem.classList.remove('highlightedSetButton')
-            search()
-        }
-    }
-
-    function fullScreenSidebar (elem, fullScreen) {
-        if (fullScreen == true) {
-            Object.assign(sideBar.style,{
-                'width': 'calc(100% - 1.5cm)',
-                'margin-left': '0%'
-            })
-            elem.setAttribute('onclick', 'fullScreenSidebar(this, false)')
-        }
-        if (fullScreen == false) {
-            sideBarDiv.style = ''
-            elem.setAttribute('onclick', 'fullScreenSidebar(this, true)')
-        }
+    function fadeOut (element) {
+        element.classList.add('fadeOut')
+        setTimeout(function () {
+            if (element) {
+                element.remove()
+            }
+        }, 150)
     }
 
     function createCard(cardData, width, height, hiRes, properties) {
@@ -230,26 +229,10 @@
             }
             if ((item == 'imageUrl' && hiRes === false) || (item == 'imageUrlHiRes' && hiRes === true)) {
                 properties['src'] = cardData[item]
+                properties['alt'] = cardData[item]
             }
         }
         return createElement('img', null, properties)
-    }
-
-    function addCard(card) {
-        clone = card.cloneNode(true)
-        clone.setAttribute('oncontextmenu', 'event.preventDefault(); onCardClick(this)')
-        clone.setAttribute('onclick', 'this.remove()')
-        console.log(clone)
-        mainDiv.appendChild(clone)
-    }
-
-    function fadeOut (element) {
-        element.classList.add('fadeOut')
-        setTimeout(function () {
-            if (element) {
-                element.remove()
-            }
-        }, 150)
     }
 
     async function fetchCards (url) {
@@ -258,15 +241,92 @@
         return json['cards']
     }
 
-    var previousSearch = {
-        'searchType': null,
-        'searchText': null,
-        'setCode': null
+    //CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS
+
+    function onCardClick (data) {
+        //create focused
+        var focused = mainDiv.appendChild(
+            createElement('div', null, {
+                'id': 'focused',
+                'onclick': 'fadeOut(this)',
+                'class': 'fadeIn'
+            })
+        )
+
+        //create placeholder image
+        focused.appendChild(
+            createElement('img', null, {
+                'importance': 'high',
+                'id': 'placeholderImage',
+                'style': 'z-index:1028',
+                'class': 'focusedCard',
+                'src': placeholderImage,
+                'alt': 'Loading...'
+            })
+        )
+        
+        //create low res image
+        focused.appendChild(
+            createElement('img', null, {
+                'importance': 'high',
+                'id': 'lowResFocused',
+                'style': 'z-index:1027',
+                'class': 'focusedCard',
+                'onload': "if(document.getElementById('placeholderImage')){document.getElementById('placeholderImage').remove()}",
+                'src': data.getAttribute('imageurl'),
+                'alt': data.getAttribute('name')
+            })
+        )
+
+        //create high res image
+        focused.appendChild(
+            createElement('img', null, {
+                'importance': 'high',
+                'id': 'hiResFocused',
+                'style': 'z-index:1026',
+                'class': 'focusedCard',
+                'onload': "if(document.getElementById('placeholderImage')){document.getElementById('placeholderImage').remove()}; if(document.getElementById('lowResFocused')){document.getElementById('lowResFocused').remove()}",
+                'src': data.getAttribute('imageurlhires'),
+                'alt': data.getAttribute('name')
+            })
+        )
     }
 
+    //SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR
 
-    var cooldown = false
-    var callSearch = false
+    function fullScreenSidebar (elem, fullScreen) {
+        if (fullScreen == true) {
+            Object.assign(sideBar.style,{
+                'width': 'calc(100% - 1.5cm)',
+                'margin-left': '0%'
+            })
+            elem.setAttribute('onclick', 'fullScreenSidebar(this, false)')
+        }
+        if (fullScreen == false) {
+            sideBarDiv.style = ''
+            elem.setAttribute('onclick', 'fullScreenSidebar(this, true)')
+        }
+    }
+    
+    function hilightButton (elem, hilight) {
+        if (hilight == true) {
+            Object.assign(elem.style,{
+                'background-color': 'rgba(0, 255, 0, 0.6)',
+            })
+            elem.setAttribute('onclick', 'hilightButton(this, false)')
+            elem.classList.add('highlightedSetButton')
+            search()
+        }
+        else {
+            Object.assign(elem.style,{
+                'background-color': '',
+            })
+            elem.setAttribute('onclick', 'hilightButton(this, true)')
+            elem.classList.remove('highlightedSetButton')
+            search()
+        }
+    }
+
     async function search () {
         callSearch = false
         if (cooldown == true) {
@@ -274,21 +334,28 @@
             return
         }
         else {
-            // console.log('TIMEOUT BEGINS')
             cooldown = true
             setTimeout(() => {
-                    // console.log('TIMEOUT ENDS')
                     cooldown = false
                     if (callSearch == true) {
                         search()
                         callSearch = false
                     }
-                }, 1000);
+                }, 1500);
         }
 
-
         const searchType = document.getElementById('searchType').value
-        const searchText = document.getElementById('searchField').value.replace(/ /g, '%20')
+        var searchFieldText = document.getElementById('searchField').value.replace(/'/g, '%27').split('"')
+        var searchText = ''
+        for (i=0; i<searchFieldText.length; i++) {
+            if (i % 2 == 1) {
+                searchText = searchText + searchFieldText[i].replace(/ /g, '%20')
+            }
+            else {
+                searchText = searchText + searchFieldText[i].replace(/ /g, ',')
+            }
+        }
+
         const setButtons = document.getElementsByClassName('highlightedSetButton')
         var setCode = ''
         if (setButtons.length > 0) {
@@ -323,53 +390,26 @@
             searchFieldCards.removeChild(searchFieldCards.firstChild);
         }
 
-        for (i=0; i<Math.min(cardData.length, 1000); i++) {
+        for (i=0; i<Math.min(cardData.length, 72); i++) {
             const card = cardData[i]
-            const newCard = createCard(card, cardWidth/2, cardHeight/2, false, {'onclick': 'addCard(this);', 'oncontextmenu': 'event.preventDefault(); onCardClick(this)'})
+            const newCard = createCard(card, cardWidth, cardHeight, false, {'onclick': 'addCard(this);', 'oncontextmenu': 'event.preventDefault(); onCardClick(this)'})
             searchFieldCards.append(newCard)
         }
 
         //add padding to bottom of scrollable
         searchFieldCards.appendChild(
             createElement('div', null, {
-                'style': `width:100%; height:${cardHeight/2}cm;`
+                'style': `width:100%; height:${cardHeight}cm;`
             })
         )
     }
 
-    function onCardClick (data) {
-        console.log(data)
+    //DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST
 
-        //create focused
-        var focused = mainDiv.appendChild(
-            createElement('div', null, {
-                'id': 'focused',
-                'onclick': 'fadeOut(this)',
-                'class': 'fadeIn'
-            })
-        )
-        
-        //create low res image
-        focused.appendChild(
-            createElement('img', null, {
-                'importance': 'high',
-                'id': 'lowResFocused',
-                'style': 'z-index:1027',
-                'class': 'focusedCard',
-                'src': data.getAttribute('imageurl')
-            })
-        )
-
-        //create high res image
-        focused.appendChild(
-            createElement('img', null, {
-                'importance': 'high',
-                'id': 'hiResFocused',
-                'style': 'z-index:1026',
-                'class': 'focusedCard',
-                'onload': "if(document.getElementById('lowResFocused')){document.getElementById('lowResFocused').remove()}",
-                'src': data.getAttribute('imageurlhires')
-            })
-        )
+    function addCard(card) {
+        clone = card.cloneNode(true)
+        clone.setAttribute('oncontextmenu', 'event.preventDefault(); onCardClick(this)')
+        clone.setAttribute('onclick', 'this.remove()')
+        mainDiv.appendChild(clone)
     }
 </script>
