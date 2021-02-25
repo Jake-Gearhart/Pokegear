@@ -639,7 +639,7 @@
 
     function fullScreenSidebar (elem, fullScreen) {
         if (fullScreen == true) {
-            sidebar.setAttribute('style', 'width: 100%; margin-left: 0%')
+            sidebarDiv.setAttribute('style', 'width: 100%; margin-left: 0%')
             document.getElementById('sidebarArrow').setAttribute('style', 'transform: rotate(180deg); cursor: w-resize')
             elem.setAttribute('onclick', 'fullScreenSidebar(this, false)')
         }
