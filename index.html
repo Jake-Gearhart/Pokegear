@@ -15,7 +15,7 @@
         <div id='decklistCards'></div>
     </div>
     <div id='sidebar' onmouseenter='enableSidebarChildren()' onmouseleave='disableSidebarChildren()'>
-        <div id='sidebarArrow' class='disabled' onclick='fullScreenSidebar(this, true)'>❯</div>
+        <div id='sidebarArrow' class='disabled' title='Click to Expand' onclick='fullScreenSidebar(this, true)'>❯</div>
         <div id='searchFieldCards' class='disabled' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br><br>
             <p>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it (or pressing and holding on mobile). When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
@@ -24,16 +24,16 @@
         <div class='searchParameter disabled'>
             <input class='searchType textObject' type='button' value='Name' searchType='name'>
             <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
-            <input class='deleteParameterButton textObject' type='button' value='-' onclick='this.parentNode.remove(); search(1)'>
+            <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='-' onclick='this.parentNode.remove(); search(1)'>
         </div>
-        <input class='addParameterButton textObject disabled' type='button' value='+' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
+        <input class='addParameterButton textObject disabled' title='Add Parameter' type='button' value='+' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
     </div>
 </html>
 <template>
     <div class='searchParameter'>
         <input class='searchType textObject' type='button' value='Attack Text' searchType='attacks.text'>
         <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
-        <input class='deleteParameterButton textObject' type='button' value='-' onclick='this.parentNode.remove(); search(1)'>
+        <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='-' onclick='this.parentNode.remove(); search(1)'>
     </div>
 </template>
 <style>
@@ -525,6 +525,7 @@
                 createElement('div', null, {
                     'id': 'set.id:' + sets[i]['id'],
                     'class': 'setSymbolDiv disabled',
+                    'title': sets[i]['name'],
                     'onclick': 'hilightButton(this, true)'
                 })
             ).appendChild(
@@ -721,11 +722,13 @@
         if (fullScreen == true) {
             sidebarDiv.setAttribute('style', 'width: 100%; margin-left: 0%')
             document.getElementById('sidebarArrow').setAttribute('style', 'transform: rotate(180deg); cursor: w-resize')
+            elem.title = 'Click to Minimize'
             elem.setAttribute('onclick', 'fullScreenSidebar(this, false)')
         }
         if (fullScreen == false) {
             sidebarDiv.style = ''
             document.getElementById('sidebarArrow').style = ''
+            elem.title = 'Click to Expand'
             elem.setAttribute('onclick', 'fullScreenSidebar(this, true)')
         }
     }
