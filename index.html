@@ -5,7 +5,7 @@
 <html>
     <div id='bottomRightText'>
         <img id='bottomRightIcon' src='favicon.png'>
-        <a href='https://twitter.com/jakekgearhart'>Twitter.com/jakekgearhart</a>
+        <a href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
     </div>
     <input id='importDecklist' class='textObject' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
     <input id='exportDecklist' class='textObject' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
@@ -1013,6 +1013,10 @@
     }
 
     async function importDecklist (text) {
+        if (isDecklistLocked == true) {
+            alert('Editing decklist is disabled.')
+            return
+        }
         while (decklistCards.firstChild) {
             decklistCards.removeChild(decklistCards.firstChild);
         }
