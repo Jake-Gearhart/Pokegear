@@ -410,6 +410,52 @@
     var callSearch = false
     var loadingMoreCards = false
 
+    //Import decklist variables
+    var basicEnergies = {
+        'grass': ['hs', '115'],
+        'fire': ['hs', '116'],
+        'water': ['hs', '117'],
+        'lightning': ['hs', '118'],
+        'psychic': ['hs', '119'],
+        'fighting': ['hs', '120'],
+        'darkness': ['hs', '121'],
+        'metal': ['hs', '122'],
+        'fairy': ['gen', '83']
+    }
+    var setIdTranslations = {
+        'shf': 'swsh45',
+        'si': 'si1',
+        'wbsp': 'basep',
+        'bs2': 'base4',
+        'exp': 'ecard1',
+        'aqp': 'ecard2',
+        'skr': 'ecard3',
+        'tr': 'ex7',
+        'p1': 'pop1',
+        'p2': 'pop2',
+        'p3': 'pop3',
+        'p4': 'pop4',
+        'p5': 'pop5',
+        'p6': 'pop6',
+        'p7': 'pop7',
+        'p8': 'pop8',
+        'p9': 'pop9'
+    }
+
+    //Export decklist variables
+    var exportTranslations = {
+        'pop1': 'POP1',
+        'pop2': 'POP2',
+        'pop3': 'POP3',
+        'pop4': 'POP4',
+        'pop5': 'POP5',
+        'pop6': 'POP6',
+        'pop7': 'POP7',
+        'pop8': 'POP8',
+        'pop9': 'POP9'
+    }
+
+    //Add event listeners
     document.addEventListener('keydown', keyDown);
     
     function keyDown (event) {
@@ -426,16 +472,8 @@
     }
 
     //Populate search parameters
-    var setIdTranslations = {
-        'shf': 'swsh45',
-        'si': 'si1',
-        'wbsp': 'basep',
-        'bs2': 'base4',
-        'exp': 'ecard1',
-        'aqp': 'ecard2',
-        'skr': 'ecard3'
-    }
     populateSets()
+
     async function populateSets () {
         const response = await fetch('https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate', header)
         const json = await response.json()
@@ -926,18 +964,6 @@
         }
     }
 
-    var basicEnergies = {
-        'grass': ['hs', '115'],
-        'fire': ['hs', '116'],
-        'water': ['hs', '117'],
-        'lightning': ['hs', '118'],
-        'psychic': ['hs', '119'],
-        'fighting': ['hs', '120'],
-        'darkness': ['hs', '121'],
-        'metal': ['hs', '122'],
-        'fairy': ['gen', '83']
-    }
-
     async function importDecklist (text) {
         while (decklistCards.firstChild) {
             decklistCards.removeChild(decklistCards.firstChild);
@@ -1038,8 +1064,23 @@
 
         var text = []
         for (i=0; i<cards.length; i++) {
+            var count = cards[i].getElementsByClassName('decklistCardCountNumber')[0].value
+            var name = cards[i].getAttribute('name')
+            var code
+            if (JSON.parse(cards[i].getAttribute('set'))['ptcgoCode']) {
+                code = JSON.parse(cards[i].getAttribute('set'))['ptcgoCode']
+            }
+            else {
+                id = JSON.parse(cards[i].getAttribute('set'))['id']
+                for (translation in exportTranslations) {
+                    if (id == translation) {
+                        code = exportTranslations[translation]
+                    }
+                }
+            }
+            var number = cards[i].getAttribute('number')
             text.push(
-                `${cards[i].getElementsByClassName('decklistCardCountNumber')[0].value} ${cards[i].getAttribute('name')} ${JSON.parse(cards[i].getAttribute('set'))['ptcgoCode']} ${cards[i].getAttribute('number')}`
+                `${count} ${name} ${code} ${number}`
             )
         }
         text = text.join('\n')
