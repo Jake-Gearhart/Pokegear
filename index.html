@@ -3,9 +3,9 @@
     <meta charset="utf-8">
 </head>
 <html>
-    <div id='topText'>
+    <div id='bottomRightText'>
         <img id='icon' src='favicon.png'>
-        <a href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
+        <a href='https://twitter.com/jakekgearhart'>Twitter.com/jakekgearhart</a>
     </div>
     <input id='importDecklist' class='textObject' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
     <input id='exportDecklist' class='textObject' onclick='exportDecklist()' type='button' value='↧'></input>
@@ -73,18 +73,18 @@
         background-color: var(--darkBlueOpacity);
         color: white;
     }
-    #topText {
+    #bottomRightText {
         z-index: 1000;
         position: absolute;
-        height: calc(var(--cardHeight)/3);
-        top: calc(var(--cardHeight)/6);
-        left: var(--cardHeight);
+        height: calc(var(--cardHeight) / 3);
+        bottom: 0;
+        right: calc(var(--cardHeight) * 6/12);
     }
     #icon {
         position: absolute;
-        height: calc(var(--cardHeight)/3);
-        top: calc(-1 * var(--cardHeight)/12);
-        left: calc(-1 * var(--cardHeight)/3);
+        height: calc(var(--cardHeight) / 3);
+        bottom: calc(var(--cardHeight) / 12);
+        right: calc(-1 * var(--cardHeight) * 5/12);
     }
     #importDecklist {
         z-index: 1000;
