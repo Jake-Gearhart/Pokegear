@@ -7,8 +7,9 @@
         <img id='bottomRightIcon' src='favicon.png'>
         <a href='https://twitter.com/jakekgearhart'>Twitter.com/jakekgearhart</a>
     </div>
-    <input id='importDecklist' class='textObject' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
-    <input id='exportDecklist' class='textObject' onclick='exportDecklist()' type='button' value='↧'></input>
+    <input id='importDecklist' class='textObject' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
+    <input id='exportDecklist' class='textObject' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
+    <input id='lockDecklist' class='textObject' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
     <div id='decklist'>
         <input id='decklistCardCount' class='textObject disabled' type='button' value='0'>
         <div id='decklistCards'></div>
@@ -110,6 +111,15 @@
         z-index: 1000;
         position: absolute;
         top: calc(var(--cardHeight) / 2);
+        right: calc(var(--cardHeight) / 12);
+        background-color: var(--darkBlue);
+        font-weight: bold;
+        cursor: pointer;
+    }
+    #lockDecklist {
+        z-index: 1000;
+        position: absolute;
+        top: calc(var(--cardHeight) * 11/12);
         right: calc(var(--cardHeight) / 12);
         background-color: var(--darkBlue);
         font-weight: bold;
@@ -427,6 +437,7 @@
     //decklist
     const decklistCards = document.getElementById('decklistCards')
     const decklistCardCount = document.getElementById('decklistCardCount')
+    var isDecklistLocked = false
 
     //Focused card
     var currentFocused
@@ -938,6 +949,9 @@
     }
 
     function decklistCardHover (card) {
+        if (isDecklistLocked == true) {
+            return
+        }
         if (card.getElementsByClassName('cardHoverMenu')[0]) {
             card.getElementsByClassName('cardHoverMenu')[0].remove()
         }
@@ -1121,5 +1135,18 @@
         document.body.removeChild(dummy);
 
         alert('Decklist copied to clipboard.\n\n' + text)
+    }
+
+    function lockDecklist (button) {
+        if (button.value == '🔓') {
+            button.value = '🔐'
+            button.title ='Enable Editing'
+            isDecklistLocked = true
+        }
+        else {
+            button.value = '🔓'
+            button.title ='Disable Editing'
+            isDecklistLocked = false
+        }
     }
 </script>
