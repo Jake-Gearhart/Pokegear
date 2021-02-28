@@ -908,6 +908,9 @@
     }
 
     function sidebarCardHover (card) {
+        if (isDecklistLocked == true) {
+            return
+        }
         if (card.getElementsByClassName('cardHoverMenu')[0]) {
             card.getElementsByClassName('cardHoverMenu')[0].remove()
         }
