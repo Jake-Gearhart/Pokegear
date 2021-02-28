@@ -4,7 +4,7 @@
 </head>
 <html>
     <div id='bottomRightText'>
-        <img id='icon' src='favicon.png'>
+        <img id='bottomRightIcon' src='favicon.png'>
         <a href='https://twitter.com/jakekgearhart'>Twitter.com/jakekgearhart</a>
     </div>
     <input id='importDecklist' class='textObject' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
@@ -80,11 +80,22 @@
         bottom: 0;
         right: calc(var(--cardHeight) * 6/12);
     }
-    #icon {
+    #bottomRightIcon {
         position: absolute;
         height: calc(var(--cardHeight) / 3);
         bottom: calc(var(--cardHeight) / 12);
         right: calc(-1 * var(--cardHeight) * 5/12);
+    }
+    #bottomRightIcon:hover {
+        animation: bounce 1s infinite;
+    }
+    @keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+            transform: translateY(calc(-1 * var(--cardHeight) / 12));
+        }
     }
     #importDecklist {
         z-index: 1000;
