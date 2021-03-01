@@ -3,13 +3,14 @@
     <meta charset="utf-8">
 </head>
 <html>
-    <div id='bottomRightText'>
+    <div id='creditText'>
         <img id='bottomRightIcon' src='favicon.png'>
         <a href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
     </div>
-    <input id='importDecklist' class='textObject' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
-    <input id='exportDecklist' class='textObject' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
-    <input id='lockDecklist' class='textObject' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
+    <input id='lockDecklist' class='textObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
+    <input id='importDecklist' class='textObject decklistButton' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
+    <input id='exportDecklist' class='textObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
+    <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='alert("Sort Decklist— Work In Progress")' type='button' value='⟳'></input>
     <div id='decklist'>
         <input id='decklistCardCount' class='textObject disabled' type='button' value='0'>
         <div id='decklistCards'></div>
@@ -38,8 +39,8 @@
 </template>
 <style>
     :root {
-        --cardWidth: calc(6.3cm / 2);
-        --cardHeight: calc(8.8cm / 2);
+        --cardHeight: calc(4.4cm);
+        --cardWidth: calc(var(--cardHeight) * 367/512);
         --lightBlue: rgb(207, 239, 255);
         --darkBlue: rgb(15, 15, 71);
         --midBlue: rgb(130, 149, 181);
@@ -74,18 +75,18 @@
         background-color: var(--darkBlueOpacity);
         color: white;
     }
-    #bottomRightText {
+    #creditText {
         z-index: 1000;
         position: absolute;
         height: calc(var(--cardHeight) / 3);
-        bottom: 0;
-        right: calc(var(--cardHeight) * 6/12);
+        top: calc(var(--cardHeight) / 6);
+        left: calc(var(--cardHeight) * 5/6);
     }
     #bottomRightIcon {
         position: absolute;
         height: calc(var(--cardHeight) / 3);
         bottom: calc(var(--cardHeight) / 12);
-        right: calc(-1 * var(--cardHeight) * 5/12);
+        left: calc(var(--cardHeight) / -3);
     }
     #bottomRightIcon:hover {
         animation: bounce 1s infinite;
@@ -98,32 +99,26 @@
             transform: translateY(calc(-1 * var(--cardHeight) / 12));
         }
     }
-    #importDecklist {
+    .decklistButton {
         z-index: 1000;
         position: absolute;
-        top: calc(var(--cardHeight) / 12);
         right: calc(var(--cardHeight) / 12);
         background-color: var(--darkBlue);
         font-weight: bold;
         cursor: pointer;
-    }
-    #exportDecklist {
-        z-index: 1000;
-        position: absolute;
-        top: calc(var(--cardHeight) / 2);
-        right: calc(var(--cardHeight) / 12);
-        background-color: var(--darkBlue);
-        font-weight: bold;
-        cursor: pointer;
+
     }
     #lockDecklist {
-        z-index: 1000;
-        position: absolute;
+        top: calc(var(--cardHeight) / 12);
+    }
+    #importDecklist {
+        top: calc(var(--cardHeight) / 2);
+    }
+    #exportDecklist {
         top: calc(var(--cardHeight) * 11/12);
-        right: calc(var(--cardHeight) / 12);
-        background-color: var(--darkBlue);
-        font-weight: bold;
-        cursor: pointer;
+    }
+    #sortDecklist {
+        top: calc(var(--cardHeight) * 4/3);
     }
     #decklistCardCount {
         z-index: 1000;
@@ -298,7 +293,7 @@
         position: absolute;
         width: calc(100% - var(--cardWidth) / 2);
         height: 50%;
-        bottom: calc(-50% + calc(var(--cardWidth) / 2));
+        bottom: calc(-50% + calc(var(--cardHeight) / 3));
         background-color: var(--darkBlueOpacity);
         transition: 0.5s;
         transition-delay: 0.15s;
@@ -311,19 +306,19 @@
     }
     .setSymbolDiv {
         display: inline-block;
-        width: calc(var(--cardWidth) / 2); 
-        height: calc(var(--cardWidth) / 2);
-        border-radius: calc(var(--cardWidth) / 6);
+        width: calc(var(--cardHeight) / 3); 
+        height: calc(var(--cardHeight) / 3);
+        border-radius: calc(var(--cardHeight) / 9);
         cursor: pointer;
     }
     .setSymbol {
         position: absolute;
-        margin: calc(var(--cardWidth) / 12);
-        width: calc(var(--cardWidth) / 3); 
-        height: calc(var(--cardWidth) / 3);
+        margin: calc(var(--cardHeight) / 18);
+        width: calc(var(--cardHeight) / 4.5); 
+        height: calc(var(--cardHeight) / 4.5);
     }
     .spacer {
-        height: calc(var(--cardWidth) / 3);
+        height: calc(var(--cardHeight) / 4.5);
     }
     .card {
         position: relative;
