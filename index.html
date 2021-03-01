@@ -194,7 +194,7 @@
         margin: auto;
         cursor: pointer;
     }
-    .disableHilight {
+    .disableHighlight {
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         -khtml-user-select: none;
@@ -311,12 +311,18 @@
     }
     .setSymbolDiv {
         display: inline-block;
+        width: calc(var(--cardWidth) / 2); 
+        height: calc(var(--cardWidth) / 2);
         border-radius: calc(var(--cardWidth) / 6);
         cursor: pointer;
     }
     .setSymbol {
+        position: absolute;
         margin: calc(var(--cardWidth) / 12);
         width: calc(var(--cardWidth) / 3); 
+        height: calc(var(--cardWidth) / 3);
+    }
+    .spacer {
         height: calc(var(--cardWidth) / 3);
     }
     .card {
@@ -494,6 +500,32 @@
         'pop9': 'POP9'
     }
 
+    //combination buttons
+    var RSPK_sets = [
+            'set.id:ex1',
+            'set.id:ex2',
+            'set.id:ex3',
+            'set.id:ex4',
+            'set.id:ex5',
+            'set.id:ex6',
+            'set.id:ex7',
+            'set.id:ex8',
+            'set.id:ex9',
+            'set.id:ex10',
+            'set.id:ex11',
+            'set.id:ex12',
+            'set.id:ex13',
+            'set.id:ex14',
+            'set.id:ex15',
+            'set.id:ex16',
+            'set.id:np',
+            'set.id:pop1',
+            'set.id:pop2',
+            'set.id:pop3',
+            'set.id:pop4',
+            'set.id:pop5'
+    ]
+
     //Add event listeners
     document.addEventListener('keydown', keyDown);
     
@@ -510,7 +542,7 @@
         }
     }
 
-    //Populate search parameters
+    //Populate set buttons
     populateSets()
 
     async function populateSets () {
@@ -526,7 +558,7 @@
                     'id': 'set.id:' + sets[i]['id'],
                     'class': 'setSymbolDiv disabled',
                     'title': sets[i]['name'],
-                    'onclick': 'hilightButton(this, true)'
+                    'onclick': 'highlightButton(this, true, true, [])'
                 })
             ).appendChild(
                 createElement('img', null, {
@@ -534,6 +566,99 @@
                     'src': sets[i]['images']['symbol'],
                     'alt': 'set.id:' + sets[i]['id'],
                     'style': 'pointer-events: none;'
+                })
+            )
+        }
+        bottomSearchButtonsDiv.appendChild(
+            createElement('div', null, {
+                'class': 'spacer disabled'
+            })
+        )
+        var combinationButtons = [
+            {
+                'combinationId': 'bs-g2',
+                'combinationTitle': 'Red & Blue Era',
+                'setA_img': document.getElementById('set.id:base1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:gym2').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:basep", "set.id:base1", "set.id:base2", "set.id:base3", "set.id:base4", "set.id:base5", "set.id:gym1", "set.id:gym2", "set.id:base6"]'
+            },
+            {
+                'combinationId': 'bs-g2',
+                'combinationTitle': 'Gold & Silver Era',
+                'setA_img': document.getElementById('set.id:neo1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:ecard3').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:neo1", "set.id:neo2", "set.id:neo3", "set.id:neo4", "set.id:ecard1", "set.id:ecard2", "set.id:ecard3", "set.id:si1" ]'
+            },
+            {
+                'combinationId': 'rs-pk',
+                'combinationTitle': 'Ruby & Sapphire Era',
+                'setA_img': document.getElementById('set.id:ex1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:ex16').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:np", "set.id:ex1", "set.id:ex2", "set.id:ex3", "set.id:ex4", "set.id:ex5", "set.id:ex6", "set.id:ex7", "set.id:ex8", "set.id:ex9", "set.id:ex10", "set.id:ex11", "set.id:ex12", "set.id:ex13", "set.id:ex14", "set.id:ex15", "set.id:ex16", "set.id:pop1", "set.id:pop2", "set.id:pop3", "set.id:pop4", "set.id:pop5"]'
+            },
+            {
+                'combinationId': 'dp-ar',
+                'combinationTitle': 'Diamond & Pearl Era',
+                'setA_img': document.getElementById('set.id:dp1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:pl4').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:dpp", "set.id:dp1", "set.id:dp2", "set.id:dp3", "set.id:dp4", "set.id:dp5", "set.id:dp6", "set.id:dp7", "set.id:pl1", "set.id:pl2", "set.id:pl3", "set.id:pl4", "set.id:ru1", "set.id:pop6", "set.id:pop7", "set.id:pop8", "set.id:pop9"]'
+            },
+            {
+                'combinationId': 'hgss-col',
+                'combinationTitle': 'Heart Gold & Soul Silver Era',
+                'setA_img': document.getElementById('set.id:hgss1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:col1').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:hsp", "set.id:hgss1", "set.id:hgss2", "set.id:hgss3", "set.id:hgss4", "set.id:col1"]'
+            },
+            {
+                'combinationId': 'blw-ltr',
+                'combinationTitle': 'Black & White Era',
+                'setA_img': document.getElementById('set.id:bw1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:bw11').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:bwp", "set.id:bw1", "set.id:bw2", "set.id:bw3", "set.id:bw4", "set.id:bw5", "set.id:bw6", "set.id:bw7", "set.id:bw8", "set.id:bw9", "set.id:bw10", "set.id:bw11", "set.id:mcd11", "set.id:mcd12", "set.id:dv1"]'
+            },
+            {
+                'combinationId': 'xy-evo',
+                'combinationTitle': 'X & Y Era',
+                'setA_img': document.getElementById('set.id:xy1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:xy12').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:xyp", "set.id:xy0", "set.id:xy1", "set.id:xy2", "set.id:xy3", "set.id:xy4", "set.id:xy5", "set.id:xy6", "set.id:xy7", "set.id:xy8", "set.id:xy9", "set.id:xy10", "set.id:xy11", "set.id:xy12", "set.id:dc1", "set.id:g1", "set.id:mcd16"]'
+            },
+            {
+                'combinationId': 'sum-cec',
+                'combinationTitle': 'Sun & Moon Era',
+                'setA_img': document.getElementById('set.id:sm1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:sm12').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:smp", "set.id:sm1", "set.id:sm2", "set.id:sm3", "set.id:sm35", "set.id:sm4", "set.id:sm5", "set.id:sm6", "set.id:sm7", "set.id:sm75", "set.id:sm8", "set.id:sm9", "set.id:sm10", "set.id:sm11", "set.id:sm12", "set.id:det1", "set.id:sma", "set.id:sm115", "set.id:mcd19"]'
+            },
+            {
+                'combinationId': 'ssh-shf',
+                'combinationTitle': 'Sword & Shield Era',
+                'setA_img': document.getElementById('set.id:swsh1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:swsh45').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:swshp", "set.id:swsh1", "set.id:swsh2", "set.id:swsh3", "set.id:swsh35", "set.id:swsh4", "set.id:swsh45", "set.id:swsh45sv"]'
+            }
+        ]
+        for (i=0; i<combinationButtons.length; i++) {
+            var newButton = bottomSearchButtonsDiv.appendChild(
+                createElement('div', null, {
+                    'id': combinationButtons[i]['combinationId'],
+                    'class': 'setSymbolDiv disabled',
+                    'title': combinationButtons[i]['combinationTitle'],
+                    'onclick': `highlightButton(this, true, true, ${combinationButtons[i]['sets']})`
+                }))
+            newButton.appendChild(
+                createElement('img', null, {
+                    'class': 'setSymbol',
+                    'src': combinationButtons[i]['setB_img'],
+                    'style': 'pointer-events: none; transform: translateX(calc(var(--cardWidth)/12)) translateY(calc(-1 * var(--cardWidth)/12)) scale(0.85)'
+                })
+            )
+            newButton.appendChild(
+                createElement('img', null, {
+                    'class': 'setSymbol',
+                    'src': combinationButtons[i]['setA_img'],
+                    'style': 'pointer-events: none; transform: translateX(calc(-1 * var(--cardWidth)/12)) translateY(calc(var(--cardWidth)/12)) scale(0.85)'
                 })
             )
         }
@@ -765,18 +890,38 @@
         }
     }
     
-    function hilightButton (elem, hilight) {
-        if (hilight == true) {
+    function highlightButton (elem, highlight, initiateSearch, group) {
+        if (highlight == true) {
             elem.setAttribute('style', 'background-color: rgba(0, 255, 0, 0.6)')
-            elem.setAttribute('onclick', 'hilightButton(this, false)')
-            elem.classList.add('highlightedSetButton')
-            search(1)
+            if (group.length < 1) {
+                elem.setAttribute('onclick', `highlightButton(this, false, true, [])`)
+                elem.classList.add('searchSet')
+            }
+            else {
+                for (i=0; i<group.length; i++) {
+                    elem.setAttribute('onclick', `highlightButton(this, false, true, ["${group.join('", "')}"])`)
+                    highlightButton(document.getElementById(group[i]), true, false, []);
+                }
+            }
+            if (initiateSearch == true) {
+                search(1)
+            }
         }
         else {
             elem.setAttribute('style', 'background-color: initial')
-            elem.setAttribute('onclick', 'hilightButton(this, true)')
-            elem.classList.remove('highlightedSetButton')
-            search(1)
+            if (group.length < 1) {
+                elem.setAttribute('onclick', `highlightButton(this, true, true, [])`)
+                elem.classList.remove('searchSet')
+            }
+            else {
+                for (i=0; i<group.length; i++) {
+                    elem.setAttribute('onclick', `highlightButton(this, true, true, ["${group.join('", "')}"])`)
+                    highlightButton(document.getElementById(group[i]), false, false, []);
+                }
+            }
+            if (initiateSearch == true) {
+                search(1)
+            }
         }
     }
 
@@ -821,7 +966,7 @@
             }
         }
 
-        const setButtons = document.getElementsByClassName('highlightedSetButton')
+        const setButtons = document.getElementsByClassName('searchSet')
         if (setButtons.length > 0) {
             q = q + '(' + setButtons[0].id
             if (setButtons.length > 1) {
@@ -939,6 +1084,9 @@
             newCard = cloneCard(card, {
                     'oncontextmenu': 'event.preventDefault(); focusCard(this)',
                     'onmouseenter': 'decklistCardHover(this)',
+                    'draggable': 'false',
+                    'ondragstart': 'this.setAttribute("style", "transform: scale(1); box-shadow: none;")',
+                    'ondragend': 'this.removeAttribute("style")',
                     'onmouseleave': "if (this.getElementsByClassName('cardHoverMenu')[0]) {fadeOut(this.getElementsByClassName('cardHoverMenu')[0]);}"
                 })
             if (newCard.getElementsByClassName('cardHoverMenu')[0]) {
