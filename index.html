@@ -3,9 +3,10 @@
     <meta charset="utf-8">
 </head>
 <html>
-    <div id='creditText'>
-        <img id='bottomRightIcon' src='favicon.png'>
-        <a href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
+    <div id='title'>
+        <img id='titleIcon' src='favicon.png'>
+        <h1 id='titleText'>Pokegear.app</h1>
+        <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
     </div>
     <input id='lockDecklist' class='textObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
     <input id='importDecklist' class='textObject decklistButton' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
@@ -67,7 +68,7 @@
     .textObject {
         width: calc(var(--cardHeight) / 3);
         height: calc(var(--cardHeight) / 3);
-        font-size: calc(var(--cardHeight) / 5);
+        font-size: calc(var(--cardHeight) / 6);
         border: calc(var(--cardHeight) / 48) solid var(--lightBlueOpactiy);
         margin: 0;
         border-radius: calc(var(--cardHeight) / 9);
@@ -75,18 +76,29 @@
         background-color: var(--darkBlueOpacity);
         color: white;
     }
-    #creditText {
+    #title {
         z-index: 1000;
         position: absolute;
         height: calc(var(--cardHeight) / 3);
-        top: calc(var(--cardHeight) / 6);
+        top: calc(var(--cardHeight) / 24);
         left: calc(var(--cardHeight) * 5/6);
     }
-    #bottomRightIcon {
+    #titleIcon {
         position: absolute;
         height: calc(var(--cardHeight) / 3);
-        bottom: calc(var(--cardHeight) / 12);
+        bottom: calc(-1 * var(--cardHeight) / 12);
         left: calc(var(--cardHeight) / -3);
+    }
+    #titleText {
+        font-family: 'Courier New', Courier, monospace;
+        color: var(--darkBlue);
+        font-size: calc(var(--cardHeight) / 6);
+    }
+    #titleLink {
+        position: absolute;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: calc(var(--cardHeight) / 12);
+        bottom: calc(-1 * var(--cardHeight) / 12);
     }
     #bottomRightIcon:hover {
         animation: bounce 1s infinite;
@@ -717,24 +729,17 @@
 
     function createCard (data) {
         container = createElement('div', null, {
-            'id': data[name],
+            'id': data['id'],
             'class': 'card',
             'oncontextmenu': 'event.preventDefault(); focusCard(this)',
             'onmouseenter': 'sidebarCardHover(this)',
             'onmouseleave': "if (this.getElementsByClassName('cardHoverMenu')[0]) {fadeOut(this.getElementsByClassName('cardHoverMenu')[0]);}"
         })
-        for (const key in data) {
-            if (typeof data[key] != 'string') {
-                data[key] = JSON.stringify(data[key])
-            }
-            container.setAttribute(key, data[key])
-        }
 
-        image = createElement('img', null, {
+        container.appendChild(createElement('img', null, {
             'class': 'cardImage',
-            'src': JSON.parse(data['images'])['small']
-        })
-        container.appendChild(image)
+            'src': data['images']['small']
+        }))
 
         if (holo_animations == true) {
             var shine = false
@@ -745,13 +750,25 @@
                 }
             }
             if (shine === true) {
-                shine = createElement('div', null, {
+                container.appendChild(createElement('div', null, {
                     'class': 'shine',
                     'style': `animation-delay: -${randomInteger(0, holo_animation_fps*5) / 20}s`
-                })
-                container.appendChild(shine)
+                }))
             }
         }
+
+        var dataContainer = createElement('div', null, {
+            'class': 'data'
+        })
+        delete data['id']
+        for (const key in data) {
+            if (typeof data[key] != 'string') {
+                data[key] = JSON.stringify(data[key])
+            }
+            dataContainer.setAttribute(key, data[key])
+        }
+
+        container.appendChild(dataContainer)
         
         return container
     }
@@ -799,8 +816,10 @@
             fadeIn(focused)
         }
 
+        var dataContainer = card.getElementsByClassName('data')[0]
+
         var rotation = 0
-        if (card.getAttribute('subtypes') && (card.getAttribute('subtypes').includes('BREAK') || card.getAttribute('subtypes').includes('LEGEND'))) {
+        if (dataContainer.getAttribute('subtypes') && (dataContainer.getAttribute('subtypes').includes('BREAK') || dataContainer.getAttribute('subtypes').includes('LEGEND'))) {
             rotation = 90
         }
 
@@ -810,7 +829,7 @@
                 'onclick': null,
                 'oncontextmenu': null,
                 'onmouseenter': null,
-                'image': JSON.parse(card.getAttribute('images'))['large']
+                'image': JSON.parse(dataContainer.getAttribute('images'))['large']
         })
 
         //remove decklistCardCountNumber, cardHoverMenu, and shine
@@ -1125,19 +1144,1358 @@
 
     function modifyDecklistCardCount (card, value) {
         if (card && card.getElementsByClassName('decklistCardCountNumber')[0].value) {
+            var dataContainer = card.getElementsByClassName('data')[0]
             const decklistCardCountNumber = Number(card.getElementsByClassName('decklistCardCountNumber')[0].value)
             if (decklistCardCountNumber + value <= 0) {
                 card.remove()
             }
             else if (decklistCardCountNumber + value > 1 &&
-            (card.getAttribute('rarity') && card.getAttribute('rarity') == 'Rare ACE') ||
-            (card.getAttribute('rules') && card.getAttribute('rules').includes("◇ (Prism Star) Rule: You can't have more than 1 ◇ card with the same name in your deck. If a ◇ card would go to the discard pile, put it in the Lost Zone instead.")) ||
-            (card.getAttribute('rules') && card.getAttribute('rules').includes("You can't have more than 1 Pokémon Star in your deck."))) {
+            (dataContainer.getAttribute('rarity') && dataContainer.getAttribute('rarity') == 'Rare ACE') ||
+            (dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("◇ (Prism Star) Rule: You can't have more than 1 ◇ card with the same name in your deck. If a ◇ card would go to the discard pile, put it in the Lost Zone instead.")) ||
+            (dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You can't have more than 1 Pokémon Star in your deck."))) {
                 return
             }
             else if (decklistCardCountNumber + value > 4 && 
-            !(card.getAttribute('supertype') == 'Energy' && card.getAttribute('subtypes').includes('Basic')) && 
-            !(card.getAttribute('rules') && card.getAttribute('rules').includes("You may have as many of this card in your deck as you like."))) {
+            !(dataContainer.getAttribute('supertype') == 'Energy' && dataContainer.getAttribute('subtypes').includes('Basic')) && 
+            !(dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You may have as many of this card in your deck as you like."))) {
+                return
+            }
+            card.getElementsByClassName('decklistCardCountNumber')[0].value = decklistCardCountNumber + value
+        }
+        
+        decklistCardCount.value = Number(decklistCardCount.value) + value
+        if (decklistCardCount.value > 60) {
+            decklistCardCount.setAttribute('style', 'color: red')
+        }
+        else if (decklistCardCount.value == 60) {
+            decklistCardCount.setAttribute('style', 'color: #00ff00')
+        }
+        else {
+            decklistCardCount.setAttribute('style', 'color: white')
+        }
+    }
+
+    async function importDecklist (text) {
+        if (isDecklistLocked == true) {
+            alert('Editing decklist is disabled.')
+            return
+        }
+        while (decklistCards.firstChild) {
+            decklistCards.removeChild(decklistCards.firstChild);
+        }
+        decklistCardCount.value = 0;
+        decklistCardCount.setAttribute('style', 'color: white')
+        text = text.split('\n')
+        for (i=0; i<text.length; i++) {
+            text[i] = text[i].replace('(', '').replace(')', '')
+            var line = text[i].split(' ')
+
+            //remove * from beginning of line
+            if (line[0] == '*') {
+                line.shift()
+            }
+
+            //format line
+            if (isNaN(Number(line[0])) || line.length < 4) {
+                continue
+            }
+            else if (line.length == 4) {
+                for (basicEnergy in basicEnergies) {
+                    if (line[1].toLowerCase() == basicEnergy) {
+                        line[3] = basicEnergies[basicEnergy][0]
+                        line.push(basicEnergies[basicEnergy][1])
+                    }
+                }
+            }
+            else if (line.length == 5 && line[2] == 'Energy' && line[3] == 'Energy') {
+                for (basicEnergy in basicEnergies) {
+                    if (line[1].toLowerCase() == basicEnergy) {
+                        line[3] = basicEnergies[basicEnergy][0]
+                        line[4] = basicEnergies[basicEnergy][1]
+                    }
+                }
+            }
+
+            //set code translation
+            line[line.length -2] = line[line.length -2].toLowerCase()
+            for (input in setIdTranslations) {
+                if (line[line.length -2] == input) {
+                    line[line.length -2] = setIdTranslations[input]
+                    break
+                }
+            }
+
+            //fix set numbers
+            var brokenSetNumbers = {
+                'swshp': '*00',
+                'smp': '*0',
+                'xyp': '*0',
+                'bwp': '*0',
+                'hsp': '*0',
+                'dpp': '*0',
+                'swsh45sv': '*00',
+                'bw11': 115,
+                'g1': 100
+            }
+
+            for (brokenSetNumber in brokenSetNumbers) {
+                if (line[line.length - 2] == brokenSetNumber) {
+                    if (brokenSetNumbers[brokenSetNumber] == '*00') {
+                        if (line[line.length -1] == 1) {
+                            line[line.length -1] = '*00' + line[line.length -1]
+                        }
+                        else if (line[line.length -1] == 2) {
+                            line[line.length -1] = '*0' + line[line.length -1]
+                        }
+                        else {
+                            line[line.length -1] = '*' + line[line.length -1]
+                        }
+                    }
+                    else if (brokenSetNumbers[brokenSetNumber] == '*0') {
+                        if (line[line.length -1] == 1) {
+                            line[line.length -1] = '*0' + line[line.length -1]
+                        }
+                        else {
+                            line[line.length -1] = '*' + line[line.length -1]
+                        }
+                    }
+                    else if (line[line.length -1] > brokenSetNumbers[brokenSetNumber]) {
+                        console.log(line[line.length -1])
+                        console.log(brokenSetNumbers[brokenSetNumber])
+                        line[line.length -1] = 'RC' + (Number(line[line.length -1]) - brokenSetNumbers[brokenSetNumber])
+                    }
+                    break
+                }
+            }
+
+            var url = `https://api.pokemontcg.io/v2/cards?q=set.id:${line[line.length -2]}+number:${line[line.length -1]}+`
+            console.log(`Fetching ${url}`)
+            const response = await fetch(url, header)
+            const json = await response.json()
+            if (json['data'][0]) {
+                const cardData = json['data'][0]
+                card = createCard(cardData)
+                addDecklistCard(card, Number(line[0]))
+            }
+            else {
+                console.error(`Unable to load: ${text[i]}`)
+            }
+        }
+    }
+
+    function exportDecklist () {
+        var cards = decklistCards.childNodes
+        if (cards.length == 0) {
+            alert('Use this button to export the decklist to your clipboard.')
+            return
+        }
+
+        var text = []
+        for (i=0; i<cards.length; i++) {
+            var count = cards[i].getElementsByClassName('decklistCardCountNumber')[0].value
+            var name = cards[i].getAttribute('name')
+            var code
+            if (JSON.parse(cards[i].getAttribute('set'))['ptcgoCode']) {
+                code = JSON.parse(cards[i].getAttribute('set'))['ptcgoCode']
+            }
+            else {
+                id = JSON.parse(cards[i].getAttribute('set'))['id']
+                for (translation in exportTranslations) {
+                    if (id == translation) {
+                        code = exportTranslations[translation]
+                    }
+                }
+            }
+            var number = cards[i].getAttribute('number')
+            text.push(
+                `${count} ${name} ${code} ${number}`
+            )
+        }
+        text = text.join('\n')
+
+        var dummy = document.createElement('textarea');
+        document.body.appendChild(dummy);
+        dummy.value = text;
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+
+        alert('Decklist copied to clipboard.\n\n' + text)
+    }
+
+    function lockDecklist (button) {
+        if (button.value == '🔓') {
+            button.value = '🔐'
+            button.title ='Enable Editing'
+            isDecklistLocked = true
+        }
+        else {
+            button.value = '🔓'
+            button.title ='Disable Editing'
+            isDecklistLocked = false
+        }
+    }
+</script>
+<head>
+    <link rel="shortcut icon" type="image/png" href='favicon.png'>
+    <meta charset="utf-8">
+</head>
+<html>
+    <div id='title'>
+        <img id='titleIcon' src='favicon.png'>
+        <h1 id='titleText'>Pokegear.app</h1>
+        <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
+    </div>
+    <input id='lockDecklist' class='textObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
+    <input id='importDecklist' class='textObject decklistButton' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
+    <input id='exportDecklist' class='textObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
+    <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='alert("Sort Decklist— Work In Progress")' type='button' value='⟳'></input>
+    <div id='decklist'>
+        <input id='decklistCardCount' class='textObject disabled' type='button' value='0'>
+        <div id='decklistCards'></div>
+    </div>
+    <div id='sidebar' onmouseenter='enableSidebarChildren()' onmouseleave='disableSidebarChildren()'>
+        <div id='sidebarArrow' class='disabled' title='Click to Expand' onclick='fullScreenSidebar(this, true)'>❯</div>
+        <div id='searchFieldCards' class='disabled' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
+            <br><br>
+            <p>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it (or pressing and holding on mobile). When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
+        </div>
+        <div id='bottomSearchButtons' class='disabled' onmouseenter='enableBottomSearchButtons(this.children)' onmouseleave='disableBottomSearchButtons(this.children)'></div>
+        <div class='searchParameter disabled'>
+            <input class='searchType textObject' type='button' value='Name' searchType='name'>
+            <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
+            <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='-' onclick='this.parentNode.remove(); search(1)'>
+        </div>
+        <input class='addParameterButton textObject disabled' title='Add Parameter' type='button' value='+' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
+    </div>
+</html>
+<template>
+    <div class='searchParameter'>
+        <input class='searchType textObject' type='button' value='Attack Text' searchType='attacks.text'>
+        <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
+        <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='-' onclick='this.parentNode.remove(); search(1)'>
+    </div>
+</template>
+<style>
+    :root {
+        --cardHeight: calc(4.4cm);
+        --cardWidth: calc(var(--cardHeight) * 367/512);
+        --lightBlue: rgb(207, 239, 255);
+        --darkBlue: rgb(15, 15, 71);
+        --midBlue: rgb(130, 149, 181);
+        --lightBlueOpactiy: rgba(207, 239, 255, 0.6);
+        --darkBlueOpacity: rgba(15, 15, 71, 0.6);
+    }
+    body {
+        background-color: var(--lightBlue);
+        font-family: sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+    .disabled {
+        pointer-events: none;
+    }
+    .textObject {
+        width: calc(var(--cardHeight) / 3);
+        height: calc(var(--cardHeight) / 3);
+        font-size: calc(var(--cardHeight) / 6);
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlueOpactiy);
+        margin: 0;
+        border-radius: calc(var(--cardHeight) / 9);
+        text-shadow: 0px 0px 5px black;
+        background-color: var(--darkBlueOpacity);
+        color: white;
+    }
+    #title {
+        z-index: 1000;
+        position: absolute;
+        height: calc(var(--cardHeight) / 3);
+        top: calc(var(--cardHeight) / 24);
+        left: calc(var(--cardHeight) * 5/6);
+    }
+    #titleIcon {
+        position: absolute;
+        height: calc(var(--cardHeight) / 3);
+        bottom: calc(-1 * var(--cardHeight) / 12);
+        left: calc(var(--cardHeight) / -3);
+    }
+    #titleText {
+        font-family: 'Courier New', Courier, monospace;
+        color: var(--darkBlue);
+        font-size: calc(var(--cardHeight) / 6);
+    }
+    #titleLink {
+        position: absolute;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: calc(var(--cardHeight) / 12);
+        bottom: calc(-1 * var(--cardHeight) / 12);
+    }
+    #bottomRightIcon:hover {
+        animation: bounce 1s infinite;
+    }
+    @keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+            transform: translateY(calc(-1 * var(--cardHeight) / 12));
+        }
+    }
+    .decklistButton {
+        z-index: 1000;
+        position: absolute;
+        right: calc(var(--cardHeight) / 12);
+        background-color: var(--darkBlue);
+        font-weight: bold;
+        cursor: pointer;
+
+    }
+    #lockDecklist {
+        top: calc(var(--cardHeight) / 12);
+    }
+    #importDecklist {
+        top: calc(var(--cardHeight) / 2);
+    }
+    #exportDecklist {
+        top: calc(var(--cardHeight) * 11/12);
+    }
+    #sortDecklist {
+        top: calc(var(--cardHeight) * 4/3);
+    }
+    #decklistCardCount {
+        z-index: 1000;
+        position: absolute;
+        width: calc(var(--cardHeight) / 2);
+        left: calc(50% - var(--cardHeight) / 4);
+        top: calc(var(--cardHeight) / 12);
+        background-color: var(--lightBlueOpactiy);
+        border: calc(var(--cardHeight) / 48) solid var(--midBlue);
+        pointer-events: none;
+    }
+    .decklistCardCountNumber {
+        position: absolute;
+        width: calc(var(--cardHeight) / 3);
+        height: calc(var(--cardHeight) / 3);
+        bottom: calc(var(--cardHeight) / 32);
+        left: 0;
+        right: 0;
+        margin: auto;
+        background-color: var(--lightBlueOpactiy);
+        border: calc(var(--cardHeight) / 48) solid var(--midBlue);
+        pointer-events: none;
+    }
+    #decklist {
+        position: absolute;
+        text-align: center;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        width: calc(100% - var(--cardWidth) * 2);
+        height: calc(100% - var(--cardHeight));
+
+        padding-top: calc(var(--cardHeight) / 2);
+        padding-bottom: calc(var(--cardHeight) / 2);
+        padding-left: calc(var(--cardWidth));
+        padding-right: calc(var(--cardWidth));
+
+        margin-left: 0;
+    }
+    .cardHoverMenu {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    .decklistCardHoverButtonAdd {
+        position: absolute;
+        height: calc(var(--cardHeight) / 4);
+        width: calc(var(--cardHeight) / 4);
+        font-size: calc(var(--cardHeight) / (20/3));
+        border: calc(var(--cardHeight) / 64) solid var(--lightBlueOpactiy);
+        margin: calc(-1 * var(--cardHeight) / 64);
+        border-radius: calc(var(--cardHeight) / 12);
+        bottom: calc(7 * var(--cardHeight) / 96);
+        left: calc(var(--cardHeight) / 32);
+        margin: auto;
+        cursor: pointer;
+    }
+    .decklistCardHoverButtonRemove {
+        position: absolute;
+        height: calc(var(--cardHeight) / 4);
+        width: calc(var(--cardHeight) / 4);
+        font-size: calc(var(--cardHeight) / (20/3));
+        border: calc(var(--cardHeight) / 64) solid var(--lightBlueOpactiy);
+        margin: calc(-1 * var(--cardHeight) / 64);
+        border-radius: calc(var(--cardHeight) / 12);
+        bottom: calc(7 * var(--cardHeight) / 96);
+        right: calc(var(--cardHeight) / 32);
+        margin: auto;
+        cursor: pointer;
+    }
+    .disableHighlight {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    #sidebar {
+        z-index: 1000;
+        position: absolute;
+        width: calc(40% + var(--cardWidth) / 2);
+        height: 100%;
+        margin-left: -40%;
+        background-color: var(--darkBlueOpacity);
+        transition: 0.5s;
+        transition-delay: 0.15s;
+    }
+    #sidebar:hover {
+        margin-left: 0%;
+        transition-delay: 0s;
+    }
+    .sidebarCardHoverButton {
+        position: relative;
+        top: 15%;
+        left: calc(50% - var(--cardHeight) / 6);
+        margin: 0 auto;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    #sidebarArrow {
+        position: absolute;
+        width: calc(var(--cardWidth) / 2);
+        height: 100%;
+        margin-left: calc(100% - var(--cardWidth) / 2);
+        background-color: var(--darkBlueOpacity);
+        color: white;
+        font-size: calc(var(--cardWidth) / 2);
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        flex-direction: column;
+        cursor: e-resize;
+    }
+    .searchParameter {
+        z-index: 1000;
+        position: relative;
+        font-size: 0;
+        width: calc(100% - var(--cardWidth) / 2);
+    }
+    .searchType {
+        display: inline-block;
+        width: var(--cardWidth);
+        margin: 0;
+        vertical-align: top;
+        font-size: calc(var(--cardWidth) / 6);
+        pointer-events: None;
+    }
+    .searchField {
+        width: calc(100% - calc(var(--cardWidth) *  1.5));
+        margin: 0;
+        padding-inline-start: calc(var(--cardWidth) / 4);
+        text-align: left;
+        display: inline-block;
+    }
+    .deleteParameterButton {
+        z-index: 1000;
+        position: relative;
+        width: calc(var(--cardWidth) / 2);
+        margin: 0;
+        vertical-align: top;
+        font-weight: bold;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .addParameterButton {
+        z-index: 1000;
+        position: relative;
+        margin: 0;
+        width: var(--cardWidth);
+        vertical-align: top;
+        font-weight: bold;
+        box-sizing: border-box;
+        display: inline-block;
+        cursor: pointer;
+    }
+    #searchFieldCards {
+        position: absolute;
+        height: 100%;
+        opacity: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        color: lightgray;
+        padding-top: calc(var(--cardHeight) / 2);
+        padding-left: calc(var(--cardWidth) / 2);
+        padding-right: calc(var(--cardWidth) / 2);
+        width: calc(100% - var(--cardWidth) * 1.5)
+    }
+    #bottomSearchButtons {
+        z-index: 1000;
+        position: absolute;
+        width: calc(100% - var(--cardWidth) / 2);
+        height: 50%;
+        bottom: calc(-50% + calc(var(--cardHeight) / 3));
+        background-color: var(--darkBlueOpacity);
+        transition: 0.5s;
+        transition-delay: 0.15s;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    #bottomSearchButtons:hover {
+        bottom: 0%;
+        transition-delay: 0s;
+    }
+    .setSymbolDiv {
+        display: inline-block;
+        width: calc(var(--cardHeight) / 3); 
+        height: calc(var(--cardHeight) / 3);
+        border-radius: calc(var(--cardHeight) / 9);
+        cursor: pointer;
+    }
+    .setSymbol {
+        position: absolute;
+        margin: calc(var(--cardHeight) / 18);
+        width: calc(var(--cardHeight) / 4.5); 
+        height: calc(var(--cardHeight) / 4.5);
+    }
+    .spacer {
+        height: calc(var(--cardHeight) / 4.5);
+    }
+    .card {
+        position: relative;
+        display: inline-block;
+        border-radius: 0.15cm;
+        transition: transform 0.25s, z-index 0.25s, box-shadow 0.25s;
+        width: var(--cardWidth);
+        height: var(--cardHeight);
+    }
+    .card:hover {
+        transform: scale(2);
+        z-index: 999;
+        transition: transform 0.25s, z-index 0s, box-shadow 0.25s;
+        box-shadow: 1em 1em 1em rgba(0, 0, 0, 0.6);
+    }
+    .cardImage {
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        position: absolute;
+        left: 0;
+        object-fit: inherit;
+    }
+    .shine {
+        width: 100%; 
+        height: 100%;
+        position: absolute;
+        pointer-events: none;
+        border-radius: 0.15cm;
+        background-image: repeating-linear-gradient(
+            -54.4deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.5),
+            transparent 50%
+        );
+        background-size: 300% 100%;
+        animation: shine 5s infinite steps(calc(20*5));
+    }
+
+    @keyframes shine {
+        0% {
+            background-position: right;    
+        }
+    }
+    .focusedCard {
+        position: fixed;
+        max-height: 90%;
+        max-width: 90%;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0%;
+        margin: auto;
+        object-fit: contain;
+    }
+    #focused {
+        z-index: 2000;
+        position: fixed;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    .fadeIn {
+        animation: fadeIn 0.25s;
+    }
+    .fadeOut {
+        animation: fadeOut 0.25s;
+        animation-fill-mode: forwards;
+        pointer-events: none;
+    }
+    @keyframes fadeIn {from {opacity: 0} to {opacity: 1}}
+    @keyframes fadeOut {from {opacity: 1} to {opacity: 0}}
+
+</style>
+<script>
+    //SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP
+    var holo_animations = true
+    var holo_animation_fps = 20
+    const holoRarities = [
+        'Amazing Rare',
+        'LEGEND',
+        'Rare ACE',
+        'Rare BREAK',
+        'Rare Holo',
+        'Rare Holo EX',
+        'Rare Holo GX',
+        'Rare Holo LV.X',
+        'Rare Holo Star',
+        'Rare Holo V',
+        'Rare Holo VMAX',
+        'Rare Prime',
+        'Rare Prism Star',
+        'Rare Rainbow',
+        'Rare Secret',
+        'Rare Shining',
+        'Rare Shiny',
+        'Rare Shiny GX',
+        'Rare Ultra'
+    ]
+    const translations = {
+        'é': '%C3%A9',
+        '◇': '%E2%97%87',
+        '◊': '%E2%97%87',
+        'prism star': '%E2%97%87'
+    }
+
+    const header = {headers:{'X-Api-Key': 'c937592b-dbe9-47de-a29f-194bce94c11b'}}
+
+    //sidebar
+    const sidebarDiv = document.getElementById('sidebar')
+    const searchFieldCards = document.getElementById('searchFieldCards');
+    const bottomSearchButtonsDiv = document.getElementById('bottomSearchButtons')
+    var checkBottomSearchButtonsHover
+
+    //decklist
+    const decklistCards = document.getElementById('decklistCards')
+    const decklistCardCount = document.getElementById('decklistCardCount')
+    var isDecklistLocked = false
+
+    //Focused card
+    var currentFocused
+    var currentFetchID = 0
+
+    //Search variables
+    var previousSearch
+    var cooldown = false
+    var callSearch = false
+    var loadingMoreCards = false
+
+    //Import decklist variables
+    var basicEnergies = {
+        'grass': ['hs', '115'],
+        'fire': ['hs', '116'],
+        'water': ['hs', '117'],
+        'lightning': ['hs', '118'],
+        'psychic': ['hs', '119'],
+        'fighting': ['hs', '120'],
+        'darkness': ['hs', '121'],
+        'metal': ['hs', '122'],
+        'fairy': ['gen', '83']
+    }
+    var setIdTranslations = {
+        'shf': 'swsh45',
+        'si': 'si1',
+        'wbsp': 'basep',
+        'bs2': 'base4',
+        'exp': 'ecard1',
+        'aqp': 'ecard2',
+        'skr': 'ecard3',
+        'tr': 'ex7',
+        'p1': 'pop1',
+        'p2': 'pop2',
+        'p3': 'pop3',
+        'p4': 'pop4',
+        'p5': 'pop5',
+        'p6': 'pop6',
+        'p7': 'pop7',
+        'p8': 'pop8',
+        'p9': 'pop9'
+    }
+
+    //Export decklist variables
+    var exportTranslations = {
+        'pop1': 'POP1',
+        'pop2': 'POP2',
+        'pop3': 'POP3',
+        'pop4': 'POP4',
+        'pop5': 'POP5',
+        'pop6': 'POP6',
+        'pop7': 'POP7',
+        'pop8': 'POP8',
+        'pop9': 'POP9'
+    }
+
+    //combination buttons
+    var RSPK_sets = [
+            'set.id:ex1',
+            'set.id:ex2',
+            'set.id:ex3',
+            'set.id:ex4',
+            'set.id:ex5',
+            'set.id:ex6',
+            'set.id:ex7',
+            'set.id:ex8',
+            'set.id:ex9',
+            'set.id:ex10',
+            'set.id:ex11',
+            'set.id:ex12',
+            'set.id:ex13',
+            'set.id:ex14',
+            'set.id:ex15',
+            'set.id:ex16',
+            'set.id:np',
+            'set.id:pop1',
+            'set.id:pop2',
+            'set.id:pop3',
+            'set.id:pop4',
+            'set.id:pop5'
+    ]
+
+    //Add event listeners
+    document.addEventListener('keydown', keyDown);
+    
+    function keyDown (event) {
+        if (currentFocused && (event.keyCode == 39 || event.keyCode == 40 || event.keyCode == 68 || event.keyCode == 83)) {
+            //left arrow, down arrow, D key, S key
+            event.preventDefault()
+            cycleFocused('right')
+        }
+        else if (currentFocused && (event.keyCode == 37 || event.keyCode == 38 || event.keyCode == 65 || event.keyCode == 87)) {
+            //right arrow, up arrow, A key, W key
+            event.preventDefault()
+            cycleFocused('left')
+        }
+    }
+
+    //Populate set buttons
+    populateSets()
+
+    async function populateSets () {
+        const response = await fetch('https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate', header)
+        const json = await response.json()
+        sets = json['data']
+        for (i=0; i<sets.length; i++) {
+            if (sets[i]['ptcgoCode'] && !setIdTranslations[sets[i]['ptcgoCode'].toLowerCase()]) {
+                setIdTranslations[sets[i]['ptcgoCode'].toLowerCase()] = sets[i]['id']
+            }
+            bottomSearchButtonsDiv.appendChild(
+                createElement('div', null, {
+                    'id': 'set.id:' + sets[i]['id'],
+                    'class': 'setSymbolDiv disabled',
+                    'title': sets[i]['name'],
+                    'onclick': 'highlightButton(this, true, true, [])'
+                })
+            ).appendChild(
+                createElement('img', null, {
+                    'class': 'setSymbol',
+                    'src': sets[i]['images']['symbol'],
+                    'alt': 'set.id:' + sets[i]['id'],
+                    'style': 'pointer-events: none;'
+                })
+            )
+        }
+        bottomSearchButtonsDiv.appendChild(
+            createElement('div', null, {
+                'class': 'spacer disabled'
+            })
+        )
+        var combinationButtons = [
+            {
+                'combinationId': 'bs-g2',
+                'combinationTitle': 'Red & Blue Era',
+                'setA_img': document.getElementById('set.id:base1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:gym2').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:basep", "set.id:base1", "set.id:base2", "set.id:base3", "set.id:base4", "set.id:base5", "set.id:gym1", "set.id:gym2", "set.id:base6"]'
+            },
+            {
+                'combinationId': 'bs-g2',
+                'combinationTitle': 'Gold & Silver Era',
+                'setA_img': document.getElementById('set.id:neo1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:ecard3').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:neo1", "set.id:neo2", "set.id:neo3", "set.id:neo4", "set.id:ecard1", "set.id:ecard2", "set.id:ecard3", "set.id:si1" ]'
+            },
+            {
+                'combinationId': 'rs-pk',
+                'combinationTitle': 'Ruby & Sapphire Era',
+                'setA_img': document.getElementById('set.id:ex1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:ex16').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:np", "set.id:ex1", "set.id:ex2", "set.id:ex3", "set.id:ex4", "set.id:ex5", "set.id:ex6", "set.id:ex7", "set.id:ex8", "set.id:ex9", "set.id:ex10", "set.id:ex11", "set.id:ex12", "set.id:ex13", "set.id:ex14", "set.id:ex15", "set.id:ex16", "set.id:pop1", "set.id:pop2", "set.id:pop3", "set.id:pop4", "set.id:pop5"]'
+            },
+            {
+                'combinationId': 'dp-ar',
+                'combinationTitle': 'Diamond & Pearl Era',
+                'setA_img': document.getElementById('set.id:dp1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:pl4').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:dpp", "set.id:dp1", "set.id:dp2", "set.id:dp3", "set.id:dp4", "set.id:dp5", "set.id:dp6", "set.id:dp7", "set.id:pl1", "set.id:pl2", "set.id:pl3", "set.id:pl4", "set.id:ru1", "set.id:pop6", "set.id:pop7", "set.id:pop8", "set.id:pop9"]'
+            },
+            {
+                'combinationId': 'hgss-col',
+                'combinationTitle': 'Heart Gold & Soul Silver Era',
+                'setA_img': document.getElementById('set.id:hgss1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:col1').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:hsp", "set.id:hgss1", "set.id:hgss2", "set.id:hgss3", "set.id:hgss4", "set.id:col1"]'
+            },
+            {
+                'combinationId': 'blw-ltr',
+                'combinationTitle': 'Black & White Era',
+                'setA_img': document.getElementById('set.id:bw1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:bw11').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:bwp", "set.id:bw1", "set.id:bw2", "set.id:bw3", "set.id:bw4", "set.id:bw5", "set.id:bw6", "set.id:bw7", "set.id:bw8", "set.id:bw9", "set.id:bw10", "set.id:bw11", "set.id:mcd11", "set.id:mcd12", "set.id:dv1"]'
+            },
+            {
+                'combinationId': 'xy-evo',
+                'combinationTitle': 'X & Y Era',
+                'setA_img': document.getElementById('set.id:xy1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:xy12').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:xyp", "set.id:xy0", "set.id:xy1", "set.id:xy2", "set.id:xy3", "set.id:xy4", "set.id:xy5", "set.id:xy6", "set.id:xy7", "set.id:xy8", "set.id:xy9", "set.id:xy10", "set.id:xy11", "set.id:xy12", "set.id:dc1", "set.id:g1", "set.id:mcd16"]'
+            },
+            {
+                'combinationId': 'sum-cec',
+                'combinationTitle': 'Sun & Moon Era',
+                'setA_img': document.getElementById('set.id:sm1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:sm12').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:smp", "set.id:sm1", "set.id:sm2", "set.id:sm3", "set.id:sm35", "set.id:sm4", "set.id:sm5", "set.id:sm6", "set.id:sm7", "set.id:sm75", "set.id:sm8", "set.id:sm9", "set.id:sm10", "set.id:sm11", "set.id:sm12", "set.id:det1", "set.id:sma", "set.id:sm115", "set.id:mcd19"]'
+            },
+            {
+                'combinationId': 'ssh-shf',
+                'combinationTitle': 'Sword & Shield Era',
+                'setA_img': document.getElementById('set.id:swsh1').getElementsByClassName('setSymbol')[0].src,
+                'setB_img': document.getElementById('set.id:swsh45').getElementsByClassName('setSymbol')[0].src,
+                'sets': '["set.id:swshp", "set.id:swsh1", "set.id:swsh2", "set.id:swsh3", "set.id:swsh35", "set.id:swsh4", "set.id:swsh45", "set.id:swsh45sv"]'
+            }
+        ]
+        for (i=0; i<combinationButtons.length; i++) {
+            var newButton = bottomSearchButtonsDiv.appendChild(
+                createElement('div', null, {
+                    'id': combinationButtons[i]['combinationId'],
+                    'class': 'setSymbolDiv disabled',
+                    'title': combinationButtons[i]['combinationTitle'],
+                    'onclick': `highlightButton(this, true, true, ${combinationButtons[i]['sets']})`
+                }))
+            newButton.appendChild(
+                createElement('img', null, {
+                    'class': 'setSymbol',
+                    'src': combinationButtons[i]['setB_img'],
+                    'style': 'pointer-events: none; transform: translateX(calc(var(--cardWidth)/12)) translateY(calc(-1 * var(--cardWidth)/12)) scale(0.85)'
+                })
+            )
+            newButton.appendChild(
+                createElement('img', null, {
+                    'class': 'setSymbol',
+                    'src': combinationButtons[i]['setA_img'],
+                    'style': 'pointer-events: none; transform: translateX(calc(-1 * var(--cardWidth)/12)) translateY(calc(var(--cardWidth)/12)) scale(0.85)'
+                })
+            )
+        }
+    }
+    
+    //UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS
+
+    function randomInteger(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function isElementPartiallyInViewport(el) {
+        var rect = el.getBoundingClientRect();
+        var windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+        var windowWidth = (window.innerWidth || document.documentElement.clientWidth);
+        var vertInView = (rect.top <= windowHeight) && ((rect.top + rect.height) >= 0);
+        var horInView = (rect.left <= windowWidth) && ((rect.left + rect.width) >= 0);
+        return (vertInView && horInView);
+    }
+
+    function createElement (type, innerHTML, attributes) {
+        var elem = document.createElement(type)
+        elem.innerHTML = innerHTML
+        for (const attr in attributes) {
+            elem.setAttribute(attr, attributes[attr])
+        }
+        return elem
+    }
+
+    function fadeIn (elem) {
+        elem.classList.add('fadeIn')
+        elem.setAttribute('style', 'pointer-events: none;')
+        setTimeout(function () {
+            elem.setAttribute('style', 'pointer-events: all')
+        }, 250)
+    }
+
+    function fadeOut (elem) {
+        elem.classList.add('fadeOut')
+        elem.setAttribute('style', 'pointer-events: none')
+        setTimeout(function () {
+            if (elem) {
+                elem.remove()
+            }
+        }, 250)
+    }
+
+    async function fetchCards (url) {
+        currentFetchID++
+        const id = currentFetchID
+        const response = await fetch(url, header)
+        const json = await response.json()
+        return {
+            'id': id,
+            'cards': json['data'],
+            'page': json['page'],
+            'pageSize': json['pageSize'],
+            'totalCardCount': json['totalCount']
+        }
+    }
+
+    function createCard (data) {
+        container = createElement('div', null, {
+            'id': data['id'],
+            'class': 'card',
+            'oncontextmenu': 'event.preventDefault(); focusCard(this)',
+            'onmouseenter': 'sidebarCardHover(this)',
+            'onmouseleave': "if (this.getElementsByClassName('cardHoverMenu')[0]) {fadeOut(this.getElementsByClassName('cardHoverMenu')[0]);}"
+        })
+
+        container.appendChild(createElement('img', null, {
+            'class': 'cardImage',
+            'src': data['images']['small']
+        }))
+
+        if (holo_animations == true) {
+            var shine = false
+            for (var i=0; i<holoRarities.length; i++) {
+                if (data['rarity'] == holoRarities[i]) {
+                    shine = true
+                    break
+                }
+            }
+            if (shine === true) {
+                container.appendChild(createElement('div', null, {
+                    'class': 'shine',
+                    'style': `animation-delay: -${randomInteger(0, holo_animation_fps*5) / 20}s`
+                }))
+            }
+        }
+
+        var dataContainer = createElement('div', null, {
+            'class': 'data'
+        })
+        delete data['id']
+        for (const key in data) {
+            if (typeof data[key] != 'string') {
+                data[key] = JSON.stringify(data[key])
+            }
+            dataContainer.setAttribute(key, data[key])
+        }
+
+        container.appendChild(dataContainer)
+        
+        return container
+    }
+
+    function cloneCard (card, modifications) {
+        newCard = card.cloneNode(true)
+        for (const key in modifications) {
+            const mod = modifications[key]
+            if (mod == null) {
+                newCard.removeAttribute(key)
+            }
+            else if (key == 'image') {
+                newCard.prepend(
+                    createElement('img', null, {
+                        'src': mod,
+                        'class': 'cardImage',
+                        'onload': 'this.parentNode.getElementsByClassName("cardImage")[1].remove()'
+                    })
+                )
+            }
+            else {
+                newCard.setAttribute(key, mod)
+            }
+        }
+        return newCard
+    }
+
+    //CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS
+
+    function focusCard (card) {
+        currentFocused = card
+        //create focused
+        var focused
+        if (document.getElementById('focused')) {
+            focused = document.getElementById('focused')
+            document.querySelectorAll(".focusedCard").forEach(focusedCard => focusedCard.remove())
+        }
+        else {
+            focused = document.body.appendChild(
+                createElement('div', null, {
+                    'id': 'focused',
+                    'onclick': 'fadeOut(this); currentFocused = null'
+                })
+            )
+            fadeIn(focused)
+        }
+
+        var dataContainer = card.getElementsByClassName('data')[0]
+
+        var rotation = 0
+        if (dataContainer.getAttribute('subtypes') && (dataContainer.getAttribute('subtypes').includes('BREAK') || dataContainer.getAttribute('subtypes').includes('LEGEND'))) {
+            rotation = 90
+        }
+
+        newCard = cloneCard(card, {
+                'style': `transform: rotate(${rotation}deg);`,
+                'class': 'focusedCard',
+                'onclick': null,
+                'oncontextmenu': null,
+                'onmouseenter': null,
+                'image': JSON.parse(dataContainer.getAttribute('images'))['large']
+        })
+
+        //remove decklistCardCountNumber, cardHoverMenu, and shine
+        var remove = ['decklistCardCountNumber', 'cardHoverMenu', 'shine']
+        for (i=0; i<remove.length; i++) {
+            if (newCard.getElementsByClassName(remove[i])[0]) {
+                newCard.getElementsByClassName(remove[i])[0].remove()
+            }
+        }
+
+        focused.appendChild(newCard)
+    }
+
+    function cycleFocused (direction) {
+        var newFocused
+        if (direction == 'left' && currentFocused.previousSibling && currentFocused.previousSibling.classList.contains('card')) {
+            newFocused = currentFocused.previousSibling
+            focusCard(newFocused)
+        }
+        else if (direction == 'right' && currentFocused.nextSibling && currentFocused.nextSibling.classList.contains('card')) {
+            newFocused = currentFocused.nextSibling
+            focusCard(newFocused)
+        }
+    }
+
+    //SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR
+
+    function fullScreenSidebar (elem, fullScreen) {
+        if (fullScreen == true) {
+            sidebarDiv.setAttribute('style', 'width: 100%; margin-left: 0%')
+            document.getElementById('sidebarArrow').setAttribute('style', 'transform: rotate(180deg); cursor: w-resize')
+            elem.title = 'Click to Minimize'
+            elem.setAttribute('onclick', 'fullScreenSidebar(this, false)')
+        }
+        if (fullScreen == false) {
+            sidebarDiv.style = ''
+            document.getElementById('sidebarArrow').style = ''
+            elem.title = 'Click to Expand'
+            elem.setAttribute('onclick', 'fullScreenSidebar(this, true)')
+        }
+    }
+
+    function enableSidebarChildren() {
+        checkEnableSidebarChildren = setTimeout(function () {
+            children = sidebarDiv.children
+            for (i = 0; i < children.length; i++) {
+                children[i].classList.remove('disabled')
+            }
+        }, 500)
+    }
+
+    function disableSidebarChildren() {
+        clearTimeout(checkEnableSidebarChildren)
+        children = sidebarDiv.children
+        for (i = 0; i < children.length; i++) {
+            children[i].classList.add('disabled')
+        }
+    }
+
+    function enableBottomSearchButtons(buttons) {
+        checkEnableBottomSearchButtons = setTimeout(function () {
+            for (i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('disabled')
+            }
+        }, 500)
+    }
+
+    function disableBottomSearchButtons(buttons) {
+        clearTimeout(checkEnableBottomSearchButtons)
+        for (i = 0; i < buttons.length; i++) {
+            buttons[i].classList.add('disabled')
+        }
+    }
+    
+    function highlightButton (elem, highlight, initiateSearch, group) {
+        if (highlight == true) {
+            elem.setAttribute('style', 'background-color: rgba(0, 255, 0, 0.6)')
+            if (group.length < 1) {
+                elem.setAttribute('onclick', `highlightButton(this, false, true, [])`)
+                elem.classList.add('searchSet')
+            }
+            else {
+                for (i=0; i<group.length; i++) {
+                    elem.setAttribute('onclick', `highlightButton(this, false, true, ["${group.join('", "')}"])`)
+                    highlightButton(document.getElementById(group[i]), true, false, []);
+                }
+            }
+            if (initiateSearch == true) {
+                search(1)
+            }
+        }
+        else {
+            elem.setAttribute('style', 'background-color: initial')
+            if (group.length < 1) {
+                elem.setAttribute('onclick', `highlightButton(this, true, true, [])`)
+                elem.classList.remove('searchSet')
+            }
+            else {
+                for (i=0; i<group.length; i++) {
+                    elem.setAttribute('onclick', `highlightButton(this, true, true, ["${group.join('", "')}"])`)
+                    highlightButton(document.getElementById(group[i]), false, false, []);
+                }
+            }
+            if (initiateSearch == true) {
+                search(1)
+            }
+        }
+    }
+
+    async function search (pageNumber) {
+        callSearch = false
+        if (cooldown == true) {
+            callSearch = true
+            return
+        }
+        else {
+            cooldown = true
+            setTimeout(() => {
+                cooldown = false
+                if (callSearch == true) {
+                    search(1)
+                    callSearch = false
+                }
+            }, 1500);
+        }
+
+        //construct URL
+        var q = ''
+
+        const parameters = document.getElementsByClassName('searchParameter')
+        for (i = 0; i < parameters.length; i++) {
+            var searchType = parameters[i].getElementsByClassName('searchType')[0].getAttribute('searchType')
+            if (searchType.length == 0) {
+                continue
+            }
+            var searchField = parameters[i].getElementsByClassName('searchField')[0].value
+            if (searchField.length == 0) {
+                continue
+            }
+            for (translation in translations) {
+                searchField = searchField.replace(translation, translations[translation])
+            }
+            searchField = searchField.split(' ')
+            for (j = 0; j < searchField.length; j++) {
+                if (searchField[j].length > 0) {
+                    q = q + searchType + ':%22*' + searchField[j] + '*%22+'
+                }
+            }
+        }
+
+        const setButtons = document.getElementsByClassName('searchSet')
+        if (setButtons.length > 0) {
+            q = q + '(' + setButtons[0].id
+            if (setButtons.length > 1) {
+                for (var i = 1; i < setButtons.length; i++) {
+                    q = q + '+OR+' + setButtons[i].id
+                }
+            } 
+            q = q + ')'
+        }
+
+        //check for blank search
+        if (q == '') {
+            while (searchFieldCards.firstChild) {
+                searchFieldCards.removeChild(searchFieldCards.firstChild);
+            }
+            previousSearch = null
+            currentFetchID++
+            return
+        }
+        url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,number&q=${q}&page=${pageNumber}`
+
+        //prevent repeat searches
+        if (previousSearch == url) {
+            return
+        }
+        else {
+            previousSearch = url
+        }
+        
+        //fetch URL
+        console.log(`Fetching ${url}`)
+        const response = await fetchCards(url, header)
+
+        //return if not the most recent request
+        if (response['id'] != currentFetchID) {
+            return
+        }
+
+
+        //remove existing cards
+        if (pageNumber == 1) {
+            while (searchFieldCards.firstChild) {
+                searchFieldCards.removeChild(searchFieldCards.firstChild);
+            }
+            searchFieldCards.scrollTop = 0
+        }
+        else {
+            searchFieldCards.lastChild.remove()
+        }
+
+        loadingMoreCards = false
+
+        searchFieldCards.setAttribute('url', url)
+        searchFieldCards.setAttribute('page', response['page'])
+        searchFieldCards.setAttribute('pageSize', response['pageSize'])
+        searchFieldCards.setAttribute('totalCardCount', response['totalCardCount'])
+
+        cardData = response['cards']
+        
+        for (i = 0; i < cardData.length; i++) {
+            const card = cardData[i]
+            var newCard = createCard(card)
+            searchFieldCards.append(newCard)
+        }
+
+        //add padding to bottom of scrollable
+        searchFieldCards.appendChild(
+            createElement('div', null, {
+                'style': `width:100%; height:var(--cardHeight);`
+            })
+        )
+    }
+
+    function loadMoreCardsCheck () {
+        if (loadingMoreCards == false && searchFieldCards.lastChild && isElementPartiallyInViewport(searchFieldCards.lastChild)) {
+            var totalCardCount = searchFieldCards.getAttribute('totalCardCount')
+            var page = searchFieldCards.getAttribute('page')
+            var pageSize = searchFieldCards.getAttribute('pageSize')
+            if (totalCardCount > page * pageSize) {
+                search(Number(page) + 1)
+                loadingMoreCards = true
+            }
+        }
+    }
+
+    function sidebarCardHover (card) {
+        if (isDecklistLocked == true) {
+            return
+        }
+        if (card.getElementsByClassName('cardHoverMenu')[0]) {
+            card.getElementsByClassName('cardHoverMenu')[0].remove()
+        }
+        card.appendChild(createElement('div', null, {
+            'class': 'cardHoverMenu'
+        }))
+        hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
+        hoverMenu.appendChild(createElement('input', null, {
+            'type': 'button',
+            'class': 'sidebarCardHoverButton textObject',
+            'value': '+',
+            'onclick': 'addDecklistCard(this.parentNode.parentNode, +1)'
+        }))
+        fadeIn(hoverMenu)
+    }
+
+    //DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST
+
+    function addDecklistCard(card, count) {
+        //if card exists in decklist
+        if (decklistCards.querySelector(`#${card['id']}`)) {
+            modifyDecklistCardCount(decklistCards.querySelector(`#${card['id']}`), count)
+        }
+        //if card does not exist in decklist
+        else {
+            newCard = cloneCard(card, {
+                    'oncontextmenu': 'event.preventDefault(); focusCard(this)',
+                    'onmouseenter': 'decklistCardHover(this)',
+                    'draggable': 'false',
+                    'ondragstart': 'this.setAttribute("style", "transform: scale(1); box-shadow: none;")',
+                    'ondragend': 'this.removeAttribute("style")',
+                    'onmouseleave': "if (this.getElementsByClassName('cardHoverMenu')[0]) {fadeOut(this.getElementsByClassName('cardHoverMenu')[0]);}"
+                })
+            if (newCard.getElementsByClassName('cardHoverMenu')[0]) {
+                newCard.getElementsByClassName('cardHoverMenu')[0].remove()
+            }
+            newCard.appendChild(createElement('input', null, {
+                'type': 'button',
+                'value': count,
+                'class': 'decklistCardCountNumber textObject'
+            }))
+            decklistCards.appendChild(newCard)
+            modifyDecklistCardCount(null, count)
+        }
+    }
+
+    function decklistCardHover (card) {
+        if (isDecklistLocked == true) {
+            return
+        }
+        if (card.getElementsByClassName('cardHoverMenu')[0]) {
+            card.getElementsByClassName('cardHoverMenu')[0].remove()
+        }
+        card.appendChild(createElement('div', null, {
+            'class': 'cardHoverMenu'
+        }))
+        hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
+        hoverMenu.appendChild(createElement('input', null, {
+            'type': 'button',
+            'class': 'decklistCardHoverButtonAdd textObject',
+            'value': '+',
+            'onclick': "modifyDecklistCardCount(this.parentNode.parentNode, +1)"
+        }))
+        hoverMenu.appendChild(createElement('input', null, {
+            'type': 'button',
+            'class': 'decklistCardHoverButtonRemove textObject',
+            'value': '-',
+            'onclick': "modifyDecklistCardCount(this.parentNode.parentNode, -1)"
+        }))
+        fadeIn(hoverMenu)
+    }
+
+    function modifyDecklistCardCount (card, value) {
+        if (card && card.getElementsByClassName('decklistCardCountNumber')[0].value) {
+            var dataContainer = card.getElementsByClassName('data')[0]
+            const decklistCardCountNumber = Number(card.getElementsByClassName('decklistCardCountNumber')[0].value)
+            if (decklistCardCountNumber + value <= 0) {
+                card.remove()
+            }
+            else if (decklistCardCountNumber + value > 1 &&
+            (dataContainer.getAttribute('rarity') && dataContainer.getAttribute('rarity') == 'Rare ACE') ||
+            (dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("◇ (Prism Star) Rule: You can't have more than 1 ◇ card with the same name in your deck. If a ◇ card would go to the discard pile, put it in the Lost Zone instead.")) ||
+            (dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You can't have more than 1 Pokémon Star in your deck."))) {
+                return
+            }
+            else if (decklistCardCountNumber + value > 4 && 
+            !(dataContainer.getAttribute('supertype') == 'Energy' && dataContainer.getAttribute('subtypes').includes('Basic')) && 
+            !(dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You may have as many of this card in your deck as you like."))) {
                 return
             }
             card.getElementsByClassName('decklistCardCountNumber')[0].value = decklistCardCountNumber + value
