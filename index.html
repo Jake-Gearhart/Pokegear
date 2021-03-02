@@ -444,6 +444,8 @@
 
     const header = {headers:{'X-Api-Key': 'c937592b-dbe9-47de-a29f-194bce94c11b'}}
 
+    document.body.addEventListener('touchmove', function(e){ e.preventDefault(); });
+
     //sidebar
     const sidebarDiv = document.getElementById('sidebar')
     const searchFieldCards = document.getElementById('searchFieldCards');
