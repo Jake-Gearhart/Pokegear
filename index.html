@@ -13,22 +13,22 @@
     <input id='exportDecklist' class='textObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
     <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='alert("Sort Decklist— Work In Progress")' type='button' value='⟳'></input>
     <div id='decklist'>
-        <input id='decklistCardCount' class='textObject disabled' type='button' value='0'>
+        <input id='decklistCardCount' class='textObject' type='button' value='0'>
         <div id='decklistCards'></div>
     </div>
     <div id='sidebar' onmouseenter='enableSidebarChildren()' onmouseleave='disableSidebarChildren()' ontouchstart='fullScreenSidebar(true); enableSidebarChildren()'>
-        <input id='sidebarArrow' class='disabled' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
-        <div id='searchFieldCards' class='disabled' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
+        <input id='sidebarArrow' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
+        <div id='searchFieldCards' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br><br>
             <p>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it (or pressing and holding on mobile). When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
         </div>
-        <div id='bottomSearchButtons' class='disabled' onmouseenter='enableBottomSearchButtons(this.children)' onmouseleave='disableBottomSearchButtons(this.children)'></div>
-        <div class='searchParameter disabled'>
+        <div id='bottomSearchButtons' onmouseenter='enableBottomSearchButtons(this.children)' onmouseleave='disableBottomSearchButtons(this.children)'></div>
+        <div class='searchParameter'>
             <input class='searchType textObject' type='button' value='Name' searchType='name'>
             <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
             <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='-' onclick='this.parentNode.remove(); search(1)'>
         </div>
-        <input class='addParameterButton textObject disabled' title='Add Parameter' type='button' value='+' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
+        <input class='addParameterButton textObject' title='Add Parameter' type='button' value='+' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
     </div>
 </html>
 <template>
@@ -47,6 +47,11 @@
         --midBlue: rgb(130, 149, 181);
         --lightBlueOpactiy: rgba(207, 239, 255, 0.6);
         --darkBlueOpacity: rgba(15, 15, 71, 0.6);
+    }
+    @media only screen and (max-device-width: 480px) {
+        :root {
+            --cardHeight: calc(8.8cm);
+        }
     }
     body {
         background-color: var(--lightBlue);
@@ -68,9 +73,6 @@
         -webkit-appearance: none;
         border-radius: 0;
         -webkit-border-radius: 0;
-    }
-    .disabled {
-        /* pointer-events: none; */
     }
     .textObject {
         width: calc(var(--cardHeight) / 3);
@@ -565,7 +567,7 @@
             bottomSearchButtonsDiv.appendChild(
                 createElement('div', null, {
                     'id': 'set.id:' + sets[i]['id'],
-                    'class': 'setSymbolDiv disabled',
+                    'class': 'setSymbolDiv',
                     'title': sets[i]['name'],
                     'onclick': 'highlightButton(this, true, true, [])'
                 })
@@ -580,7 +582,7 @@
         }
         bottomSearchButtonsDiv.appendChild(
             createElement('div', null, {
-                'class': 'spacer disabled'
+                'class': 'spacer'
             })
         )
         var combinationButtons = [
@@ -652,7 +654,7 @@
             var newButton = bottomSearchButtonsDiv.appendChild(
                 createElement('div', null, {
                     'id': combinationButtons[i]['combinationId'],
-                    'class': 'setSymbolDiv disabled',
+                    'class': 'setSymbolDiv',
                     'title': combinationButtons[i]['combinationTitle'],
                     'onclick': `highlightButton(this, true, true, ${combinationButtons[i]['sets']})`
                 }))
@@ -872,38 +874,6 @@
             sidebarArrow.style = ''
             sidebarArrow.title = 'Click to Expand'
             sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(true)')
-        }
-    }
-
-    function enableSidebarChildren() {
-        checkEnableSidebarChildren = setTimeout(function () {
-            children = sidebarDiv.children
-            for (i = 0; i < children.length; i++) {
-                children[i].classList.remove('disabled')
-            }
-        }, 500)
-    }
-
-    function disableSidebarChildren() {
-        clearTimeout(checkEnableSidebarChildren)
-        children = sidebarDiv.children
-        for (i = 0; i < children.length; i++) {
-            children[i].classList.add('disabled')
-        }
-    }
-
-    function enableBottomSearchButtons(buttons) {
-        checkEnableBottomSearchButtons = setTimeout(function () {
-            for (i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove('disabled')
-            }
-        }, 500)
-    }
-
-    function disableBottomSearchButtons(buttons) {
-        clearTimeout(checkEnableBottomSearchButtons)
-        for (i = 0; i < buttons.length; i++) {
-            buttons[i].classList.add('disabled')
         }
     }
     
