@@ -237,7 +237,7 @@
         background-color: var(--darkBlueOpacity);
         color: white;
         font-size: calc(var(--cardWidth) / 2);
-        cursor: e-resize;
+        cursor: pointer;
         border: none;
     }
     .searchParameter {
@@ -854,7 +854,7 @@
     function fullScreenSidebar (elem, fullScreen) {
         if (fullScreen == true) {
             sidebarDiv.setAttribute('style', 'width: 100%; margin-left: 0%')
-            document.getElementById('sidebarArrow').setAttribute('style', 'transform: rotate(180deg); cursor: w-resize')
+            document.getElementById('sidebarArrow').setAttribute('style', 'transform: rotate(180deg)')
             elem.title = 'Click to Minimize'
             elem.setAttribute('onclick', 'fullScreenSidebar(this, false)')
         }
