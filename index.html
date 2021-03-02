@@ -1,7 +1,6 @@
 <head>
     <link rel="shortcut icon" type="image/png" href='favicon.png'>
     <meta charset="utf-8">
-    <meta name="viewport" content='maximum-scale=1.0, user-scalable=0'> 
 </head>
 <html>
     <div id='title'>
@@ -62,6 +61,7 @@
         -ms-user-select: none;
         user-select: none;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
+        overflow: hidden;
     }
     input[type="button"] {
         text-align: center;
@@ -70,7 +70,7 @@
         -webkit-border-radius: 0;
     }
     .disabled {
-        pointer-events: none;
+        /* pointer-events: none; */
     }
     .textObject {
         width: calc(var(--cardHeight) / 3);
