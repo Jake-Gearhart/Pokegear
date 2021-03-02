@@ -11,7 +11,7 @@
     <input id='lockDecklist' class='textObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
     <input id='importDecklist' class='textObject decklistButton' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
     <input id='exportDecklist' class='textObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
-    <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='alert("Sort Decklist— Work In Progress")' type='button' value='⟳'></input>
+    <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='alert("Sort Decklist— Coming Soon")' type='button' value='⟳'></input>
     <div id='decklist' ontouchstart='fullScreenSidebar(false)'>
         <input id='decklistCardCount' class='textObject' type='button' value='0'>
         <div id='decklistCards'></div>
@@ -22,7 +22,7 @@
             <br><br>
             <p>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it. When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
         </div>
-        <div id='bottomSearchButtons' onmouseenter='enableBottomSearchButtons(this.children)' onmouseleave='disableBottomSearchButtons(this.children)'></div>
+        <div id='bottomSearchButtons'></div>
         <div class='searchParameter'>
             <input class='searchType textObject' type='button' value='Name' searchType='name'>
             <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
@@ -582,11 +582,10 @@
                 })
             )
         }
-        bottomSearchButtonsDiv.appendChild(
-            createElement('div', null, {
-                'class': 'spacer'
-            })
-        )
+        
+        //spacer
+        bottomSearchButtonsDiv.appendChild(createElement('div', null, {'class': 'spacer'}))
+        
         var combinationButtons = [
             {
                 'combinationId': 'bs-g2',
@@ -1269,21 +1268,22 @@
 
         var text = []
         for (i=0; i<cards.length; i++) {
+            var dataContainer = cards[i].getElementsByClassName(['data'])[0]
             var count = cards[i].getElementsByClassName('decklistCardCountNumber')[0].value
-            var name = cards[i].getAttribute('name')
+            var name = dataContainer.getAttribute('name')
             var code
-            if (JSON.parse(cards[i].getAttribute('set'))['ptcgoCode']) {
-                code = JSON.parse(cards[i].getAttribute('set'))['ptcgoCode']
+            if (JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']) {
+                code = JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']
             }
             else {
-                id = JSON.parse(cards[i].getAttribute('set'))['id']
+                id = JSON.parse(dataContainer.getAttribute('set'))['id']
                 for (translation in exportTranslations) {
                     if (id == translation) {
                         code = exportTranslations[translation]
                     }
                 }
             }
-            var number = cards[i].getAttribute('number')
+            var number = dataContainer.getAttribute('number')
             text.push(
                 `${count} ${name} ${code} ${number}`
             )
