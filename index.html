@@ -12,11 +12,11 @@
     <input id='importDecklist' class='textObject decklistButton' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
     <input id='exportDecklist' class='textObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
     <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='alert("Sort Decklist— Work In Progress")' type='button' value='⟳'></input>
-    <div id='decklist'>
+    <div id='decklist' ontouchstart='fullScreenSidebar(false)'>
         <input id='decklistCardCount' class='textObject' type='button' value='0'>
         <div id='decklistCards'></div>
     </div>
-    <div id='sidebar' onmouseenter='enableSidebarChildren()' onmouseleave='disableSidebarChildren()' ontouchstart='fullScreenSidebar(true); enableSidebarChildren()'>
+    <div id='sidebar' ontouchstart='fullScreenSidebar(true)'>
         <input id='sidebarArrow' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
         <div id='searchFieldCards' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br><br>
