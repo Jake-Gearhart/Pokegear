@@ -62,6 +62,12 @@
         user-select: none;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
     }
+    input[type="button"] {
+        text-align: center;
+        -webkit-appearance: none;
+        border-radius: 0;
+        -webkit-border-radius: 0;
+    }
     .disabled {
         pointer-events: none;
     }
@@ -71,7 +77,8 @@
         font-size: calc(var(--cardHeight) / 6);
         border: calc(var(--cardHeight) / 48) solid var(--lightBlueOpactiy);
         margin: 0;
-        border-radius: calc(var(--cardHeight) / 9);
+        border-radius: calc(var(--cardHeight) / 9) !important;
+        -webkit-border-radius: calc(var(--cardHeight) / 9) !important;
         text-shadow: 0px 0px 5px black;
         background-color: var(--darkBlueOpacity);
         color: white;
