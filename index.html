@@ -11,7 +11,8 @@
     <input id='lockDecklist' class='textObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
     <input id='importDecklist' class='textObject decklistButton' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
     <input id='exportDecklist' class='textObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
-    <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='alert("Sort Decklist— Coming Soon")' type='button' value='⟳'></input>
+    <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
+    <input id='deleteDecklist' class='textObject decklistButton' title='Delete Decklist' onclick='deleteDecklist()' type='button' value='🗑'></input>
     <div id='decklist' ontouchstart='fullScreenSidebar(false)'>
         <input id='decklistCardCount' class='textObject' type='button' value='0'>
         <div id='decklistCards'></div>
@@ -89,6 +90,7 @@
         color: white;
     }
     #title {
+        z-index: 1;
         position: absolute;
         height: calc(var(--cardHeight) / 3);
         left: calc(var(--cardHeight) * 5/6);
@@ -142,6 +144,9 @@
     #sortDecklist {
         top: calc(var(--cardHeight) * 4/3);
     }
+    #deleteDecklist {
+        bottom: calc(var(--cardHeight) / 12);
+    }
     #decklistCardCount {
         z-index: 1000;
         position: absolute;
@@ -192,7 +197,8 @@
         font-size: calc(var(--cardHeight) / (20/3));
         border: calc(var(--cardHeight) / 64) solid var(--lightBlueOpactiy);
         margin: calc(-1 * var(--cardHeight) / 64);
-        border-radius: calc(var(--cardHeight) / 12);
+        border-radius: calc(var(--cardHeight) / 12) !important;
+        -webkit-border-radius: calc(var(--cardHeight) / 12) !important;
         bottom: calc(7 * var(--cardHeight) / 96);
         left: calc(var(--cardHeight) / 32);
         margin: auto;
@@ -205,7 +211,8 @@
         font-size: calc(var(--cardHeight) / (20/3));
         border: calc(var(--cardHeight) / 64) solid var(--lightBlueOpactiy);
         margin: calc(-1 * var(--cardHeight) / 64);
-        border-radius: calc(var(--cardHeight) / 12);
+        border-radius: calc(var(--cardHeight) / 12) !important;
+        -webkit-border-radius: calc(var(--cardHeight) / 12) !important;
         bottom: calc(7 * var(--cardHeight) / 96);
         right: calc(var(--cardHeight) / 32);
         margin: auto;
@@ -1074,10 +1081,9 @@
                     'oncontextmenu': 'event.preventDefault(); focusCard(this)',
                     'onmouseenter': 'decklistCardHover(this)',
                     'ontouchstart': 'decklistCardHover(this)',
-                    'draggable': 'false',
-                    'ondragstart': 'this.setAttribute("style", "transform: scale(1); box-shadow: none;")',
-                    'ondragend': 'this.removeAttribute("style")',
-                    'onmouseleave': "if (this.getElementsByClassName('cardHoverMenu')[0]) {fadeOut(this.getElementsByClassName('cardHoverMenu')[0]);}"
+                    'onmouseleave': 'if (this.getElementsByClassName("cardHoverMenu")[0]) {fadeOut(this.getElementsByClassName("cardHoverMenu")[0]);}',
+                    'count': count
+
                 })
             if (newCard.getElementsByClassName('cardHoverMenu')[0]) {
                 newCard.getElementsByClassName('cardHoverMenu')[0].remove()
@@ -1136,7 +1142,9 @@
             !(dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You may have as many of this card in your deck as you like."))) {
                 return
             }
-            card.getElementsByClassName('decklistCardCountNumber')[0].value = decklistCardCountNumber + value
+            var newValue = decklistCardCountNumber + value
+            card.setAttribute('count', newValue)
+            card.getElementsByClassName('decklistCardCountNumber')[0].value = newValue
         }
         
         decklistCardCount.value = Number(decklistCardCount.value) + value
@@ -1151,16 +1159,25 @@
         }
     }
 
+    function lockDecklist (button) {
+        if (button.value == '🔓') {
+            button.value = '🔐'
+            button.title ='Enable Editing'
+            isDecklistLocked = true
+        }
+        else {
+            button.value = '🔓'
+            button.title ='Disable Editing'
+            isDecklistLocked = false
+        }
+    }
+
     async function importDecklist (text) {
         if (isDecklistLocked == true) {
             alert('Editing decklist is disabled.')
             return
         }
-        while (decklistCards.firstChild) {
-            decklistCards.removeChild(decklistCards.firstChild);
-        }
-        decklistCardCount.value = 0;
-        decklistCardCount.setAttribute('style', 'color: white')
+        deleteDecklist()
         text = text.split('\n')
         for (i=0; i<text.length; i++) {
             text[i] = text[i].replace('(', '').replace(')', '')
@@ -1300,16 +1317,19 @@
         alert('Decklist copied to clipboard.\n\n' + text)
     }
 
-    function lockDecklist (button) {
-        if (button.value == '🔓') {
-            button.value = '🔐'
-            button.title ='Enable Editing'
-            isDecklistLocked = true
+    function sortDecklist () {
+        alert("Sort Decklist— Coming Soon")
+    }
+
+    function deleteDecklist () {
+        if (isDecklistLocked == true) {
+            alert('Editing decklist is disabled.')
+            return
         }
-        else {
-            button.value = '🔓'
-            button.title ='Disable Editing'
-            isDecklistLocked = false
+        while (decklistCards.firstChild) {
+            decklistCards.removeChild(decklistCards.firstChild);
         }
+        decklistCardCount.value = 0;
+        decklistCardCount.setAttribute('style', 'color: white')
     }
 </script>
