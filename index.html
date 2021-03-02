@@ -17,7 +17,7 @@
         <div id='decklistCards'></div>
     </div>
     <div id='sidebar' onmouseenter='enableSidebarChildren()' onmouseleave='disableSidebarChildren()'>
-        <div id='sidebarArrow' class='disabled' title='Click to Expand' onclick='fullScreenSidebar(this, true)'>❯</div>
+        <input id='sidebarArrow' class='disabled' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(this, true)'>
         <div id='searchFieldCards' class='disabled' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br><br>
             <p>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it (or pressing and holding on mobile). When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
@@ -237,12 +237,8 @@
         background-color: var(--darkBlueOpacity);
         color: white;
         font-size: calc(var(--cardWidth) / 2);
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-content: center;
-        flex-direction: column;
         cursor: e-resize;
+        border: none;
     }
     .searchParameter {
         z-index: 1000;
