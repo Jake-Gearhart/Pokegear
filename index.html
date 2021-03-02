@@ -16,7 +16,7 @@
         <input id='decklistCardCount' class='textObject disabled' type='button' value='0'>
         <div id='decklistCards'></div>
     </div>
-    <div id='sidebar' onmouseenter='enableSidebarChildren()' onmouseleave='disableSidebarChildren()' ontouchstart='fullScreenSidebar(true)'>
+    <div id='sidebar' onmouseenter='enableSidebarChildren()' onmouseleave='disableSidebarChildren()' ontouchstart='fullScreenSidebar(true); enableSidebarChildren()'>
         <input id='sidebarArrow' class='disabled' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
         <div id='searchFieldCards' class='disabled' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br><br>
