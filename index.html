@@ -737,6 +737,7 @@
             'class': 'card',
             'oncontextmenu': 'event.preventDefault(); focusCard(this)',
             'onmouseenter': 'sidebarCardHover(this)',
+            'ontouchstart': 'sidebarCardHover(this)',
             'onmouseleave': "if (this.getElementsByClassName('cardHoverMenu')[0]) {fadeOut(this.getElementsByClassName('cardHoverMenu')[0]);}"
         })
 
@@ -1071,6 +1072,7 @@
             newCard = cloneCard(card, {
                     'oncontextmenu': 'event.preventDefault(); focusCard(this)',
                     'onmouseenter': 'decklistCardHover(this)',
+                    'ontouchstart': 'decklistCardHover(this)',
                     'draggable': 'false',
                     'ondragstart': 'this.setAttribute("style", "transform: scale(1); box-shadow: none;")',
                     'ondragend': 'this.removeAttribute("style")',
