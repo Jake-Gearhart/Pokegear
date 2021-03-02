@@ -12,6 +12,9 @@
     <input id='importDecklist' class='textObject decklistButton' title='Import Decklist' onclick='navigator.clipboard.readText().then(text => importDecklist(text))' type='button' value='↥'>
     <input id='exportDecklist' class='textObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
     <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
+    <div id='scaleSliderContainer'>
+        <input id='scaleSlider' class='' title='Zoom Decklist' type='range' oninput='changeCardScale(this.value)' min='0' value='0' max='2' step='0.01'></input>
+    </div>
     <input id='deleteDecklist' class='textObject decklistButton' title='Delete Decklist' onclick='deleteDecklist()' type='button' value='🗑'></input>
     <div id='decklist' ontouchstart='fullScreenSidebar(false)'>
         <input id='decklistCardCount' class='textObject' type='button' value='0'>
@@ -27,27 +30,33 @@
         <div class='searchParameter'>
             <input class='searchType textObject' type='button' value='Name' searchType='name'>
             <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
-            <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='-' onclick='this.parentNode.remove(); search(1)'>
+            <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); search(1)'>
         </div>
-        <input class='addParameterButton textObject' title='Add Parameter' type='button' value='+' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
+        <input class='addParameterButton textObject' title='Add Parameter' type='button' value='＋' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
     </div>
 </html>
 <template>
     <div class='searchParameter'>
         <input class='searchType textObject' type='button' value='Attack Text' searchType='attacks.text'>
         <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
-        <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='-' onclick='this.parentNode.remove(); search(1)'>
+        <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); search(1)'>
     </div>
 </template>
 <style>
     :root {
-        --cardWidth: calc(3.15cm);
+        --cardWidth: 3.15cm;
         --cardHeight: calc(var(--cardWidth) * 512/367);
+        --cardScale: 1;
+        --scaledCardWidth: calc(var(--cardWidth) * var(--cardScale));
+        --scaledCardHeight: calc(var(--cardHeight) * var(--cardScale));
         --lightBlue: rgb(207, 239, 255);
+        --lightBlue30: rgba(207, 239, 255, 0.3);
+        --lightBlue60: rgba(207, 239, 255, 0.6);
         --darkBlue: rgb(15, 15, 71);
-        --midBlue: rgb(130, 149, 181);
-        --lightBlueOpactiy: rgba(207, 239, 255, 0.6);
-        --darkBlueOpacity: rgba(15, 15, 71, 0.6);
+        --darkBlue30: rgba(15, 15, 71, 0.3);
+        --darkBlue60: rgba(15, 15, 71, 0.6);
+        --midBlue: #2e3365;
+        --shineFPS: 20;
     }
     @media only screen and (max-device-width: 600px) {
         :root {
@@ -81,13 +90,25 @@
         width: calc(var(--cardHeight) / 3);
         height: calc(var(--cardHeight) / 3);
         font-size: calc(var(--cardHeight) / 6);
-        border: calc(var(--cardHeight) / 48) solid var(--lightBlueOpactiy);
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue60);
         margin: 0;
         border-radius: calc(var(--cardHeight) / 9) !important;
         -webkit-border-radius: calc(var(--cardHeight) / 9) !important;
-        text-shadow: 0px 0px 5px black;
-        background-color: var(--darkBlueOpacity);
-        color: white;
+        text-shadow: 0px 0px 8px var(--darkBlue);
+        background-color: var(--darkBlue60);
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .scaledTextObject {
+        width: calc(var(--scaledCardHeight) / 3);
+        height: calc(var(--scaledCardHeight) / 3);
+        font-size: calc(var(--scaledCardHeight) / 6);
+        border: calc(var(--scaledCardHeight) / 48) solid var(--lightBlue60);
+        margin: 0;
+        border-radius: calc(var(--scaledCardHeight) / 9) !important;
+        -webkit-border-radius: calc(var(--scaledCardHeight) / 9) !important;
+        text-shadow: 0px 0px calc(8px * var(--cardScale)) var(--darkBlue);
+        background-color: var(--darkBlue60);
+        color: rgba(255, 255, 255, 0.8);
     }
     #title {
         z-index: 1;
@@ -99,11 +120,11 @@
         position: absolute;
         height: calc(var(--cardHeight) / 3);
         bottom: calc(-1 * var(--cardHeight) / 12);
-        left: calc(var(--cardHeight) / -3);
+        left: calc(var(--cardHeight) * -9/24);
     }
     #titleText {
         font-family: 'Courier New', Courier, monospace;
-        color: var(--darkBlue);
+        color: var(--midBlue);
         font-size: calc(var(--cardHeight) / 6);
     }
     #titleLink {
@@ -127,46 +148,88 @@
         z-index: 1000;
         position: absolute;
         right: calc(var(--cardHeight) / 12);
-        background-color: var(--darkBlue);
+        background-color: var(--midBlue);
         font-weight: bold;
         cursor: pointer;
 
     }
+
+    /* right side items */
     #lockDecklist {
-        top: calc(var(--cardHeight) / 12);
+        top: calc(var(--cardHeight) * 1/12);
     }
     #importDecklist {
-        top: calc(var(--cardHeight) / 2);
+        top: calc(var(--cardHeight) * 6/12);
     }
     #exportDecklist {
         top: calc(var(--cardHeight) * 11/12);
     }
     #sortDecklist {
-        top: calc(var(--cardHeight) * 4/3);
+        top: calc(var(--cardHeight) * 16/12);
+    }
+    #scaleSliderContainer {
+        z-index: 1000;
+        position: absolute;
+        height: calc(100% - var(--cardHeight) * 27/12);
+        width: calc(var(--cardHeight) / 3);
+        right: calc(var(--cardHeight) / 12);
+        bottom: calc(var(--cardHeight) * 6/12);
+    }
+    #scaleSlider {
+        position: absolute;
+        transform-origin: top left;
+        transform: rotate(270deg);
+        width: calc(100vh - var(--cardHeight) * 27/12);
+        height: calc(var(--cardHeight) / 6);
+        bottom: 0;
+        margin-left: calc(var(--cardHeight) / 12);
+        margin-bottom: calc(-1 * var(--cardHeight) / 6);
+        -webkit-appearance: none;
+        background-color: var(--midBlue);
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue60);
+        border-radius: calc(var(--cardHeight) / 9);
+    }
+    #scaleSlider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: calc(var(--cardHeight) / 5);
+        height: calc(var(--cardHeight) / 9);
+        background: white;
+        border-radius: calc(var(--cardHeight) / 9);
+        cursor: pointer;
+    }
+    #scaleSlider::-moz-range-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: calc(var(--cardHeight) / 8);
+        height: calc(var(--cardHeight) / 8);
+        background: white;
+        border-radius: calc(var(--cardHeight) / 9);
+        cursor: pointer;
     }
     #deleteDecklist {
-        bottom: calc(var(--cardHeight) / 12);
+        bottom: calc(var(--cardHeight) * 1/12);
     }
+    /* right side items */
+
     #decklistCardCount {
         z-index: 1000;
         position: absolute;
         width: calc(var(--cardHeight) / 2);
         left: calc(50% - var(--cardHeight) / 4);
         top: calc(var(--cardHeight) / 12);
-        background-color: var(--lightBlueOpactiy);
-        border: calc(var(--cardHeight) / 48) solid var(--midBlue);
+        background-color: var(--lightBlue60);
+        border: calc(var(--cardHeight) / 48) solid var(--darkBlue30);
         pointer-events: none;
     }
-    .decklistCardCountNumber {
+    .individualCardCount {
         position: absolute;
-        width: calc(var(--cardHeight) / 3);
-        height: calc(var(--cardHeight) / 3);
-        bottom: calc(var(--cardHeight) / 32);
+        bottom: calc(var(--scaledCardHeight) / 32);
         left: 0;
         right: 0;
         margin: auto;
-        background-color: var(--lightBlueOpactiy);
-        border: calc(var(--cardHeight) / 48) solid var(--midBlue);
+        background-color: var(--lightBlue60);
+        border: calc(var(--scaledCardHeight) / 48) solid var(--darkBlue30);
         pointer-events: none;
     }
     #decklist {
@@ -175,15 +238,13 @@
         overflow-x: hidden;
         overflow-y: auto;
 
-        width: calc(100% - var(--cardWidth) * 2);
-        height: calc(100% - var(--cardHeight));
+        width: calc(100% - var(--scaledCardWidth) - var(--cardHeight) * 10/12);
+        height: calc(100% - var(--scaledCardHeight));
 
-        padding-top: calc(var(--cardHeight) / 2);
-        padding-bottom: calc(var(--cardHeight) / 2);
-        padding-left: calc(var(--cardWidth));
-        padding-right: calc(var(--cardWidth));
-
-        margin-left: 0;
+        padding-top: calc(var(--scaledCardHeight) / 2);
+        padding-bottom: calc(var(--scaledCardHeight) / 2);
+        padding-left: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
+        padding-right: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
     }
     .cardHoverMenu {
         position: absolute;
@@ -192,29 +253,31 @@
     }
     .decklistCardHoverButtonAdd {
         position: absolute;
-        height: calc(var(--cardHeight) / 4);
-        width: calc(var(--cardHeight) / 4);
-        font-size: calc(var(--cardHeight) / (20/3));
-        border: calc(var(--cardHeight) / 64) solid var(--lightBlueOpactiy);
-        margin: calc(-1 * var(--cardHeight) / 64);
-        border-radius: calc(var(--cardHeight) / 12) !important;
-        -webkit-border-radius: calc(var(--cardHeight) / 12) !important;
-        bottom: calc(7 * var(--cardHeight) / 96);
-        left: calc(var(--cardHeight) / 32);
+        height: calc(var(--scaledCardHeight) / 4);
+        width: calc(var(--scaledCardHeight) / 4);
+        font-size: calc(var(--scaledCardHeight) / (20/3));
+        font-weight: bold;
+        border: calc(var(--scaledCardHeight) / 64) solid var(--lightBlue30);
+        margin: calc(-1 * var(--scaledCardHeight) / 64);
+        border-radius: calc(var(--scaledCardHeight) / 12) !important;
+        -webkit-border-radius: calc(var(--scaledCardHeight) / 12) !important;
+        bottom: calc(7 * var(--scaledCardHeight) / 96);
+        left: calc(var(--scaledCardHeight) / 32);
         margin: auto;
         cursor: pointer;
     }
     .decklistCardHoverButtonRemove {
         position: absolute;
-        height: calc(var(--cardHeight) / 4);
-        width: calc(var(--cardHeight) / 4);
-        font-size: calc(var(--cardHeight) / (20/3));
-        border: calc(var(--cardHeight) / 64) solid var(--lightBlueOpactiy);
-        margin: calc(-1 * var(--cardHeight) / 64);
-        border-radius: calc(var(--cardHeight) / 12) !important;
-        -webkit-border-radius: calc(var(--cardHeight) / 12) !important;
-        bottom: calc(7 * var(--cardHeight) / 96);
-        right: calc(var(--cardHeight) / 32);
+        height: calc(var(--scaledCardHeight) / 4);
+        width: calc(var(--scaledCardHeight) / 4);
+        font-size: calc(var(--scaledCardHeight) / (20/3));
+        font-weight: bold;
+        border: calc(var(--scaledCardHeight) / 64) solid var(--lightBlue30);
+        margin: calc(-1 * var(--scaledCardHeight) / 64);
+        border-radius: calc(var(--scaledCardHeight) / 12) !important;
+        -webkit-border-radius: calc(var(--scaledCardHeight) / 12) !important;
+        bottom: calc(7 * var(--scaledCardHeight) / 96);
+        right: calc(var(--scaledCardHeight) / 32);
         margin: auto;
         cursor: pointer;
     }
@@ -229,10 +292,10 @@
     #sidebar {
         z-index: 1000;
         position: absolute;
-        width: calc(40% + var(--cardWidth) / 2);
+        width: calc(40% + var(--cardHeight) * 5/12);
         height: 100%;
         margin-left: -40%;
-        background-color: var(--darkBlueOpacity);
+        background-color: var(--darkBlue60);
         transition: 0.5s;
         transition-delay: 0.15s;
     }
@@ -246,16 +309,17 @@
         left: calc(50% - var(--cardHeight) / 6);
         margin: 0 auto;
         font-weight: bold;
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue30);
         cursor: pointer;
     }
     #sidebarArrow {
         position: absolute;
-        width: calc(var(--cardWidth) / 2);
+        width: calc(var(--cardHeight) * 5/12);
         height: 100%;
-        margin-left: calc(100% - var(--cardWidth) / 2);
-        background-color: var(--darkBlueOpacity);
+        margin-left: calc(100% - var(--cardHeight) * 5/12);
+        background-color: var(--darkBlue60);
         color: white;
-        font-size: calc(var(--cardWidth) / 2);
+        font-size: calc(var(--cardHeight) * 5/12);
         cursor: pointer;
         border: none;
     }
@@ -263,7 +327,7 @@
         z-index: 1000;
         position: relative;
         font-size: 0;
-        width: calc(100% - var(--cardWidth) / 2);
+        width: calc(100% - var(--cardHeight) * 5/12);
     }
     .searchType {
         display: inline-block;
@@ -316,10 +380,10 @@
     #bottomSearchButtons {
         z-index: 1000;
         position: absolute;
-        width: calc(100% - var(--cardWidth) / 2);
+        width: calc(100% - var(--cardHeight) * 5/12);
         height: 50%;
         bottom: calc(-50% + calc(var(--cardHeight) / 3));
-        background-color: var(--darkBlueOpacity);
+        background-color: var(--darkBlue60);
         transition: 0.5s;
         transition-delay: 0.15s;
         overflow-x: hidden;
@@ -353,6 +417,10 @@
         width: var(--cardWidth);
         height: var(--cardHeight);
     }
+    .decklistCard {
+        width: var(--scaledCardWidth);
+        height: var(--scaledCardHeight);
+    }
     .card:hover {
         transform: scale(2);
         z-index: 999;
@@ -380,7 +448,7 @@
             transparent 50%
         );
         background-size: 300% 100%;
-        animation: shine 5s infinite steps(calc(20*5));
+        animation: shine 5s infinite steps(calc(var(--shineFPS)*5));
     }
 
     @keyframes shine {
@@ -422,8 +490,8 @@
 </style>
 <script>
     //SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP
+    
     var holo_animations = true
-    var holo_animation_fps = 20
     const holoRarities = [
         'Amazing Rare',
         'LEGEND',
@@ -765,7 +833,7 @@
             if (shine === true) {
                 container.appendChild(createElement('div', null, {
                     'class': 'shine',
-                    'style': `animation-delay: -${randomInteger(0, holo_animation_fps*5) / 20}s`
+                    'style': `animation-delay: -${randomInteger(0, window.getComputedStyle(document.documentElement).getPropertyValue('--shineFPS') * 5) / 20}s`
                 }))
             }
         }
@@ -845,8 +913,8 @@
                 'image': JSON.parse(dataContainer.getAttribute('images'))['large']
         })
 
-        //remove decklistCardCountNumber, cardHoverMenu, and shine
-        var remove = ['decklistCardCountNumber', 'cardHoverMenu', 'shine']
+        //remove individualCardCount, cardHoverMenu, and shine
+        var remove = ['individualCardCount', 'cardHoverMenu', 'shine']
         for (i=0; i<remove.length; i++) {
             if (newCard.getElementsByClassName(remove[i])[0]) {
                 newCard.getElementsByClassName(remove[i])[0].remove()
@@ -1062,7 +1130,7 @@
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
             'class': 'sidebarCardHoverButton textObject',
-            'value': '+',
+            'value': '＋',
             'onclick': 'addDecklistCard(this.parentNode.parentNode, +1)'
         }))
         fadeIn(hoverMenu)
@@ -1078,6 +1146,7 @@
         //if card does not exist in decklist
         else {
             newCard = cloneCard(card, {
+                    'class': 'card decklistCard',
                     'oncontextmenu': 'event.preventDefault(); focusCard(this)',
                     'onmouseenter': 'decklistCardHover(this)',
                     'ontouchstart': 'decklistCardHover(this)',
@@ -1091,7 +1160,7 @@
             newCard.appendChild(createElement('input', null, {
                 'type': 'button',
                 'value': count,
-                'class': 'decklistCardCountNumber textObject'
+                'class': 'individualCardCount scaledTextObject'
             }))
             decklistCards.appendChild(newCard)
             modifyDecklistCardCount(null, count)
@@ -1111,40 +1180,40 @@
         hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
-            'class': 'decklistCardHoverButtonAdd textObject',
-            'value': '+',
+            'class': 'decklistCardHoverButtonAdd scaledTextObject',
+            'value': '＋',
             'onclick': "modifyDecklistCardCount(this.parentNode.parentNode, +1)"
         }))
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
-            'class': 'decklistCardHoverButtonRemove textObject',
-            'value': '-',
+            'class': 'decklistCardHoverButtonRemove scaledTextObject',
+            'value': '－',
             'onclick': "modifyDecklistCardCount(this.parentNode.parentNode, -1)"
         }))
         fadeIn(hoverMenu)
     }
 
     function modifyDecklistCardCount (card, value) {
-        if (card && card.getElementsByClassName('decklistCardCountNumber')[0].value) {
+        if (card && card.getElementsByClassName('individualCardCount')[0].value) {
             var dataContainer = card.getElementsByClassName('data')[0]
-            const decklistCardCountNumber = Number(card.getElementsByClassName('decklistCardCountNumber')[0].value)
-            if (decklistCardCountNumber + value <= 0) {
+            const individualCardCount = Number(card.getElementsByClassName('individualCardCount')[0].value)
+            if (individualCardCount + value <= 0) {
                 card.remove()
             }
-            else if (decklistCardCountNumber + value > 1 &&
+            else if (individualCardCount + value > 1 &&
             (dataContainer.getAttribute('rarity') && dataContainer.getAttribute('rarity') == 'Rare ACE') ||
             (dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("◇ (Prism Star) Rule: You can't have more than 1 ◇ card with the same name in your deck. If a ◇ card would go to the discard pile, put it in the Lost Zone instead.")) ||
             (dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You can't have more than 1 Pokémon Star in your deck."))) {
                 return
             }
-            else if (decklistCardCountNumber + value > 4 && 
+            else if (individualCardCount + value > 4 && 
             !(dataContainer.getAttribute('supertype') == 'Energy' && dataContainer.getAttribute('subtypes').includes('Basic')) && 
             !(dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You may have as many of this card in your deck as you like."))) {
                 return
             }
-            var newValue = decklistCardCountNumber + value
+            var newValue = individualCardCount + value
             card.setAttribute('count', newValue)
-            card.getElementsByClassName('decklistCardCountNumber')[0].value = newValue
+            card.getElementsByClassName('individualCardCount')[0].value = newValue
         }
         
         decklistCardCount.value = Number(decklistCardCount.value) + value
@@ -1177,7 +1246,7 @@
             alert('Editing decklist is disabled.')
             return
         }
-        deleteDecklist()
+        removeDecklistCards()
         text = text.split('\n')
         for (i=0; i<text.length; i++) {
             text[i] = text[i].replace('(', '').replace(')', '')
@@ -1286,7 +1355,7 @@
         var text = []
         for (i=0; i<cards.length; i++) {
             var dataContainer = cards[i].getElementsByClassName(['data'])[0]
-            var count = cards[i].getElementsByClassName('decklistCardCountNumber')[0].value
+            var count = cards[i].getElementsByClassName('individualCardCount')[0].value
             var name = dataContainer.getAttribute('name')
             var code
             if (JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']) {
@@ -1321,14 +1390,33 @@
         alert("Sort Decklist— Coming Soon")
     }
 
+    function changeCardScale (value) {
+        value = Number(value)
+        if (value < 0) {
+            value = -1 / (value -1)
+        }
+        else {
+            value = value + 1
+        }
+        document.documentElement.style.setProperty('--cardScale', value);
+    }
+
     function deleteDecklist () {
-        if (isDecklistLocked == true) {
+        if (!decklistCards.firstChild) {
+            alert('There are no cards to delete.')
+        }
+        else if (isDecklistLocked == true) {
             alert('Editing decklist is disabled.')
-            return
         }
+        else if (confirm('Are you sure you want to delete the decklist?')) {
+            removeDecklistCards()
+        }
+    }
+
+    function removeDecklistCards () {
         while (decklistCards.firstChild) {
-            decklistCards.removeChild(decklistCards.firstChild);
-        }
+                decklistCards.removeChild(decklistCards.firstChild);
+            }
         decklistCardCount.value = 0;
         decklistCardCount.setAttribute('style', 'color: white')
     }
