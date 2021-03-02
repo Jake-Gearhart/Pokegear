@@ -16,8 +16,8 @@
         <input id='decklistCardCount' class='textObject disabled' type='button' value='0'>
         <div id='decklistCards'></div>
     </div>
-    <div id='sidebar' onmouseenter='enableSidebarChildren()' onmouseleave='disableSidebarChildren()'>
-        <input id='sidebarArrow' class='disabled' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(this, true)'>
+    <div id='sidebar' onmouseenter='enableSidebarChildren()' onmouseleave='disableSidebarChildren()' ontouchstart='fullScreenSidebar(true)'>
+        <input id='sidebarArrow' class='disabled' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
         <div id='searchFieldCards' class='disabled' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br><br>
             <p>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it (or pressing and holding on mobile). When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
@@ -858,18 +858,19 @@
 
     //SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR
 
-    function fullScreenSidebar (elem, fullScreen) {
+    function fullScreenSidebar (fullScreen) {
+        var sidebarArrow = document.getElementById('sidebarArrow')
         if (fullScreen == true) {
             sidebarDiv.setAttribute('style', 'width: 100%; margin-left: 0%')
-            document.getElementById('sidebarArrow').setAttribute('style', 'transform: rotate(180deg)')
-            elem.title = 'Click to Minimize'
-            elem.setAttribute('onclick', 'fullScreenSidebar(this, false)')
+            sidebarArrow.setAttribute('style', 'transform: rotate(180deg)')
+            sidebarArrow.title = 'Click to Minimize'
+            sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(false)')
         }
         if (fullScreen == false) {
             sidebarDiv.style = ''
-            document.getElementById('sidebarArrow').style = ''
-            elem.title = 'Click to Expand'
-            elem.setAttribute('onclick', 'fullScreenSidebar(this, true)')
+            sidebarArrow.style = ''
+            sidebarArrow.title = 'Click to Expand'
+            sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(true)')
         }
     }
 
