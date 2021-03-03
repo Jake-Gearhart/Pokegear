@@ -1356,44 +1356,44 @@
 
             //fix set numbers
             var brokenSetNumbers = {
-                'swshp': '*00',
-                'smp': '*0',
-                'xyp': '*0',
-                'bwp': '*0',
-                'hsp': '*0',
-                'dpp': '*0',
-                'swsh45sv': '*00',
-                'bw11': 115,
-                'g1': 100
+                'swshp': ['SWSH', '00'],
+                'smp': ['SM', '0'],
+                'xyp': ['XY', '0'],
+                'bwp': ['BW', '0'],
+                'hsp': ['HGSS', '0'],
+                'dpp': ['DP', '0'],
+                'swsh45sv': ['SV', '00'],
+                'bw11': ['RC', 115],
+                'g1': ['RC', 100]
             }
 
             for (brokenSetNumber in brokenSetNumbers) {
-                if (line[line.length - 2] == brokenSetNumber) {
-                    if (brokenSetNumbers[brokenSetNumber] == '*00') {
-                        if (line[line.length -1] == 1) {
-                            line[line.length -1] = '*00' + line[line.length -1]
+                if (line[line.length -2] == brokenSetNumber && !line[line.length -1].includes(brokenSetNumbers[brokenSetNumber][0])) {
+                    //00x
+                    if (brokenSetNumbers[brokenSetNumber][1] == '00') {
+                        if (Number(line[line.length -1]) < 10) {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '00' + line[line.length -1]
                         }
-                        else if (line[line.length -1] == 2) {
-                            line[line.length -1] = '*0' + line[line.length -1]
-                        }
-                        else {
-                            line[line.length -1] = '*' + line[line.length -1]
-                        }
-                    }
-                    else if (brokenSetNumbers[brokenSetNumber] == '*0') {
-                        if (line[line.length -1] == 1) {
-                            line[line.length -1] = '*0' + line[line.length -1]
+                        else if (Number(line[line.length -1]) < 100) {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
                         }
                         else {
-                            line[line.length -1] = '*' + line[line.length -1]
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
                         }
                     }
-                    else if (line[line.length -1] > brokenSetNumbers[brokenSetNumber]) {
-                        console.log(line[line.length -1])
-                        console.log(brokenSetNumbers[brokenSetNumber])
-                        line[line.length -1] = 'RC' + (Number(line[line.length -1]) - brokenSetNumbers[brokenSetNumber])
+                    //0x
+                    else if (brokenSetNumbers[brokenSetNumber][1] == '0') {
+                        if (Number(line[line.length -1]) < 10) {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
+                        }
+                        else {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
+                        }
                     }
-                    break
+                    //RC
+                    else if (Number(line[line.length -1]) > brokenSetNumbers[brokenSetNumber][1]) {
+                        line[line.length -1] = 'RC' + (Number(line[line.length -1]) - brokenSetNumbers[brokenSetNumber][1])
+                    }
                 }
             }
 
