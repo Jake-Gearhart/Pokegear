@@ -1206,7 +1206,8 @@
             var dataContainer = card.getElementsByClassName('data')[0]
             const individualCardCount = Number(card.getElementsByClassName('individualCardCount')[0].value)
             if (individualCardCount + value <= 0) {
-                card.remove()
+                fadeOut(card)
+                return
             }
             else if (individualCardCount + value > 1 &&
             (dataContainer.getAttribute('rarity') && dataContainer.getAttribute('rarity') == 'Rare ACE') ||
