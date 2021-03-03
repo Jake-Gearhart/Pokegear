@@ -652,7 +652,7 @@
                 })
             ).appendChild(
                 createElement('img', null, {
-                    'class': 'setSymbol',
+                    'class': 'setSymbol fadeIn',
                     'src': sets[i]['images']['symbol'],
                     'alt': 'set.id:' + sets[i]['id'],
                     'style': 'pointer-events: none;'
@@ -733,7 +733,7 @@
             var newButton = bottomSearchButtonsDiv.appendChild(
                 createElement('div', null, {
                     'id': combinationButtons[i]['combinationId'],
-                    'class': 'setSymbolDiv',
+                    'class': 'setSymbolDiv fadeIn',
                     'title': combinationButtons[i]['combinationTitle'],
                     'onclick': `highlightButton(this, true, true, ${combinationButtons[i]['sets']})`
                 }))
@@ -813,7 +813,7 @@
     function createCard (data) {
         container = createElement('div', null, {
             'id': data['id'],
-            'class': 'card',
+            'class': 'card fadeIn',
             'oncontextmenu': 'event.preventDefault(); focusCard(this)',
             'onmouseenter': 'sidebarCardHover(this)',
             'ontouchstart': 'sidebarCardHover(this)',
@@ -1047,8 +1047,8 @@
 
         //check for blank search
         if (q == '') {
-            while (searchFieldCards.firstChild) {
-                searchFieldCards.removeChild(searchFieldCards.firstChild);
+            for (i=0; i<searchFieldCards.children.length; i++) {
+                fadeOut(searchFieldCards.children[i])
             }
             previousSearch = null
             currentFetchID++
@@ -1076,8 +1076,8 @@
 
         //remove existing cards
         if (pageNumber == 1) {
-            while (searchFieldCards.firstChild) {
-                searchFieldCards.removeChild(searchFieldCards.firstChild);
+            for (i=0; i<searchFieldCards.children.length; i++) {
+                fadeOut(searchFieldCards.children[i])
             }
             searchFieldCards.scrollTop = 0
         }
@@ -1162,7 +1162,8 @@
                 newCard.getElementsByClassName('cardHoverMenu')[0].remove()
             }
             if (newCard.getElementsByClassName('shine')[0]) {
-                newCard.getElementsByClassName('shine')[0].setAttribute('style', 'border-radius: calc(0.15cm * var(--cardScale));')
+                var shineFPS = window.getComputedStyle(document.documentElement).getPropertyValue('--shineFPS')
+                newCard.getElementsByClassName('shine')[0].setAttribute('style', `animation-delay: -${randomInteger(0, shineFPS * 5) / shineFPS}s; border-radius: calc(0.15cm * var(--cardScale));`)
             }
             newCard.appendChild(createElement('input', null, {
                 'type': 'button',
@@ -1432,8 +1433,8 @@
     }
 
     function removeDecklistCards () {
-        for (i=0; i<decklistCards.childNodes.length; i++) {
-            fadeOut(decklistCards.childNodes[i])
+        for (i=0; i<decklistCards.children.length; i++) {
+            fadeOut(decklistCards.children[i])
         }
         decklistCardCount.value = 0;
         decklistCardCount.setAttribute('style', 'color: white')
