@@ -56,7 +56,7 @@
         --darkBlue30: rgba(15, 15, 71, 0.3);
         --darkBlue60: rgba(15, 15, 71, 0.6);
         --midBlue: #2e3365;
-        --shineFPS: 20;
+        --shineFPS: 30;
     }
     @media only screen and (max-device-width: 600px) {
         :root {
@@ -420,6 +420,7 @@
     .decklistCard {
         width: var(--scaledCardWidth);
         height: var(--scaledCardHeight);
+        border-radius: calc(0.15cm * var(--cardScale));
     }
     .card:hover {
         transform: scale(2);
@@ -831,9 +832,10 @@
                 }
             }
             if (shine === true) {
+                var shineFPS = window.getComputedStyle(document.documentElement).getPropertyValue('--shineFPS')
                 container.appendChild(createElement('div', null, {
                     'class': 'shine',
-                    'style': `animation-delay: -${randomInteger(0, window.getComputedStyle(document.documentElement).getPropertyValue('--shineFPS') * 5) / 20}s`
+                    'style': `animation-delay: -${randomInteger(0, shineFPS * 5) / shineFPS}s`
                 }))
             }
         }
@@ -1156,6 +1158,9 @@
                 })
             if (newCard.getElementsByClassName('cardHoverMenu')[0]) {
                 newCard.getElementsByClassName('cardHoverMenu')[0].remove()
+            }
+            if (newCard.getElementsByClassName('shine')[0]) {
+                newCard.getElementsByClassName('shine')[0].setAttribute('style', 'border-radius: calc(0.15cm * var(--cardScale));')
             }
             newCard.appendChild(createElement('input', null, {
                 'type': 'button',
