@@ -23,8 +23,9 @@
     <div id='sidebar' ontouchstart='fullScreenSidebar(true)'>
         <input id='sidebarArrow' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
         <div id='searchFieldCards' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
-            <br><br>
-            <p>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it. When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
+            <br class='helpText'>
+            <br class='helpText'>
+            <p class='helpText'>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it. When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
         </div>
         <div id='bottomSearchButtons'></div>
         <div class='searchParameter'>
@@ -1046,7 +1047,7 @@
         }
 
         //check for blank search
-        if (q == '') {
+        if (q == '' && !searchFieldCards.getElementsByClassName('helpText')[0]) {
             for (i=0; i<searchFieldCards.children.length; i++) {
                 fadeOut(searchFieldCards.children[i])
             }
@@ -1073,9 +1074,16 @@
             return
         }
 
-
         //remove existing cards
         if (pageNumber == 1) {
+            if (searchFieldCards.getElementsByClassName('helpText')[0]) {
+                while (searchFieldCards.getElementsByClassName('helpText')[0]) {
+                    searchFieldCards.getElementsByClassName('helpText')[0].remove()
+                }
+            }
+            else {
+                searchFieldCards.lastChild.remove()
+            }
             for (i=0; i<searchFieldCards.children.length; i++) {
                 fadeOut(searchFieldCards.children[i])
             }
