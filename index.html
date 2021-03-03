@@ -21,6 +21,7 @@
         <div id='decklistCards'></div>
     </div>
     <div id='sidebar' ontouchstart='fullScreenSidebar(true)'>
+        <img id='loadingGif' src='loading.gif'>
         <input id='sidebarArrow' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
         <div id='searchFieldCards' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br class='helpText'>
@@ -29,7 +30,7 @@
         </div>
         <div id='bottomSearchButtons'></div>
         <div class='searchParameter'>
-            <input class='searchType textObject' type='button' value='Name' searchType='name'>
+            <input class='searchType textObject' type='button' value='Name' searchType='["name"]'>
             <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
             <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); search(1)'>
         </div>
@@ -38,7 +39,7 @@
 </html>
 <template>
     <div class='searchParameter'>
-        <input class='searchType textObject' type='button' value='Attack Text' searchType='attacks.text'>
+        <input class='searchType textObject' type='button' value='Card Text' searchType='["attacks.text", "abilities.text"]'>
         <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
         <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); search(1)'>
     </div>
@@ -86,6 +87,16 @@
         -webkit-appearance: none;
         border-radius: 0;
         -webkit-border-radius: 0;
+    }
+    #loadingGif {
+        z-index: 2000;
+        position: absolute;
+        width: calc(var(--cardHeight) / 3);
+        height: calc(var(--cardHeight) / 3);
+        top: 0;
+        right: calc(var(--cardHeight) / 24);
+        margin: 0;
+        visibility: hidden;
     }
     .textObject {
         width: calc(var(--cardHeight) / 3);
@@ -545,6 +556,9 @@
     var callSearch = false
     var loadingMoreCards = false
 
+    //loading queue
+    var loadingQueue = 0
+
     //Import decklist variables
     var basicEnergies = {
         'grass': ['hs', '115'],
@@ -798,16 +812,40 @@
     }
 
     async function fetchCards (url) {
+        //fetching alert
+        loadingQueue = loadingQueue + 1
+        console.log(`Fetching ${url}`)
+        document.getElementById('loadingGif').setAttribute('style', 'visibility: visible')
+
         currentFetchID++
         const id = currentFetchID
-        const response = await fetch(url, header)
-        const json = await response.json()
-        return {
-            'id': id,
-            'cards': json['data'],
-            'page': json['page'],
-            'pageSize': json['pageSize'],
-            'totalCardCount': json['totalCount']
+        
+        try {
+            const response = await fetch(url, header)
+            const json = await response.json()
+
+            //recieved alert
+            loadingQueue = loadingQueue - 1
+            console.log(`Recieved ${url}`)
+            if (loadingQueue == 0) {
+                document.getElementById('loadingGif').setAttribute('style', 'visibility: hidden')
+            }
+
+            return {
+                'id': id,
+                'cards': json['data'],
+                'page': json['page'],
+                'pageSize': json['pageSize'],
+                'totalCardCount': json['totalCount']
+            }
+        }
+        catch {
+            //failed alert
+            loadingQueue = loadingQueue - 1
+            console.error(`Failed to recieve ${url}`)
+            if (loadingQueue == 0) {
+                document.getElementById('loadingGif').setAttribute('style', 'visibility: hidden')
+            }
         }
     }
 
@@ -1016,7 +1054,7 @@
 
         const parameters = document.getElementsByClassName('searchParameter')
         for (i = 0; i < parameters.length; i++) {
-            var searchType = parameters[i].getElementsByClassName('searchType')[0].getAttribute('searchType')
+            var searchType = JSON.parse(parameters[i].getElementsByClassName('searchType')[0].getAttribute('searchType'))
             if (searchType.length == 0) {
                 continue
             }
@@ -1030,7 +1068,18 @@
             searchField = searchField.split(' ')
             for (j = 0; j < searchField.length; j++) {
                 if (searchField[j].length > 0) {
-                    q = q + searchType + ':%22*' + searchField[j] + '*%22+'
+                    for (k = 0; k < searchType.length; k++) {
+                        if (k == 0) {
+                            q = q + '('
+                        }
+                        q = q + searchType[k] + ':%22*' + searchField[j] + '*%22'
+                        if (k + 1 != searchType.length) {
+                            q = q + '+OR+'
+                        }
+                        else {
+                            q = q + ')+'             
+                        }
+                    }
                 }
             }
         }
@@ -1065,8 +1114,8 @@
             previousSearch = url
         }
         
+        
         //fetch URL
-        console.log(`Fetching ${url}`)
         const response = await fetchCards(url, header)
 
         //return if not the most recent request
@@ -1347,6 +1396,12 @@
                     break
                 }
             }
+
+            //shiny vault
+            if (line[line.length -2] == 'swsh45' && line[line.length -1].includes('SV')) {
+                line[line.length -2] = 'swsh45sv'
+            }
+
             cardsToSearch.push({
                 'id': `${line[line.length -2]}-${line[line.length -1]}`,
                 'count': Number(line[0])
@@ -1358,18 +1413,20 @@
             setIDs.push(cardsToSearch[i]['id'])
         }
         var url = `https://api.pokemontcg.io/v2/cards?q=id:${setIDs.join('+OR+id:')}`
-        console.log(`Fetching ${url}`)
-        const response = await fetch(url, header)
-        const json = await response.json()
-        var cardData = json['data']
+
+        const response = await fetchCards(url, header)
+        var cardData = response['cards']
+
         for (i=0; i<cardsToSearch.length; i++) {
             var newCard = cardData.filter(function(e) {
                 return e.id == cardsToSearch[i]['id'];
             })[0]
             if (!newCard) {
-                console.error(`Could not load ${cardsToSearch[i]['id']}`)
+                console.error(`Failed to import ${cardsToSearch[i]['id']}`)
             }
-            addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
+            else {
+                addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
+            }
         }
     }
 
