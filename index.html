@@ -1264,7 +1264,6 @@
             const individualCardCount = Number(card.getElementsByClassName('individualCardCount')[0].value)
             if (individualCardCount + value <= 0) {
                 fadeOut(card)
-                return
             }
             else if (individualCardCount + value > 1 &&
             (dataContainer.getAttribute('rarity') && dataContainer.getAttribute('rarity') == 'Rare ACE') ||
@@ -1277,9 +1276,11 @@
             !(dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You may have as many of this card in your deck as you like."))) {
                 return
             }
-            var newValue = individualCardCount + value
-            card.setAttribute('count', newValue)
-            card.getElementsByClassName('individualCardCount')[0].value = newValue
+            if (individualCardCount + value > 0) {
+                var newValue = individualCardCount + value
+                card.setAttribute('count', newValue)
+                card.getElementsByClassName('individualCardCount')[0].value = newValue
+            }
         }
         
         decklistCardCount.value = Number(decklistCardCount.value) + value
