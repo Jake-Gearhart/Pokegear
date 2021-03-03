@@ -1130,7 +1130,7 @@
                     searchFieldCards.getElementsByClassName('helpText')[0].remove()
                 }
             }
-            else {
+            else if (searchFieldCards.lastChild) {
                 searchFieldCards.lastChild.remove()
             }
             for (i=0; i<searchFieldCards.children.length; i++) {
