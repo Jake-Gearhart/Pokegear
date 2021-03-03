@@ -1126,7 +1126,7 @@
         cardData = response['cards']
 
         //remove existing cards
-        if (cardData.length == 0) {
+        if (pageNumber == 1 && cardData.length == 0) {
             if (document.getElementById('sidebarCardsBottom')) {
                 document.getElementById('sidebarCardsBottom').remove()
             }
@@ -1134,9 +1134,14 @@
                 fadeOut(sidebarCards.children[i])
             }
         }
-        else {
+        else if (pageNumber == 1) {
             while (sidebarCards.firstChild) {
                 sidebarCards.firstChild.remove()
+            }
+        }
+        else {
+            if (document.getElementById('sidebarCardsBottom')) {
+                document.getElementById('sidebarCardsBottom').remove()
             }
         }
 
