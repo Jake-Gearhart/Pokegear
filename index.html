@@ -1146,17 +1146,15 @@
             sidebarCards.append(newCard)
         }
 
-        //bottom box
-        if (cardData.length > 0) {
-            sidebarCards.appendChild(
-                createElement('div', null, {
-                    'id': 'sidebarCardsBottom',
-                    'style': `width:100%; height: var(--cardHeight); transform: translateY(calc(-1 * var(--cardHeight))); pointer-events: none;`
-                })
-            )
-        }
-
         loadingMoreCards = false
+
+        //bottom box
+        sidebarCards.appendChild(
+            createElement('div', null, {
+                'id': 'sidebarCardsBottom',
+                'style': `width:100%; height: var(--cardHeight); transform: translateY(calc(-1 * var(--cardHeight))); pointer-events: none;`
+            })
+        )
     }
 
     function loadMoreCardsCheck () {
