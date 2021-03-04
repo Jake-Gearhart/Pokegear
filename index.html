@@ -525,6 +525,16 @@
         'Rare Shiny GX',
         'Rare Ultra'
     ]
+    const otherHolos = [
+        'col1-88',
+        'col1-89',
+        'col1-90',
+        'col1-91',
+        'col1-92',
+        'col1-93',
+        'col1-94',
+        'col1-95',
+    ]
     const translations = {
         'é': '%C3%A9',
         '◇': '%E2%97%87',
@@ -861,6 +871,14 @@
                     shine = true
                     break
                 }
+            }
+            if (shine == false) {
+                for (var i=0; i<otherHolos.length; i++) {
+                if (data['id'] == otherHolos[i]) {
+                    shine = true
+                    break
+                }
+            }
             }
             if (shine === true) {
                 var shineFPS = window.getComputedStyle(document.documentElement).getPropertyValue('--shineFPS')
