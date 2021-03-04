@@ -816,7 +816,7 @@
 
             //recieved alert
             loadingQueue = loadingQueue - 1
-            console.log(`Recieved ${url}`)
+            // console.log(`Recieved ${url}`)
             if (loadingQueue == 0) {
                 document.getElementById('loadingGif').setAttribute('style', 'visibility: hidden')
             }
@@ -1146,8 +1146,6 @@
             sidebarCards.append(newCard)
         }
 
-        loadingMoreCards = false
-
         //bottom box
         sidebarCards.appendChild(
             createElement('div', null, {
@@ -1155,10 +1153,11 @@
                 'style': `width:100%; height: var(--cardHeight); transform: translateY(calc(-1 * var(--cardHeight))); pointer-events: none;`
             })
         )
+
+        loadingMoreCards = false
     }
 
     function loadMoreCardsCheck () {
-        console.log(loadingMoreCards)
         if (loadingMoreCards == false && document.getElementById('sidebarCardsBottom')) {
             //if sidebarCardsBottom is in view
             var rect = document.getElementById('sidebarCardsBottom').getBoundingClientRect();
