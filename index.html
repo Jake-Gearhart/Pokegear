@@ -1260,13 +1260,13 @@
             'type': 'button',
             'class': 'decklistCardHoverButtonAdd scaledTextObject',
             'value': '＋',
-            'onclick': "modifyDecklistCardCount(this.parentNode.parentNode, +1)"
+            'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, +1)}'
         }))
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
             'class': 'decklistCardHoverButtonRemove scaledTextObject',
             'value': '－',
-            'onclick': "modifyDecklistCardCount(this.parentNode.parentNode, -1)"
+            'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, -1)}'
         }))
         fadeIn(hoverMenu)
     }
