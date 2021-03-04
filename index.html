@@ -31,8 +31,8 @@
         <div id='bottomSearchButtons'></div>
         <div class='searchParameter'>
             <input class='searchType textObject' type='button' value='Name' searchType='["name"]'>
-            <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
-            <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); search(1)'>
+            <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
+            <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
         </div>
         <input class='addParameterButton textObject' title='Add Parameter' type='button' value='＋' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
     </div>
@@ -40,8 +40,8 @@
 <template>
     <div class='searchParameter'>
         <input class='searchType textObject' type='button' value='Card Text' searchType='["attacks.text", "abilities.text", "rules"]'>
-        <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='search(1)'>
-        <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); search(1)'>
+        <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
+        <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
     </div>
 </template>
 <style>
@@ -552,7 +552,7 @@
     //Search variables
     var previousSearch
     var cooldown = false
-    var callSearch = false
+    var queuedSearch = false
     var loadingMoreCards = false
 
     //loading queue
@@ -772,15 +772,6 @@
 
     function randomInteger(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function isElementPartiallyInViewport(el) {
-        var rect = el.getBoundingClientRect();
-        var windowHeight = (window.innerHeight || document.documentElement.clientHeight);
-        var windowWidth = (window.innerWidth || document.documentElement.clientWidth);
-        var vertInView = (rect.top <= windowHeight) && ((rect.top + rect.height) >= 0);
-        var horInView = (rect.left <= windowWidth) && ((rect.left + rect.width) >= 0);
-        return (vertInView && horInView);
     }
 
     function createElement (type, innerHTML, attributes) {
@@ -1010,7 +1001,7 @@
                 }
             }
             if (initiateSearch == true) {
-                search(1)
+                constructSearchUrl()
             }
         }
         else {
@@ -1026,27 +1017,25 @@
                 }
             }
             if (initiateSearch == true) {
-                search(1)
+                constructSearchUrl()
             }
         }
     }
 
-    async function search (pageNumber) {
-        callSearch = false
+    function constructSearchUrl () {
         if (cooldown == true) {
-            callSearch = true
+            queuedSearch = true
             return
         }
-        else {
-            cooldown = true
-            setTimeout(() => {
-                cooldown = false
-                if (callSearch == true) {
-                    search(1)
-                    callSearch = false
-                }
-            }, 1500);
-        }
+        cooldown = true
+        queuedSearch = false
+        setTimeout(() => {
+            cooldown = false
+            if (queuedSearch == true) {
+                constructSearchUrl ()
+                queuedSearch = false
+            }
+        }, 1500);
 
         //construct URL
         var q = ''
@@ -1103,7 +1092,7 @@
             currentFetchID++
             return
         }
-        url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,number&q=${q}&page=${pageNumber}`
+        url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,number&q=${q}&page=1`
 
         //prevent repeat searches
         if (previousSearch == url) {
@@ -1112,8 +1101,13 @@
         else {
             previousSearch = url
         }
-        
-        
+
+        fetchNewSidebarCards(url)
+    }
+    
+    async function fetchNewSidebarCards(url) {
+        loadingMoreCards = true
+
         //fetch URL
         const response = await fetchCards(url, header)
 
@@ -1125,26 +1119,21 @@
         cardData = response['cards']
 
         //remove existing cards
-        if (pageNumber == 1 && cardData.length == 0) {
-            if (document.getElementById('sidebarCardsBottom')) {
-                document.getElementById('sidebarCardsBottom').remove()
+        if (document.getElementById('sidebarCardsBottom')) {
+            document.getElementById('sidebarCardsBottom').remove()
+        }
+        if (response['page'] == 1) {
+            if (cardData.length == 0) {
+                for (i=0; i<sidebarCards.children.length; i++) {
+                    fadeOut(sidebarCards.children[i])
+                }
             }
-            for (i=0; i<sidebarCards.children.length; i++) {
-                fadeOut(sidebarCards.children[i])
+            else {
+                while (sidebarCards.firstChild) {
+                    sidebarCards.firstChild.remove()
+                }
             }
         }
-        else if (pageNumber == 1) {
-            while (sidebarCards.firstChild) {
-                sidebarCards.firstChild.remove()
-            }
-        }
-        else {
-            if (document.getElementById('sidebarCardsBottom')) {
-                document.getElementById('sidebarCardsBottom').remove()
-            }
-        }
-
-        loadingMoreCards = false
 
         sidebarCards.setAttribute('url', url)
         sidebarCards.setAttribute('page', response['page'])
@@ -1162,20 +1151,26 @@
             sidebarCards.appendChild(
                 createElement('div', null, {
                     'id': 'sidebarCardsBottom',
-                    'style': `width:100%; height: var(--cardHeight); transform: translateY(calc(-1 * var(--cardHeight))); pointer-events: none;`
+                    'style': `width:100%; height: var(--cardHeight); transform: translateY(calc(-1 * var(--cardHeight))); pointer-events: none; background-color: rgba(255, 0, 0, 0.5)`
                 })
             )
         }
+
+        loadingMoreCards = false
     }
 
     function loadMoreCardsCheck () {
-        if (loadingMoreCards == false && document.getElementById('sidebarCardsBottom') && isElementPartiallyInViewport(document.getElementById('sidebarCardsBottom'))) {
-            var totalCardCount = sidebarCards.getAttribute('totalCardCount')
-            var page = sidebarCards.getAttribute('page')
-            var pageSize = sidebarCards.getAttribute('pageSize')
-            if (totalCardCount > page * pageSize) {
-                search(Number(page) + 1)
-                loadingMoreCards = true
+        console.log(loadingMoreCards)
+        if (loadingMoreCards == false && document.getElementById('sidebarCardsBottom')) {
+            //if sidebarCardsBottom is in view
+            var rect = document.getElementById('sidebarCardsBottom').getBoundingClientRect();
+            var windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+            if ((rect.top <= windowHeight) && ((rect.top + rect.height) >= 0)) {
+                //if not last page
+                var page = sidebarCards.getAttribute('page')
+                if (sidebarCards.getAttribute('totalCardCount') > page * sidebarCards.getAttribute('pageSize')) {
+                    fetchNewSidebarCards(sidebarCards.getAttribute('url').slice(0, -1) + (Number(page) + 1))
+                }
             }
         }
     }
