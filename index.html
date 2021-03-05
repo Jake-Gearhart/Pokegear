@@ -58,7 +58,7 @@
         --darkBlue30: rgba(15, 15, 71, 0.3);
         --darkBlue60: rgba(15, 15, 71, 0.6);
         --midBlue: #2e3365;
-        --shineFPS: 20;
+        --holoSpeed: 20s;
     }
     @media only screen and (max-device-width: 600px) {
         :root {
@@ -448,25 +448,19 @@
         object-fit: inherit;
     }
     .shine {
-        width: 100%; 
+        width: 100%;
         height: 100%;
         position: absolute;
         pointer-events: none;
-        border-radius: 0.15cm;
-        background-image: repeating-linear-gradient(
-            -54.4deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.5),
-            transparent 50%
-        );
-        background-size: 300% 100%;
-        animation: shine 5s infinite steps(calc(var(--shineFPS)*5));
+        opacity: 35%;
+        background-size: 200% 200%;
+        background-image: url('holo_overlay.png');
+        animation: shine var(--holoSpeed) linear infinite;
     }
 
     @keyframes shine {
-        0% {
-            background-position: right;    
-        }
+        from { background-position: 0 0; }
+	    to { background-position: calc(var(--scaledCardWidth) * 2) calc(var(--scaledCardHeight) * 2); }
     }
     .focusedCard {
         position: fixed;
@@ -543,6 +537,8 @@
     }
 
     const header = {headers:{'X-Api-Key': 'c937592b-dbe9-47de-a29f-194bce94c11b'}}
+
+    const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed').slice(0, -1))
 
     //sidebar
     const sidebarDiv = document.getElementById('sidebar')
@@ -881,10 +877,9 @@
             }
             }
             if (shine === true) {
-                var shineFPS = window.getComputedStyle(document.documentElement).getPropertyValue('--shineFPS')
                 container.appendChild(createElement('div', null, {
                     'class': 'shine',
-                    'style': `animation-delay: -${randomInteger(0, shineFPS * 5) / shineFPS}s`
+                    'style': `animation-delay: -${randomInteger(0, holoSpeed)}s`
                 }))
             }
         }
@@ -1233,8 +1228,7 @@
                 newCard.getElementsByClassName('cardHoverMenu')[0].remove()
             }
             if (newCard.getElementsByClassName('shine')[0]) {
-                var shineFPS = window.getComputedStyle(document.documentElement).getPropertyValue('--shineFPS')
-                newCard.getElementsByClassName('shine')[0].setAttribute('style', `animation-delay: -${randomInteger(0, shineFPS * 5) / shineFPS}s; border-radius: calc(0.15cm * var(--cardScale));`)
+                newCard.getElementsByClassName('shine')[0].setAttribute('style', `animation-delay: -${randomInteger(0, holoSpeed)}s;`)
             }
             newCard.appendChild(createElement('input', null, {
                 'type': 'button',
