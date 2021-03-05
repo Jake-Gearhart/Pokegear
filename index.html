@@ -39,7 +39,7 @@
 </html>
 <template>
     <div class='searchParameter'>
-        <input class='searchType textObject' type='button' value='Card Text' searchType='["attacks.text", "abilities.text", "rules"]'>
+        <input class='searchType textObject' type='button' value='Card Text' searchType='["attacks.name", "attacks.text", "abilities.name", "abilities.text", "rules"]'>
         <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
         <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
     </div>
