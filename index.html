@@ -452,17 +452,18 @@
     .shine {
         width: 100%;
         height: 100%;
+        border-radius: inherit;
         position: absolute;
         pointer-events: none;
-        opacity: 35%;
+        opacity: 40%;
         background-size: 200% 200%;
         background-image: url('holo_overlay.png');
         animation: shine var(--holoSpeed) linear infinite;
     }
 
     @keyframes shine {
-        from { background-position: 0 0; }
-	    to { background-position: calc(var(--scaledCardWidth) * 2) calc(var(--scaledCardHeight) * 2); }
+        from { background-position: 200% 200%; }
+	    to { background-position: 0 0; }
     }
     .focusedCard {
         position: fixed;
@@ -535,7 +536,8 @@
         'é': '%C3%A9',
         '◇': '%E2%97%87',
         '◊': '%E2%97%87',
-        'prism star': '%E2%97%87'
+        'prism star': '%E2%97%87',
+        'delta': '%CE%B4'
     }
 
     const header = {headers:{'X-Api-Key': 'c937592b-dbe9-47de-a29f-194bce94c11b'}}
