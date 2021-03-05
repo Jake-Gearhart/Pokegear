@@ -58,7 +58,8 @@
         --darkBlue30: rgba(15, 15, 71, 0.3);
         --darkBlue60: rgba(15, 15, 71, 0.6);
         --midBlue: #2e3365;
-        --holoSpeed: 20s;
+        --holoSpeed: 20;
+        --holoFPS: 20;
     }
     @media only screen and (max-device-width: 600px) {
         :root {
@@ -458,7 +459,7 @@
         opacity: 40%;
         background-size: 200% 200%;
         background-image: url('holo_overlay.png');
-        animation: shine var(--holoSpeed) linear infinite;
+        animation: shine calc(1s * var(--holoSpeed)) infinite steps(calc(var(--holoSpeed) * var(--holoFPS)));
     }
 
     @keyframes shine {
@@ -541,8 +542,6 @@
     }
 
     const header = {headers:{'X-Api-Key': 'c937592b-dbe9-47de-a29f-194bce94c11b'}}
-
-    const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed').slice(0, -1))
 
     //sidebar
     const sidebarDiv = document.getElementById('sidebar')
@@ -881,9 +880,11 @@
             }
             }
             if (shine === true) {
+                const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
+                const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
                 container.appendChild(createElement('div', null, {
                     'class': 'shine',
-                    'style': `animation-delay: -${randomInteger(0, holoSpeed)}s`
+                    'style': `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`
                 }))
             }
         }
@@ -1232,7 +1233,9 @@
                 newCard.getElementsByClassName('cardHoverMenu')[0].remove()
             }
             if (newCard.getElementsByClassName('shine')[0]) {
-                newCard.getElementsByClassName('shine')[0].setAttribute('style', `animation-delay: -${randomInteger(0, holoSpeed)}s;`)
+                const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
+                const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
+                newCard.getElementsByClassName('shine')[0].setAttribute('style', `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`)
             }
             newCard.appendChild(createElement('input', null, {
                 'type': 'button',
