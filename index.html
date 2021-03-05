@@ -1012,6 +1012,7 @@
             prices = prices.join('\n')
             focused.appendChild(createElement('input', null, {
                 'class': 'textObject focusedPrice',
+                'title': JSON.parse(dataContainer.getAttribute('tcgplayer'))['url'],
                 'type': 'button',
                 'value': prices,
                 'onclick': `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`
