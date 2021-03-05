@@ -450,7 +450,7 @@
         left: 0;
         object-fit: inherit;
     }
-    .shine {
+    .holo {
         width: 100%;
         height: 100%;
         border-radius: inherit;
@@ -459,23 +459,12 @@
         opacity: 40%;
         background-size: 200% 200%;
         background-image: url('holo_overlay.png');
-        animation: shine calc(1s * var(--holoSpeed)) infinite steps(calc(var(--holoSpeed) * var(--holoFPS)));
+        animation: holo calc(1s * var(--holoSpeed)) infinite steps(calc(var(--holoSpeed) * var(--holoFPS)));
     }
 
-    @keyframes shine {
+    @keyframes holo {
         from { background-position: 200% 200%; }
 	    to { background-position: 0 0; }
-    }
-    .focusedCard {
-        position: fixed;
-        max-height: 90%;
-        max-width: 90%;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0%;
-        margin: auto;
-        object-fit: contain;
     }
     #focused {
         z-index: 2000;
@@ -485,6 +474,26 @@
         top: -50%;
         left: -50%;
         background-color: rgba(0, 0, 0, 0.6);
+    }
+    .focusedCard {
+        position: fixed;
+        height: 90%;
+        width: 50%;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto;
+        object-fit: contain;
+    }
+    .focusedPrice {
+        position: fixed;
+        height: 50%;
+        width: 20%;
+        top: 25%;
+        left: 2.5%;
+        object-fit: contain;
+        cursor: pointer;
     }
     .fadeIn {
         animation: fadeIn 0.25s;
@@ -557,6 +566,14 @@
     //Focused card
     var currentFocused
     var currentFetchID = 0
+
+    const priceDataTranslations = {
+        'normal': 'Regular',
+        'holofoil': 'Holo',
+        'reverseHolofoil': 'Reverse Holo',
+        '1stEditionHolofoil': 'First Edition Holo',
+        '1stEditionNormal': 'First Edition'
+    }
 
     //Search variables
     var previousSearch
@@ -849,6 +866,8 @@
     }
 
     function createCard (data) {
+        //TEMPORARY UNOWN FIX
+        data['id'] = data['id'].replace('?', 'question').replace('!', 'exclamation')
         container = createElement('div', null, {
             'id': data['id'],
             'class': 'card fadeIn',
@@ -864,26 +883,26 @@
         }))
 
         if (holo_animations == true) {
-            var shine = false
+            var holo = false
             for (var i=0; i<holoRarities.length; i++) {
                 if (data['rarity'] == holoRarities[i]) {
-                    shine = true
+                    holo = true
                     break
                 }
             }
-            if (shine == false) {
+            if (holo == false) {
                 for (var i=0; i<otherHolos.length; i++) {
                 if (data['id'] == otherHolos[i]) {
-                    shine = true
+                    holo = true
                     break
                 }
             }
             }
-            if (shine === true) {
+            if (holo === true) {
                 const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
                 const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
                 container.appendChild(createElement('div', null, {
-                    'class': 'shine',
+                    'class': 'holo',
                     'style': `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`
                 }))
             }
@@ -936,7 +955,9 @@
         var focused
         if (document.getElementById('focused')) {
             focused = document.getElementById('focused')
-            document.querySelectorAll(".focusedCard").forEach(focusedCard => focusedCard.remove())
+            while (focused.firstChild) {
+                focused.firstChild.remove()
+            }
         }
         else {
             focused = document.body.appendChild(
@@ -964,8 +985,8 @@
                 'image': JSON.parse(dataContainer.getAttribute('images'))['large']
         })
 
-        //remove individualCardCount, cardHoverMenu, and shine
-        var remove = ['individualCardCount', 'cardHoverMenu', 'shine']
+        //remove individualCardCount, cardHoverMenu, and holo
+        var remove = ['individualCardCount', 'cardHoverMenu', 'holo']
         for (i=0; i<remove.length; i++) {
             if (newCard.getElementsByClassName(remove[i])[0]) {
                 newCard.getElementsByClassName(remove[i])[0].remove()
@@ -973,6 +994,36 @@
         }
 
         focused.appendChild(newCard)
+
+        //add price data
+        if (dataContainer.getAttribute('tcgplayer') && JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']) {
+            var prices = []
+            var pricesData = JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']
+            for (priceData in pricesData) {
+                if (priceDataTranslations[priceData]) {
+                    prices.push(priceDataTranslations[priceData])
+                }
+                else {
+                    prices.push(priceData)
+                }
+                prices.push(`$${pricesData[priceData]['market']}`)
+                prices.push('')
+            }
+            prices = prices.join('\n')
+            focused.appendChild(createElement('input', null, {
+                'class': 'textObject focusedPrice',
+                'type': 'button',
+                'value': prices,
+                'onclick': `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`
+            }))
+        }
+        else {
+            focused.appendChild(createElement('input', null, {
+                'class': 'textObject focusedPrice',
+                'type': 'button',
+                'value': 'No Prices Available'
+            }))
+        }
     }
 
     function cycleFocused (direction) {
@@ -1009,7 +1060,7 @@
         if (highlight == true) {
             elem.setAttribute('style', 'background-color: rgba(0, 255, 0, 0.6)')
             if (group.length < 1) {
-                elem.setAttribute('onclick', `highlightButton(this, false, true, [])`)
+                elem.setAttribute('onclick', 'highlightButton(this, false, true, [])')
                 elem.classList.add('searchSet')
             }
             else {
@@ -1025,7 +1076,7 @@
         else {
             elem.setAttribute('style', 'background-color: initial')
             if (group.length < 1) {
-                elem.setAttribute('onclick', `highlightButton(this, true, true, [])`)
+                elem.setAttribute('onclick', 'highlightButton(this, true, true, [])')
                 elem.classList.remove('searchSet')
             }
             else {
@@ -1232,10 +1283,10 @@
             if (newCard.getElementsByClassName('cardHoverMenu')[0]) {
                 newCard.getElementsByClassName('cardHoverMenu')[0].remove()
             }
-            if (newCard.getElementsByClassName('shine')[0]) {
+            if (newCard.getElementsByClassName('holo')[0]) {
                 const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
                 const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
-                newCard.getElementsByClassName('shine')[0].setAttribute('style', `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`)
+                newCard.getElementsByClassName('holo')[0].setAttribute('style', `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`)
             }
             newCard.appendChild(createElement('input', null, {
                 'type': 'button',
@@ -1434,8 +1485,8 @@
         var cardData = response['cards']
 
         for (i=0; i<cardsToSearch.length; i++) {
-            var newCard = cardData.filter(function(e) {
-                return e.id == cardsToSearch[i]['id'];
+            var newCard = cardData.filter(function(card) {
+                return card.id == cardsToSearch[i]['id'];
             })[0]
             if (!newCard) {
                 console.error(`Failed to import ${cardsToSearch[i]['id']}`)
