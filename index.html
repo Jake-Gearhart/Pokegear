@@ -990,14 +990,17 @@
             var prices = []
             var pricesData = JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']
             for (priceData in pricesData) {
-                if (pricesData[priceData]['market'] || pricesData[priceData]['mid'] || pricesData[priceData]['low'] || pricesData[priceData]['high']) {
+                if (pricesData[priceData]['directLow'] || pricesData[priceData]['market'] || pricesData[priceData]['mid'] || pricesData[priceData]['low'] || pricesData[priceData]['high']) {
                     if (priceDataTranslations[priceData]) {
                         prices.push(priceDataTranslations[priceData])
                     }
                     else {
                         prices.push(priceData)
                     }
-                    if (pricesData[priceData]['market']) {
+                    if (pricesData[priceData]['directLow']) {
+                        prices.push(`$${pricesData[priceData]['directLow']}`)
+                    }
+                    else if (pricesData[priceData]['market']) {
                         prices.push(`$${pricesData[priceData]['market']}`)
                     }
                     else if (pricesData[priceData]['mid']) {
