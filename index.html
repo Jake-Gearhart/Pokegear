@@ -84,7 +84,7 @@
         user-select: none;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
     }
-    input[type="button"] {
+    input {
         text-align: center;
         -webkit-appearance: none;
         border-radius: 0;
@@ -586,11 +586,11 @@
     var currentFetchID = 0
 
     const priceDataTranslations = {
-        'normal': 'Regular',
-        'holofoil': 'Holo',
-        'reverseHolofoil': 'Reverse Holo',
-        '1stEditionHolofoil': '1st Edition Holo',
-        '1stEditionNormal': '1st Edition'
+        'normal': 'Regular:',
+        'holofoil': 'Holo:',
+        'reverseHolofoil': 'Reverse Holo:',
+        '1stEditionHolofoil': '1st Edition Holo:',
+        '1stEditionNormal': '1st Edition:'
     }
 
     //Search variables
@@ -965,6 +965,9 @@
     //CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS
 
     function focusCard (card) {
+        if (!isCardInView(card)) {
+            card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+        }
         currentFocused = card
         //create focused
         var focused
@@ -1068,14 +1071,14 @@
                     prices.push('')
                 }
             }
-            prices = prices.join('\n')
+            prices = prices.join(' ')
             focusedContainer.appendChild(createElement('input', null, {
                 'class': 'textObject focusedPrice',
                 'title': JSON.parse(dataContainer.getAttribute('tcgplayer'))['url'],
-                'type': 'button',
+                'type': 'submit',
                 'value': prices,
                 'onclick': `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`,
-                'style': 'font-weight: bold'
+                'style': 'font-weight: bold; white-space: normal; line-height: 2em'
             }))
 
         }
@@ -1084,7 +1087,7 @@
                 'class': 'textObject focusedPrice',
                 'type': 'button',
                 'value': 'No Prices Available',
-                'style': 'font-weight: bold'
+                'style': 'font-weight: bold; white-space: normal; line-height: 2em'
             }))
         }
     }
@@ -1290,12 +1293,21 @@
         loadingMoreCards = false
     }
 
+    function isCardInView (elem) {
+        var rect = elem.getBoundingClientRect();
+        var windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+        if ((rect.top <= windowHeight) && ((rect.top + rect.height) >= 0)) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+
     function loadMoreCardsCheck () {
         if (loadingMoreCards == false && document.getElementById('sidebarCardsBottom')) {
             //if sidebarCardsBottom is in view
-            var rect = document.getElementById('sidebarCardsBottom').getBoundingClientRect();
-            var windowHeight = (window.innerHeight || document.documentElement.clientHeight);
-            if ((rect.top <= windowHeight) && ((rect.top + rect.height) >= 0)) {
+            if (isCardInView(document.getElementById('sidebarCardsBottom'))) {
                 //if not last page
                 var page = sidebarCards.getAttribute('page')
                 if (sidebarCards.getAttribute('totalCardCount') > page * sidebarCards.getAttribute('pageSize')) {
