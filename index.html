@@ -1019,20 +1019,24 @@
         }
 
         //left and right buttons
-        focusedContainer.appendChild(createElement('input', null, {
-            'class': 'textObject focusedButtonLeft',
-            'type': 'button',
-            'title': 'Click, or Press W, A, Up Arrow, or Left Arrow Key',
-            'value': '❮',
-            'onclick': 'event.preventDefault(); cycleFocused("left")'
-        }))
-        focusedContainer.appendChild(createElement('input', null, {
-            'class': 'textObject focusedButtonRight',
-            'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
-            'type': 'button',
-            'value': '❯',
-            'onclick': 'cycleFocused("right")'
-        }))
+        if (currentFocused.previousSibling && currentFocused.previousSibling.classList.contains('card')) {
+            focusedContainer.appendChild(createElement('input', null, {
+                'class': 'textObject focusedButtonLeft',
+                'type': 'button',
+                'title': 'Click, or Press W, A, Up Arrow, or Left Arrow Key',
+                'value': '❮',
+                'onclick': 'event.preventDefault(); cycleFocused("left")'
+            }))
+        }
+        if (currentFocused.nextSibling && currentFocused.nextSibling.classList.contains('card')) {
+            focusedContainer.appendChild(createElement('input', null, {
+                'class': 'textObject focusedButtonRight',
+                'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
+                'type': 'button',
+                'value': '❯',
+                'onclick': 'cycleFocused("right")'
+            }))
+        }
 
         //add price data
         if (dataContainer.getAttribute('tcgplayer') && JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices'] && Object.keys(JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']).length != 0) {
