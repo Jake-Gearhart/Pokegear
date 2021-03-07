@@ -47,7 +47,8 @@
 <style>
     :root {
         --cardWidth: 3.15cm;
-        --cardHeight: calc(var(--cardWidth) * 512/367);
+        --heightWidthRatio: 512/367;
+        --cardHeight: calc(var(--cardWidth) * var(--heightWidthRatio));
         --cardScale: 1;
         --scaledCardWidth: calc(var(--cardWidth) * var(--cardScale));
         --scaledCardHeight: calc(var(--cardHeight) * var(--cardScale));
@@ -475,29 +476,53 @@
         left: -50%;
         background-color: rgba(0, 0, 0, 0.6);
     }
-    .focusedCard {
+    .focusedContainer {
         position: fixed;
+        width: min(100vw, 200vh);
+        height: min(50vw, 100vh);
+        top: calc(50% - min(50vw, 100vh) / 2);
+        left: calc(50% - min(100vw, 200vh) / 2);
+        /* background-color: rgba(0, 0, 255, 0.5); */
+    }
+    .focusedCard {
         height: 90%;
-        width: 50%;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        margin: auto;
         object-fit: contain;
     }
     .focusedPrice {
-        position: fixed;
-        height: 50%;
-        width: 20%;
-        top: 25%;
+        position: absolute;
+        height: 90%;
+        width: 12.5%;
+        top: 5%;
         left: 2.5%;
-        object-fit: contain;
         cursor: pointer;
+        object-fit: contain;
+        pointer-events: all
     }
-    .focusedPrice90 {
-        width: 10%;
+    .focusedButtonLeft {
+        position: absolute;
+        height: calc(100% / 3);
+        width: 7.5%;
+        top: calc(100% / 3);
+        left: 17.5%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all
     }
+    .focusedButtonRight {
+        position: absolute;
+        height: calc(100% / 3);
+        width: 7.5%;
+        top: calc(100% / 3);
+        right: 17.5%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all
+    }
+    
     .fadeIn {
         animation: fadeIn 0.25s;
     }
@@ -952,12 +977,22 @@
         else {
             focused = document.body.appendChild(
                 createElement('div', null, {
-                    'id': 'focused',
-                    'onclick': 'fadeOut(this); currentFocused = null'
+                    'id': 'focused'
                 })
             )
             fadeIn(focused)
         }
+
+        var focusedClickbox = focused.appendChild(createElement('div', null, {
+            'class': 'focusedClickbox',
+            'style': 'width: 100%; height: 100%;',
+            'onclick': 'fadeOut(this.parentNode); currentFocused = null'
+        }))
+
+        var focusedContainer = focused.appendChild(createElement('div', null, {
+            'class': 'focusedContainer',
+            'style': 'pointer-events: none'
+        }))
 
         var dataContainer = card.getElementsByClassName('data')[0]
 
@@ -966,14 +1001,14 @@
             rotation = 90
         }
 
-        newCard = cloneCard(card, {
-                'style': `transform: rotate(${rotation}deg);`,
+        var newCard = focusedContainer.appendChild(cloneCard(card, {
+                'style': `transform: translateY(5%) rotate(${rotation}deg);`,
                 'class': 'focusedCard',
                 'onclick': null,
                 'oncontextmenu': null,
                 'onmouseenter': null,
                 'image': JSON.parse(dataContainer.getAttribute('images'))['large']
-        })
+        }))
 
         //remove individualCardCount, cardHoverMenu, and holo
         var remove = ['individualCardCount', 'cardHoverMenu', 'holo']
@@ -983,7 +1018,19 @@
             }
         }
 
-        focused.appendChild(newCard)
+        //left and right buttons
+        focusedContainer.appendChild(createElement('input', null, {
+            'class': 'textObject focusedButtonLeft',
+            'type': 'button',
+            'value': '❮',
+            'onclick': 'event.preventDefault(); cycleFocused("left")'
+        }))
+        focusedContainer.appendChild(createElement('input', null, {
+            'class': 'textObject focusedButtonRight',
+            'type': 'button',
+            'value': '❯',
+            'onclick': 'cycleFocused("right")'
+        }))
 
         //add price data
         if (dataContainer.getAttribute('tcgplayer') && JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices'] && Object.keys(JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']).length != 0) {
@@ -1016,41 +1063,23 @@
                 }
             }
             prices = prices.join('\n')
-            if (rotation == 90) {
-                focused.appendChild(createElement('input', null, {
-                    'class': 'textObject focusedPrice focusedPrice90',
-                    'title': JSON.parse(dataContainer.getAttribute('tcgplayer'))['url'],
-                    'type': 'button',
-                    'value': prices,
-                    'onclick': `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`
-                }))  
-            }
-            else {
-                focused.appendChild(createElement('input', null, {
-                    'class': 'textObject focusedPrice',
-                    'title': JSON.parse(dataContainer.getAttribute('tcgplayer'))['url'],
-                    'type': 'button',
-                    'value': prices,
-                    'onclick': `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`
-                }))
-            }
+            focusedContainer.appendChild(createElement('input', null, {
+                'class': 'textObject focusedPrice',
+                'title': JSON.parse(dataContainer.getAttribute('tcgplayer'))['url'],
+                'type': 'button',
+                'value': prices,
+                'onclick': `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`,
+                'style': 'font-weight: bold'
+            }))
 
         }
         else {
-            if (rotation == 90) {
-                focused.appendChild(createElement('input', null, {
-                    'class': 'textObject focusedPrice focusedPrice90',
-                    'type': 'button',
-                    'value': 'No Prices Available'
-                }))
-            }
-            else {
-                focused.appendChild(createElement('input', null, {
-                    'class': 'textObject focusedPrice',
-                    'type': 'button',
-                    'value': 'No Prices Available'
-                }))
-            }
+            focusedContainer.appendChild(createElement('input', null, {
+                'class': 'textObject focusedPrice',
+                'type': 'button',
+                'value': 'No Prices Available',
+                'style': 'font-weight: bold'
+            }))
         }
     }
 
@@ -1072,13 +1101,13 @@
         var sidebarArrow = document.getElementById('sidebarArrow')
         if (fullScreen == true) {
             sidebarDiv.setAttribute('style', 'width: 100%; margin-left: 0%')
-            sidebarArrow.setAttribute('style', 'transform: rotate(180deg)')
+            sidebarArrow.setAttribute('value', '❮')
             sidebarArrow.title = 'Click to Minimize'
             sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(false)')
         }
         if (fullScreen == false) {
             sidebarDiv.style = ''
-            sidebarArrow.style = ''
+            sidebarArrow.setAttribute('value', '❯')
             sidebarArrow.title = 'Click to Expand'
             sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(true)')
         }
@@ -1403,124 +1432,125 @@
     }
 
     async function importDecklist (text) {
-        if (isDecklistLocked == true) {
-            alert('Editing decklist is disabled.')
-            return
-        }
-        removeDecklistCards()
-        text = text.split('\n')
-        var cardsToSearch = []
-        for (i=0; i<text.length; i++) {
-            text[i] = text[i].replace('(', '').replace(')', '')
-            var line = text[i].split(' ')
+        if (!decklistCards.firstChild || confirm('Are you sure you want to overwrite the existing decklist?')) {
+            removeDecklistCards()
+            text = text.split('\n')
+            var cardsToSearch = []
+            for (i=0; i<text.length; i++) {
+                text[i] = text[i].replace('(', '').replace(')', '')
+                var line = text[i].split(' ')
 
-            //remove * from beginning of line
-            if (line[0] == '*') {
-                line.shift()
-            }
+                //remove * from beginning of line
+                if (line[0] == '*') {
+                    line.shift()
+                }
 
-            //format line
-            if (isNaN(Number(line[0])) || line.length < 4) {
-                continue
-            }
-            else if (line.length == 4) {
-                for (basicEnergy in basicEnergies) {
-                    if (line[1].toLowerCase() == basicEnergy) {
-                        line[3] = basicEnergies[basicEnergy][0]
-                        line.push(basicEnergies[basicEnergy][1])
+                //format line
+                if (isNaN(Number(line[0])) || line.length < 4) {
+                    continue
+                }
+                else if (line.length == 4) {
+                    for (basicEnergy in basicEnergies) {
+                        if (line[1].toLowerCase() == basicEnergy) {
+                            line[3] = basicEnergies[basicEnergy][0]
+                            line.push(basicEnergies[basicEnergy][1])
+                        }
                     }
                 }
-            }
-            else if (line.length == 5 && line[2] == 'Energy' && line[3] == 'Energy') {
-                for (basicEnergy in basicEnergies) {
-                    if (line[1].toLowerCase() == basicEnergy) {
-                        line[3] = basicEnergies[basicEnergy][0]
-                        line[4] = basicEnergies[basicEnergy][1]
+                else if (line.length == 5 && line[2] == 'Energy' && line[3] == 'Energy') {
+                    for (basicEnergy in basicEnergies) {
+                        if (line[1].toLowerCase() == basicEnergy) {
+                            line[3] = basicEnergies[basicEnergy][0]
+                            line[4] = basicEnergies[basicEnergy][1]
+                        }
                     }
                 }
-            }
 
-            //set code translation
-            line[line.length -2] = line[line.length -2].toLowerCase()
-            for (input in setIdTranslations) {
-                if (line[line.length -2] == input) {
-                    line[line.length -2] = setIdTranslations[input]
-                    break
-                }
-            }
-
-            //fix set numbers
-            var brokenSetNumbers = {
-                'swshp': ['SWSH', '00'],
-                'smp': ['SM', '0'],
-                'xyp': ['XY', '0'],
-                'bwp': ['BW', '0'],
-                'hsp': ['HGSS', '0'],
-                'dpp': ['DP', '0'],
-                'swsh45sv': ['SV', '00'],
-                'bw11': ['RC', 115],
-                'g1': ['RC', 100]
-            }
-
-            for (brokenSetNumber in brokenSetNumbers) {
-                if (line[line.length -2] == brokenSetNumber && !line[line.length -1].includes(brokenSetNumbers[brokenSetNumber][0])) {
-                    //00x
-                    if (brokenSetNumbers[brokenSetNumber][1] == '00') {
-                        if (Number(line[line.length -1]) < 10) {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '00' + line[line.length -1]
-                        }
-                        else if (Number(line[line.length -1]) < 100) {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
-                        }
-                        else {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
-                        }
-                    }
-                    //0x
-                    else if (brokenSetNumbers[brokenSetNumber][1] == '0') {
-                        if (Number(line[line.length -1]) < 10) {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
-                        }
-                        else {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
-                        }
-                    }
-                    //RC
-                    else if (Number(line[line.length -1]) > brokenSetNumbers[brokenSetNumber][1]) {
-                        line[line.length -1] = 'RC' + (Number(line[line.length -1]) - brokenSetNumbers[brokenSetNumber][1])
+                //set code translation
+                line[line.length -2] = line[line.length -2].toLowerCase()
+                for (input in setIdTranslations) {
+                    if (line[line.length -2] == input) {
+                        line[line.length -2] = setIdTranslations[input]
+                        break
                     }
                 }
+
+                //fix set numbers
+                var brokenSetNumbers = {
+                    'swshp': ['SWSH', '00'],
+                    'smp': ['SM', '0'],
+                    'xyp': ['XY', '0'],
+                    'bwp': ['BW', '0'],
+                    'hsp': ['HGSS', '0'],
+                    'dpp': ['DP', '0'],
+                    'swsh45sv': ['SV', '00'],
+                    'bw11': ['RC', 115],
+                    'g1': ['RC', 100]
+                }
+
+                for (brokenSetNumber in brokenSetNumbers) {
+                    if (line[line.length -2] == brokenSetNumber && !line[line.length -1].includes(brokenSetNumbers[brokenSetNumber][0])) {
+                        //00x
+                        if (brokenSetNumbers[brokenSetNumber][1] == '00') {
+                            if (Number(line[line.length -1]) < 10) {
+                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '00' + line[line.length -1]
+                            }
+                            else if (Number(line[line.length -1]) < 100) {
+                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
+                            }
+                            else {
+                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
+                            }
+                        }
+                        //0x
+                        else if (brokenSetNumbers[brokenSetNumber][1] == '0') {
+                            if (Number(line[line.length -1]) < 10) {
+                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
+                            }
+                            else {
+                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
+                            }
+                        }
+                        //RC
+                        else if (Number(line[line.length -1]) > brokenSetNumbers[brokenSetNumber][1]) {
+                            line[line.length -1] = 'RC' + (Number(line[line.length -1]) - brokenSetNumbers[brokenSetNumber][1])
+                        }
+                    }
+                }
+
+                //shiny vault
+                if (line[line.length -2] == 'swsh45' && line[line.length -1].includes('SV')) {
+                    line[line.length -2] = 'swsh45sv'
+                }
+
+                cardsToSearch.push({
+                    'id': `${line[line.length -2]}-${line[line.length -1]}`,
+                    'count': Number(line[0])
+                })
             }
 
-            //shiny vault
-            if (line[line.length -2] == 'swsh45' && line[line.length -1].includes('SV')) {
-                line[line.length -2] = 'swsh45sv'
-            }
+            if (cardsToSearch.length > 1) {
+                var url = 'https://api.pokemontcg.io/v2/cards?q='
+                setIDs = []
+                for (i=0; i<cardsToSearch.length; i++) {
+                    setIDs.push(cardsToSearch[i]['id'])
+                }
+                var url = `https://api.pokemontcg.io/v2/cards?q=id:${setIDs.join('+OR+id:')}`
 
-            cardsToSearch.push({
-                'id': `${line[line.length -2]}-${line[line.length -1]}`,
-                'count': Number(line[0])
-            })
-        }
-        var url = 'https://api.pokemontcg.io/v2/cards?q='
-        setIDs = []
-        for (i=0; i<cardsToSearch.length; i++) {
-            setIDs.push(cardsToSearch[i]['id'])
-        }
-        var url = `https://api.pokemontcg.io/v2/cards?q=id:${setIDs.join('+OR+id:')}`
+                const response = await fetchCards(url, header)
+                var cardData = response['cards']
 
-        const response = await fetchCards(url, header)
-        var cardData = response['cards']
-
-        for (i=0; i<cardsToSearch.length; i++) {
-            var newCard = cardData.filter(function(card) {
-                return card.id == cardsToSearch[i]['id'];
-            })[0]
-            if (!newCard) {
-                console.error(`Failed to import ${cardsToSearch[i]['id']}`)
-            }
-            else {
-                addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
+                for (i=0; i<cardsToSearch.length; i++) {
+                    var newCard = cardData.filter(function(card) {
+                        return card.id == cardsToSearch[i]['id'];
+                    })[0]
+                    if (!newCard) {
+                        console.error(`Failed to import ${cardsToSearch[i]['id']}`)
+                    }
+                    else {
+                        addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
+                    }
+                }
             }
         }
     }
@@ -1584,9 +1614,6 @@
     function deleteDecklist () {
         if (!decklistCards.firstChild) {
             alert('There are no cards to delete.')
-        }
-        else if (isDecklistLocked == true) {
-            alert('Editing decklist is disabled.')
         }
         else if (confirm('Are you sure you want to delete the decklist?')) {
             removeDecklistCards()
