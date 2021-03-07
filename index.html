@@ -1022,11 +1022,13 @@
         focusedContainer.appendChild(createElement('input', null, {
             'class': 'textObject focusedButtonLeft',
             'type': 'button',
+            'title': 'Click, or Press W, A, Up Arrow, or Left Arrow Key',
             'value': '❮',
             'onclick': 'event.preventDefault(); cycleFocused("left")'
         }))
         focusedContainer.appendChild(createElement('input', null, {
             'class': 'textObject focusedButtonRight',
+            'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
             'type': 'button',
             'value': '❯',
             'onclick': 'cycleFocused("right")'
