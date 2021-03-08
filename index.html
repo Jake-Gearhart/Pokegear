@@ -23,7 +23,7 @@
     <div id='sidebar' ontouchstart='fullScreenSidebar(true)'>
         <img id='loadingGif' src='loading.gif'>
         <input id='sidebarArrow' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
-        <div id='sidebarCards' onscroll='loadMoreCardsCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
+        <div id='sidebarCards' onscroll='scrollSidebarCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br class='helpText'>
             <br class='helpText'>
             <p class='helpText'>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it. When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
@@ -1022,7 +1022,7 @@
         }
 
         //left and right buttons
-        if (currentFocused.previousSibling && currentFocused.previousSibling.classList.contains('card')) {
+        if (currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
             focusedContainer.appendChild(createElement('input', null, {
                 'class': 'textObject focusedButtonLeft',
                 'type': 'button',
@@ -1031,7 +1031,7 @@
                 'onclick': 'event.preventDefault(); cycleFocused("left")'
             }))
         }
-        if (currentFocused.nextSibling && currentFocused.nextSibling.classList.contains('card')) {
+        if (currentFocused.nextElementSibling && currentFocused.nextElementSibling.classList.contains('card')) {
             focusedContainer.appendChild(createElement('input', null, {
                 'class': 'textObject focusedButtonRight',
                 'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
@@ -1094,12 +1094,12 @@
 
     function cycleFocused (direction) {
         var newFocused
-        if (direction == 'left' && currentFocused.previousSibling && currentFocused.previousSibling.classList.contains('card')) {
-            newFocused = currentFocused.previousSibling
+        if (direction == 'left' && currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
+            newFocused = currentFocused.previousElementSibling
             focusCard(newFocused)
         }
-        else if (direction == 'right' && currentFocused.nextSibling && currentFocused.nextSibling.classList.contains('card')) {
-            newFocused = currentFocused.nextSibling
+        else if (direction == 'right' && currentFocused.nextElementSibling && currentFocused.nextElementSibling.classList.contains('card')) {
+            newFocused = currentFocused.nextElementSibling
             focusCard(newFocused)
         }
     }
@@ -1282,7 +1282,25 @@
             sidebarCards.append(newCard)
         }
 
-        //bottom box
+        //spacer
+        // if (response['totalCardCount'] > response['page'] * response['pageSize']) {
+        //     sidebarCards.appendChild(
+        //         createElement('div', null, {
+        //             'class': 'sidebarCardsSpacer',
+        //             'loaded': 'false',
+        //             'style': `position: absolute; width: 100%; height: calc(var(--cardHeight) * 2); transform: translateY(calc(-1 * var(--cardHeight))); pointer-events: none; background-color: rgba(0, 0, 255, 0.5)`
+        //         })
+        //     )
+        // }
+        // else {
+        //     sidebarCards.appendChild(
+        //         createElement('div', null, {
+        //             'id': 'sidebarCardsBottom',
+        //             'style': `position: absolute; width: 100%; height: var(--cardHeight); ointer-events: none; background-color: rgba(255, 0, 0, 0.5)`
+        //         })
+        //     )
+        // }
+
         sidebarCards.appendChild(
             createElement('div', null, {
                 'id': 'sidebarCardsBottom',
@@ -1304,18 +1322,72 @@
         }
     }
 
-    function loadMoreCardsCheck () {
-        if (loadingMoreCards == false && document.getElementById('sidebarCardsBottom')) {
-            //if sidebarCardsBottom is in view
-            if (isCardInView(document.getElementById('sidebarCardsBottom'))) {
-                //if not last page
-                var page = sidebarCards.getAttribute('page')
-                if (sidebarCards.getAttribute('totalCardCount') > page * sidebarCards.getAttribute('pageSize')) {
-                    fetchNewSidebarCards(sidebarCards.getAttribute('url').slice(0, -1) + (Number(page) + 1))
-                }
-            }
+    function scrollSidebarCheck () {
+        if (loadingMoreCards == false && document.getElementById('sidebarCardsBottom') && isCardInView(sidebarCardsBottom) && (sidebarCards.getAttribute('totalCardCount') > sidebarCards.getAttribute('page') * sidebarCards.getAttribute('pageSize'))) {
+            fetchNewSidebarCards(sidebarCards.getAttribute('url').split('page=')[0] + 'page=' + (Number(sidebarCards.getAttribute('page')) + 1))
         }
     }
+
+    // function scrollSidebarCheck () {
+    //     var spacers = sidebarCards.getElementsByClassName('sidebarCardsSpacer')
+    //     var currentSpacer
+    //     var previousSpacer
+    //     var nextSpacer
+    //     for (i=0; i<spacers.length; i++) {
+    //         if (isCardInView(spacers[i]) && spacers[i].getAttribute('loaded') == 'false') {
+    //             currentSpacer = spacers[i]
+    //             if (spacers[i-1] && spacers[i-1].getAttribute('loaded') == 'true') {
+    //                 previousSpacer = spacers[i-1]
+    //             }
+    //             if (spacers[i+1] && spacers[i+1].getAttribute('loaded') == 'true') {
+    //                 nextSpacer = spacers[i+1]
+    //             }
+    //             break
+    //         }
+    //     }
+    //     if (currentSpacer) {
+    //         console.log('Loading Current')
+    //         //Load Current Spacer
+    //         if (!currentSpacer.nextElementSibling && loadingMoreCards == false && (sidebarCards.getAttribute('totalCardCount') > sidebarCards.getAttribute('page') * sidebarCards.getAttribute('pageSize'))) {
+    //             //fetch new cards
+    //             fetchNewSidebarCards(sidebarCards.getAttribute('url').split('page=')[0] + 'page=' + (Number(sidebarCards.getAttribute('page')) + 1))
+    //         }
+    //         else {
+    //             //load current spacer
+    //             currentSpacer.setAttribute('loaded', 'true')
+    //             var selectedElem = currentSpacer
+    //             while (selectedElem.previousElementSibling && !selectedElem.previousElementSibling.classList.contains('sidebarCardsSpacer')) {
+    //                 selectedElem = selectedElem.previousElementSibling
+    //                 selectedElem.setAttribute('style', 'visibility: visible')
+    //             }
+    //             selectedElem = currentSpacer
+    //             while (selectedElem.nextElementSibling && !selectedElem.nextElementSibling.classList.contains('sidebarCardsSpacer')) {
+    //                 selectedElem = selectedElem.nextElementSibling
+    //                 selectedElem.setAttribute('style', 'visibility: visible')
+    //             }
+    //         }
+    //         //Unload Previous Spacer
+    //         if (previousSpacer) {
+    //             console.log('Unloading Previous')
+    //             previousSpacer.setAttribute('loaded', 'false')
+    //             var selectedElem = previousSpacer
+    //             while (selectedElem.previousElementSibling && !selectedElem.previousElementSibling.classList.contains('sidebarCardsSpacer')) {
+    //                 selectedElem = selectedElem.previousElementSibling
+    //                 selectedElem.setAttribute('style', 'visibility: hidden')
+    //             }
+    //         }
+    //         //Unload Next Spacer
+    //         if (nextSpacer) {
+    //             console.log('Unloading Next')
+    //             nextSpacer.setAttribute('loaded', 'false')
+    //             var selectedElem = nextSpacer
+    //             while (selectedElem.nextElementSibling && !selectedElem.nextElementSibling.classList.contains('sidebarCardsSpacer')) {
+    //                 selectedElem = selectedElem.nextElementSibling
+    //                 selectedElem.setAttribute('style', 'visibility: hidden')
+    //             }
+    //         }
+    //     }
+    // }
 
     function sidebarCardHover (card) {
         if (isDecklistLocked == true) {
