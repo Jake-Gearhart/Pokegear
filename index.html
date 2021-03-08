@@ -8,16 +8,16 @@
         <h1 id='titleText'>Pokegear.app</h1>
         <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
     </div>
-    <input id='lockDecklist' class='textObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
-    <input id='importDecklist' class='textObject decklistButton' title='Import Decklist' onclick='if(setsLoaded == true) {navigator.clipboard.readText().then(text => importDecklist(text))}' type='button' value='↥'>
-    <input id='exportDecklist' class='textObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
-    <input id='sortDecklist' class='textObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
+    <input id='lockDecklist' class='buttonObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
+    <input id='importDecklist' class='buttonObject decklistButton' title='Import Decklist' onclick='if(setsLoaded == true) {navigator.clipboard.readText().then(text => importDecklist(text))}' type='button' value='↥'>
+    <input id='exportDecklist' class='buttonObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
+    <input id='sortDecklist' class='buttonObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
     <div id='scaleSliderContainer'>
         <input id='scaleSlider' class='' title='Zoom Decklist' type='range' oninput='changeCardScale(this.value)' min='0' value='0' max='2' step='0.01'></input>
     </div>
-    <input id='deleteDecklist' class='textObject decklistButton' title='Delete Decklist' onclick='deleteDecklist()' type='button' value='🗑'></input>
+    <input id='deleteDecklist' class='buttonObject decklistButton' title='Delete Decklist' onclick='deleteDecklist()' type='button' value='🗑'></input>
     <div id='decklist' ontouchstart='fullScreenSidebar(false)'>
-        <input id='decklistCardCount' class='textObject' type='button' value='0'>
+        <input id='decklistCardCount' class='buttonObject' type='button' value='0'>
         <div id='decklistCards'></div>
     </div>
     <div id='sidebar' ontouchstart='fullScreenSidebar(true)'>
@@ -30,18 +30,18 @@
         </div>
         <div id='bottomSearchButtons'></div>
         <div class='searchParameter'>
-            <input class='searchType textObject' type='button' value='Name' searchType='["name"]'>
-            <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
-            <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
+            <input class='searchType buttonObject' type='button' value='Name' searchType='["name"]'>
+            <input class='searchField buttonObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
+            <input class='deleteParameterButton buttonObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
         </div>
-        <input class='addParameterButton textObject' title='Add Parameter' type='button' value='＋' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
+        <input class='addParameterButton buttonObject' title='Add Parameter' type='button' value='＋' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
     </div>
 </html>
 <template>
     <div class='searchParameter'>
-        <input class='searchType textObject' type='button' value='Card Text' searchType='["attacks.name", "attacks.text", "abilities.name", "abilities.text", "rules"]'>
-        <input class='searchField textObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
-        <input class='deleteParameterButton textObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
+        <input class='searchType buttonObject' type='button' value='Card Text' searchType='["attacks.name", "attacks.text", "abilities.name", "abilities.text", "rules"]'>
+        <input class='searchField buttonObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
+        <input class='deleteParameterButton buttonObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
     </div>
 </template>
 <style>
@@ -100,7 +100,7 @@
         margin: 0;
         visibility: hidden;
     }
-    .textObject {
+    .buttonObject {
         width: calc(var(--cardHeight) / 3);
         height: calc(var(--cardHeight) / 3);
         font-size: calc(var(--cardHeight) / 6);
@@ -112,7 +112,7 @@
         background-color: var(--darkBlue60);
         color: rgba(255, 255, 255, 0.8);
     }
-    .scaledTextObject {
+    .scaledbuttonObject {
         width: calc(var(--scaledCardHeight) / 3);
         height: calc(var(--scaledCardHeight) / 3);
         font-size: calc(var(--scaledCardHeight) / 6);
@@ -1024,7 +1024,7 @@
         //left and right buttons
         if (currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
             focusedContainer.appendChild(createElement('input', null, {
-                'class': 'textObject focusedButtonLeft',
+                'class': 'buttonObject focusedButtonLeft',
                 'type': 'button',
                 'title': 'Click, or Press W, A, Up Arrow, or Left Arrow Key',
                 'value': '❮',
@@ -1033,7 +1033,7 @@
         }
         if (currentFocused.nextElementSibling && currentFocused.nextElementSibling.classList.contains('card')) {
             focusedContainer.appendChild(createElement('input', null, {
-                'class': 'textObject focusedButtonRight',
+                'class': 'buttonObject focusedButtonRight',
                 'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
                 'type': 'button',
                 'value': '❯',
@@ -1073,7 +1073,7 @@
             }
             prices = prices.join(' ')
             focusedContainer.appendChild(createElement('input', null, {
-                'class': 'textObject focusedPrice',
+                'class': 'buttonObject focusedPrice',
                 'title': JSON.parse(dataContainer.getAttribute('tcgplayer'))['url'],
                 'type': 'submit',
                 'value': prices,
@@ -1084,7 +1084,7 @@
         }
         else {
             focusedContainer.appendChild(createElement('input', null, {
-                'class': 'textObject focusedPrice',
+                'class': 'buttonObject focusedPrice',
                 'type': 'button',
                 'value': 'No Prices Available',
                 'style': 'font-weight: bold; white-space: normal; line-height: 2em'
@@ -1402,7 +1402,7 @@
         hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
-            'class': 'sidebarCardHoverButton textObject',
+            'class': 'sidebarCardHoverButton buttonObject',
             'value': '＋',
             'onclick': 'addDecklistCard(this.parentNode.parentNode, +1)'
         }))
@@ -1438,7 +1438,7 @@
             newCard.appendChild(createElement('input', null, {
                 'type': 'button',
                 'value': count,
-                'class': 'individualCardCount scaledTextObject'
+                'class': 'individualCardCount scaledbuttonObject'
             }))
             decklistCards.appendChild(newCard)
             modifyDecklistCardCount(null, count)
@@ -1458,13 +1458,13 @@
         hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
-            'class': 'decklistCardHoverButtonAdd scaledTextObject',
+            'class': 'decklistCardHoverButtonAdd scaledbuttonObject',
             'value': '＋',
             'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, +1)}'
         }))
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
-            'class': 'decklistCardHoverButtonRemove scaledTextObject',
+            'class': 'decklistCardHoverButtonRemove scaledbuttonObject',
             'value': '－',
             'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, -1)}'
         }))
@@ -1687,7 +1687,157 @@
     }
 
     function sortDecklist () {
-        alert("Sort Decklist— Coming Soon")
+        var sortTypes = {
+            'pokemon': [],
+            'supporter': [],
+            'item': [],
+            'tool': [],
+            'stadium': [],
+            'acespec': [],
+            'specialEnergy': [],
+            'basicEnergy': [],
+            'unknown': []
+        }
+        for (i=0; i<decklistCards.children.length; i++) {
+            var card = decklistCards.children[i]
+            var dataContainer = card.getElementsByClassName('data')[0]
+            var supertype = dataContainer.getAttribute('supertype')
+            var subtypes = JSON.parse(dataContainer.getAttribute('subtypes'))
+            var rules = JSON.parse(dataContainer.getAttribute('rules'))
+            if (supertype == 'Pokémon') {
+                sortTypes['pokemon'].push(card)
+                continue
+            }
+            else if (supertype && supertype == 'Trainer') {
+                if (subtypes && subtypes.includes('Supporter')) {
+                    sortTypes['supporter'].push(card)
+                    continue
+                }
+                else if (!subtypes) {
+                    sortTypes['item'].push(card)
+                    continue
+                }
+                else if (rules && rules.includes("You can't have more than 1 ACE SPEC card in your deck.")) {
+                    sortTypes['acespec'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Item')) {
+                    sortTypes['item'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes("Rocket's Secret Machine")) {
+                    sortTypes['item'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Pokémon Tool')) {
+                    sortTypes['tool'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Technical Machine')) {
+                    sortTypes['tool'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Stadium')) {
+                    sortTypes['stadium'].push(card)
+                    continue
+                }
+            }
+            else if (supertype && supertype == 'Energy') {
+                if (subtypes && subtypes.includes('Special')) {
+                    sortTypes['specialEnergy'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Basic Energy')) {
+                    sortTypes['basicEnergy'].push(card)
+                    continue
+                }
+            }
+            sortTypes['unknown'].push(card)
+        }
+
+        for (sortType in sortTypes) {
+            sortTypes[sortType] = sortTypes[sortType].sort(function(a,b){
+                return Number(b.getElementsByClassName('individualCardCount')[0].value) - Number(a.getElementsByClassName('individualCardCount')[0].value) || a.getElementsByClassName('data')[0].getAttribute('name').localeCompare(b.getElementsByClassName('data')[0].getAttribute('name'))
+            })
+        }
+
+        var evolutions = [
+            ['Stage 2'],
+            ['BREAK'],
+            ['Level-Up']
+        ]
+
+        //filter out evolutions
+        for (i=0; i<evolutions.length; i++) {
+            // find higher stage evolutions
+            evolutions[i][1] = sortTypes['pokemon'].filter(function(card) {
+                var cardData = card.getElementsByClassName('data')[0]
+                var subtypes = cardData.getAttribute('subtypes')
+                return subtypes.includes(evolutions[i][0])
+            })
+            sortTypes['pokemon'] = sortTypes['pokemon'].filter(function(card) {
+                var cardData = card.getElementsByClassName('data')[0]
+                var subtypes = cardData.getAttribute('subtypes')
+                return !subtypes.includes(evolutions[i][0])
+            })
+        }
+        //find lower stage evolutions
+        evolutions.unshift(['Other', sortTypes['pokemon'].filter(function(card) {
+            var cardData = card.getElementsByClassName('data')[0]
+            return cardData.getAttribute('evolvesfrom')
+        })])
+        sortTypes['pokemon'] = sortTypes['pokemon'].filter(function(card) {
+            var cardData = card.getElementsByClassName('data')[0]
+            return !cardData.getAttribute('evolvesfrom')
+        })
+
+        //add back evolutions
+        for (i=0; i<evolutions.length; i++) {
+            console.log(evolutions[i])
+            evolutions[i][1] = evolutions[i][1].reverse()
+            for (j=0; j<evolutions[i][1].length; j++) {
+                var preEvolutionIndex = null
+                // console.log('I am ' + evolutions[i][1][j].getElementsByClassName('data')[0].getAttribute('name') + '. I evolve from ' + evolutions[i][1][j].getElementsByClassName('data')[0].getAttribute('evolvesfrom') + '.')
+                for (k=0; k<sortTypes['pokemon'].length; k++) {
+                    var name = sortTypes['pokemon'][k].getElementsByClassName('data')[0].getAttribute('name')
+                    if (name.includes(' δ')) {
+                        name = name.split(' δ')[0]
+                    }
+                    if (name == evolutions[i][1][j].getElementsByClassName('data')[0].getAttribute('evolvesfrom')) {
+                        preEvolutionIndex = k
+                        // console.log('Found ' + name + '. (' + preEvolutionIndex + ')')
+                    }
+                    else {
+                        // console.log('Did not match with ' + name + '. Still using (' + preEvolutionIndex + ')')
+                    }
+                }
+                if (preEvolutionIndex != null) {
+                    sortTypes['pokemon'].splice(preEvolutionIndex+1, 0, evolutions[i][1][j])
+                    // console.log('I am being inserted at position: ' + (preEvolutionIndex+1))
+                }
+                else {
+                    sortTypes['pokemon'].push(evolutions[i][1][j])
+                }
+            }
+        }
+
+        var newDecklist = sortTypes['pokemon']
+        newDecklist = newDecklist.concat(sortTypes['supporter'])
+        newDecklist = newDecklist.concat(sortTypes['item'])
+        newDecklist = newDecklist.concat(sortTypes['tool'])
+        newDecklist = newDecklist.concat(sortTypes['stadium'])
+        newDecklist = newDecklist.concat(sortTypes['acespec'])
+        newDecklist = newDecklist.concat(sortTypes['specialEnergy'])
+        newDecklist = newDecklist.concat(sortTypes['basicEnergy'])
+        newDecklist = newDecklist.concat(sortTypes['unknown'])
+
+        while(decklistCards.firstChild) {
+            decklistCards.firstChild.remove()
+        }
+
+        for (i=0; i<newDecklist.length; i++) {
+            decklistCards.appendChild(newDecklist[i])
+        }
     }
 
     function changeCardScale (value) {
