@@ -58,7 +58,9 @@
         --darkBlue: rgb(15, 15, 71);
         --darkBlue30: rgba(15, 15, 71, 0.3);
         --darkBlue60: rgba(15, 15, 71, 0.6);
-        --midBlue: #2e3365;
+        --midBlue: rgb(46, 51, 101);
+        --midBlue30: rgba(46, 51, 101, 0.3);
+        --midBlue60: rgba(46, 51, 101, 0.6);
         --holoSpeed: 20;
         --holoFPS: 15;
     }
@@ -111,6 +113,11 @@
         text-shadow: 0px 0px 8px var(--darkBlue);
         background-color: var(--darkBlue60);
         color: rgba(255, 255, 255, 0.8);
+        transition: 0.125s;
+    }
+    .buttonObject:active {
+        background-color: var(--midBlue60);
+        transform: translateY(1px);
     }
     .scaledbuttonObject {
         width: calc(var(--scaledCardHeight) / 3);
@@ -123,6 +130,11 @@
         text-shadow: 0px 0px calc(8px * var(--cardScale)) var(--darkBlue);
         background-color: var(--darkBlue60);
         color: rgba(255, 255, 255, 0.8);
+        transition: 0.125s;
+    }
+    .scaledbuttonObject:active {
+        background-color: var(--midBlue60);
+        transform: translateY(1px);
     }
     #title {
         z-index: 500;
@@ -485,10 +497,12 @@
         /* background-color: rgba(0, 0, 255, 0.5); */
     }
     .focusedCard {
+        position: absolute;
         height: 90%;
-        object-fit: contain;
+        width: calc(min(50vw, 100vh) * 0.9 / (var(--heightWidthRatio)));
+        left: calc(50% - (min(50vw, 100vh) * 0.9 / (var(--heightWidthRatio)))/2);
     }
-    .focusedPrice {
+    #focusedPrice {
         position: absolute;
         height: 100%;
         width: 15%;
@@ -498,8 +512,11 @@
         object-fit: contain;
         pointer-events: all;
         background-color: transparent;
+        font-weight: bold; 
+        white-space: normal; 
+        line-height: 2em;
     }
-    .focusedPrice:hover {
+    #focusedPrice:hover {
         animation: priceBounce 0.5s ease-in-out;
     }
     @keyframes priceBounce {
@@ -510,7 +527,7 @@
             transform: translateY(-3%);
         }
     }
-    .focusedButtonLeft {
+    #focusedButtonLeft {
         position: absolute;
         height: calc(100% / 3);
         width: 7.5%;
@@ -522,7 +539,7 @@
         font-size: calc(var(--cardHeight) * 5/12);
         pointer-events: all;
     }
-    .focusedButtonRight {
+    #focusedButtonRight {
         position: absolute;
         height: calc(100% / 3);
         width: 7.5%;
@@ -839,14 +856,6 @@
         return elem
     }
 
-    function fadeIn (elem) {
-        elem.classList.add('fadeIn')
-        elem.setAttribute('style', 'pointer-events: none;')
-        setTimeout(function () {
-            elem.setAttribute('style', 'pointer-events: all')
-        }, 250)
-    }
-
     function fadeOut (elem) {
         elem.classList.add('fadeOut')
         elem.setAttribute('style', 'pointer-events: none')
@@ -983,31 +992,77 @@
         currentFocused = card
         //create focused
         var focused
+        var focusedContainer
+        var focusedClickbox
+        var focusedPrice
         if (document.getElementById('focused')) {
             focused = document.getElementById('focused')
-            while (focused.firstChild) {
-                focused.firstChild.remove()
-            }
+            focusedContainer = document.getElementById('focusedContainer')
+            focusedClickbox = document.getElementById('focusedContainer')
+            focusedPrice = document.getElementById('focusedPrice')
+            focusedPrice.setAttribute('value', 'No Prices Available')
+            focusedPrice.setAttribute('title', 'https://www.tcgplayer.com')
+            focusedPrice.setAttribute('onclick', null)
+            document.getElementsByClassName('focusedCard')[0].remove()
         }
         else {
             focused = document.body.appendChild(
                 createElement('div', null, {
-                    'id': 'focused'
+                    'id': 'focused',
+                    'class': 'fadeIn'
                 })
             )
-            fadeIn(focused)
+            focusedClickbox = focused.appendChild(createElement('div', null, {
+                'id': 'focusedClickbox',
+                'class': 'focusedClickbox',
+                'style': 'width: 100%; height: 100%;',
+                'onclick': 'fadeOut(this.parentNode); currentFocused = null'
+            }))
+            focusedContainer = focused.appendChild(createElement('div', null, {
+                'id': 'focusedContainer',
+                'class': 'focusedContainer',
+                'style': 'pointer-events: none'
+            }))
+            focusedPrice = focusedContainer.appendChild(createElement('input', null, {
+                'id': 'focusedPrice',
+                'class': 'buttonObject',
+                'type': 'submit',
+                'title': 'https://www.tcgplayer.com',
+                'value': 'No Prices Available'
+            }))
         }
 
-        var focusedClickbox = focused.appendChild(createElement('div', null, {
-            'class': 'focusedClickbox',
-            'style': 'width: 100%; height: 100%;',
-            'onclick': 'fadeOut(this.parentNode); currentFocused = null'
-        }))
-
-        var focusedContainer = focused.appendChild(createElement('div', null, {
-            'class': 'focusedContainer',
-            'style': 'pointer-events: none'
-        }))
+        //left and right buttons
+        if (currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
+            if (!document.getElementById('focusedButtonLeft')) {
+                focusedContainer.appendChild(createElement('input', null, {
+                    'id': 'focusedButtonLeft',
+                    'class': 'buttonObject',
+                    'type': 'button',
+                    'title': 'Click, or Press W, A, Up Arrow, or Left Arrow Key',
+                    'value': '❮',
+                    'onclick': 'event.preventDefault(); cycleFocused("left")'
+                }))
+            }
+        }
+        else if (document.getElementById('focusedButtonLeft')) {
+            document.getElementById('focusedButtonLeft').remove()
+        }
+        if (currentFocused.nextElementSibling && currentFocused.nextElementSibling.classList.contains('card')) {
+            if (!document.getElementById('focusedButtonRight')) {
+                focusedContainer.appendChild(createElement('input', null, {
+                    'id': 'focusedButtonRight',
+                    'class': 'buttonObject',
+                    'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
+                    'type': 'button',
+                    'value': '❯',
+                    'onclick': 'cycleFocused("right")'
+                }))
+            }
+        }
+        else if (document.getElementById('focusedButtonRight')) {
+            document.getElementById('focusedButtonRight').remove()
+        }
 
         var dataContainer = card.getElementsByClassName('data')[0]
 
@@ -1026,31 +1081,11 @@
         }))
 
         //remove individualCardCount, cardHoverMenu, and holo
-        var remove = ['individualCardCount', 'cardHoverMenu', 'holo']
+        var remove = ['individualCardCount', 'cardHoverMenu']
         for (i=0; i<remove.length; i++) {
             if (newCard.getElementsByClassName(remove[i])[0]) {
                 newCard.getElementsByClassName(remove[i])[0].remove()
             }
-        }
-
-        //left and right buttons
-        if (currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
-            focusedContainer.appendChild(createElement('input', null, {
-                'class': 'buttonObject focusedButtonLeft',
-                'type': 'button',
-                'title': 'Click, or Press W, A, Up Arrow, or Left Arrow Key',
-                'value': '❮',
-                'onclick': 'event.preventDefault(); cycleFocused("left")'
-            }))
-        }
-        if (currentFocused.nextElementSibling && currentFocused.nextElementSibling.classList.contains('card')) {
-            focusedContainer.appendChild(createElement('input', null, {
-                'class': 'buttonObject focusedButtonRight',
-                'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
-                'type': 'button',
-                'value': '❯',
-                'onclick': 'cycleFocused("right")'
-            }))
         }
 
         //add price data
@@ -1084,23 +1119,9 @@
                 }
             }
             prices = prices.join(' ')
-            focusedContainer.appendChild(createElement('input', null, {
-                'class': 'buttonObject focusedPrice',
-                'title': JSON.parse(dataContainer.getAttribute('tcgplayer'))['url'],
-                'type': 'submit',
-                'value': prices,
-                'onclick': `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`,
-                'style': 'font-weight: bold; white-space: normal; line-height: 2em'
-            }))
-
-        }
-        else {
-            focusedContainer.appendChild(createElement('input', null, {
-                'class': 'buttonObject focusedPrice',
-                'type': 'button',
-                'value': 'No Prices Available',
-                'style': 'font-weight: bold; white-space: normal; line-height: 2em'
-            }))
+            focusedPrice.setAttribute('value', prices)
+            focusedPrice.setAttribute('title', JSON.parse(dataContainer.getAttribute('tcgplayer'))['url'])
+            focusedPrice.setAttribute('onclick', `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`)
         }
     }
 
@@ -1409,7 +1430,7 @@
             card.getElementsByClassName('cardHoverMenu')[0].remove()
         }
         card.appendChild(createElement('div', null, {
-            'class': 'cardHoverMenu'
+            'class': 'cardHoverMenu fadeIn'
         }))
         hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
         hoverMenu.appendChild(createElement('input', null, {
@@ -1418,7 +1439,6 @@
             'value': '＋',
             'onclick': 'addDecklistCard(this.parentNode.parentNode, +1)'
         }))
-        fadeIn(hoverMenu)
     }
 
     //DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST
@@ -1465,7 +1485,7 @@
             card.getElementsByClassName('cardHoverMenu')[0].remove()
         }
         card.appendChild(createElement('div', null, {
-            'class': 'cardHoverMenu'
+            'class': 'cardHoverMenu fadeIn'
         }))
         hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
         hoverMenu.appendChild(createElement('input', null, {
@@ -1480,7 +1500,6 @@
             'value': '－',
             'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, -1)}'
         }))
-        fadeIn(hoverMenu)
     }
 
     function modifyDecklistCardCount (card, value) {
