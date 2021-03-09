@@ -147,14 +147,14 @@
         bottom: calc(-1 * var(--cardHeight) / 12);
     }
     #titleIcon:hover {
-        animation: bounce 1s infinite;
+        animation: iconBounce 1s ease-in-out infinite;
     }
-    @keyframes bounce {
+    @keyframes iconBounce {
     0%, 100% {
-        transform: translateY(0);
-    }
+            transform: translateY(0);
+        }
     50% {
-            transform: translateY(calc(-1 * var(--cardHeight) / 12));
+            transform: translateY(calc(-1 * var(--cardHeight) / 18));
         }
     }
     .decklistButton {
@@ -490,37 +490,49 @@
     }
     .focusedPrice {
         position: absolute;
-        height: 90%;
-        width: 12.5%;
-        top: 5%;
+        height: 100%;
+        width: 15%;
+        top: 0;
         left: 2.5%;
         cursor: pointer;
         object-fit: contain;
-        pointer-events: all
+        pointer-events: all;
+        background-color: transparent;
+    }
+    .focusedPrice:hover {
+        animation: priceBounce 0.5s ease-in-out;
+    }
+    @keyframes priceBounce {
+    0%, 100% {
+            transform: translateY(0);
+        }
+    50% {
+            transform: translateY(-3%);
+        }
     }
     .focusedButtonLeft {
         position: absolute;
         height: calc(100% / 3);
         width: 7.5%;
         top: calc(100% / 3);
-        left: 17.5%;
+        left: 20%;
         cursor: pointer;
         object-fit: contain;
         text-align: center;
         font-size: calc(var(--cardHeight) * 5/12);
-        pointer-events: all
+        pointer-events: all;
     }
     .focusedButtonRight {
         position: absolute;
         height: calc(100% / 3);
         width: 7.5%;
         top: calc(100% / 3);
-        right: 17.5%;
+        right: 20%;
         cursor: pointer;
         object-fit: contain;
         text-align: center;
         font-size: calc(var(--cardHeight) * 5/12);
-        pointer-events: all
+        pointer-events: all;
     }
     
     .fadeIn {
