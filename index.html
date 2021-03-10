@@ -747,7 +747,7 @@
         for (i=0; i<types.length; i++) {
             typesButtons.appendChild(
                 createElement('div', null, {
-                    'id': 'types:' + types[i],
+                    'id': 'types:' + types[i].toLocaleLowerCase(),
                     'class': 'parameterButtonDiv',
                     'title': types[i],
                     'onclick': 'highlightButton(this, true, true, [])'
@@ -786,9 +786,6 @@
             )
         }
         setsLoaded = true
-        
-        //line spacer
-        // parameterButtonsDiv.appendChild(createElement('div', null, {'class': 'spacer'}))
         
         var combinationButtons = [
             {
