@@ -428,6 +428,10 @@
         height: calc(var(--cardHeight) / 3);
         border-radius: calc(var(--cardHeight) / 9);
         cursor: pointer;
+        transition: 0.125s;
+    }
+    .parameterButtonDivSelected {
+        background-color: rgba(0, 255, 0, 0.6)
     }
     .parameterButton {
         position: absolute;
@@ -506,9 +510,9 @@
     }
     #focusedPrice {
         position: absolute;
-        height: 100%;
+        height: 90%;
         width: 15%;
-        top: 0;
+        top: 5%;
         left: 2.5%;
         cursor: pointer;
         object-fit: contain;
@@ -750,7 +754,7 @@
                     'id': 'types:' + types[i].toLocaleLowerCase(),
                     'class': 'parameterButtonDiv',
                     'title': types[i],
-                    'onclick': 'highlightButton(this, true, true, [])'
+                    'onclick': 'selectButton(this, true, [])'
                 })
             ).appendChild(
                 createElement('img', null, {
@@ -774,7 +778,7 @@
                     'id': 'set.id:' + sets[i]['id'],
                     'class': 'parameterButtonDiv',
                     'title': sets[i]['name'],
-                    'onclick': 'highlightButton(this, true, true, [])'
+                    'onclick': 'selectButton(this, true, [])'
                 })
             ).appendChild(
                 createElement('img', null, {
@@ -862,7 +866,7 @@
                     'id': combinationButtons[i]['combinationId'],
                     'class': 'parameterButtonDiv fadeIn',
                     'title': combinationButtons[i]['combinationTitle'],
-                    'onclick': `highlightButton(this, true, true, ${combinationButtons[i]['sets']})`
+                    'onclick': `selectButton(this, true, ${combinationButtons[i]['sets']})`
                 }))
             newButton.appendChild(
                 createElement('img', null, {
@@ -1187,39 +1191,38 @@
             sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(true)')
         }
     }
-    
-    function highlightButton (elem, highlight, initiateSearch, group) {
-        if (highlight == true) {
-            elem.setAttribute('style', 'background-color: rgba(0, 255, 0, 0.6)')
-            if (group.length < 1) {
-                elem.setAttribute('onclick', 'highlightButton(this, false, true, [])')
-                elem.classList.add('searchSet')
-            }
-            else {
-                for (i=0; i<group.length; i++) {
-                    elem.setAttribute('onclick', `highlightButton(this, false, true, ["${group.join('", "')}"])`)
-                    highlightButton(document.getElementById(group[i]), true, false, []);
-                }
-            }
-            if (initiateSearch == true) {
-                constructSearchUrl()
-            }
+
+    function selectButton (elem, initiateSearch, group) {
+        elem.classList.add('parameterButtonDivSelected')
+        if (group.length < 1) {
+            elem.setAttribute('onclick', 'deselectButton(this, true, [])')
+            elem.classList.add('searchSet')
         }
         else {
-            elem.setAttribute('style', 'background-color: initial')
-            if (group.length < 1) {
-                elem.setAttribute('onclick', 'highlightButton(this, true, true, [])')
-                elem.classList.remove('searchSet')
+            for (i=0; i<group.length; i++) {
+                elem.setAttribute('onclick', `deselectButton(this, true, ["${group.join('", "')}"])`)
+                selectButton(document.getElementById(group[i]), false, []);
             }
-            else {
-                for (i=0; i<group.length; i++) {
-                    elem.setAttribute('onclick', `highlightButton(this, true, true, ["${group.join('", "')}"])`)
-                    highlightButton(document.getElementById(group[i]), false, false, []);
-                }
+        }
+        if (initiateSearch == true) {
+            constructSearchUrl()
+        }
+    }
+
+    function deselectButton (elem, initiateSearch, group) {
+        elem.classList.remove('parameterButtonDivSelected')
+        if (group.length < 1) {
+            elem.setAttribute('onclick', 'selectButton(this, true, [])')
+            elem.classList.remove('searchSet')
+        }
+        else {
+            for (i=0; i<group.length; i++) {
+                elem.setAttribute('onclick', `selectButton(this, true, ["${group.join('", "')}"])`)
+                deselectButton(document.getElementById(group[i]), false, []);
             }
-            if (initiateSearch == true) {
-                constructSearchUrl()
-            }
+        }
+        if (initiateSearch == true) {
+            constructSearchUrl()
         }
     }
 
