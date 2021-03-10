@@ -26,7 +26,7 @@
         <div id='sidebarCards' onscroll='scrollSidebarCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br class='helpText'>
             <br class='helpText'>
-            <p class='helpText'>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. You can view any card in this sidebar or the decklist in full screen by right-clicking it. When a card is in full screen, you can use the arrow keys or WASD to move between cards.</p>
+            <p class='helpText'>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. Click a card to view it in fullscreen.</p>
         </div>
         <div id='bottomSearchButtons'></div>
         <div class='searchParameter'>
@@ -39,7 +39,7 @@
 </html>
 <template>
     <div class='searchParameter'>
-        <input class='searchType buttonObject' type='button' value='Card Text' searchType='["attacks.name", "attacks.text", "abilities.name", "abilities.text", "rules"]'>
+        <input class='searchType buttonObject' type='button' value='Card Text' searchType='["attacks.name", "attacks.text", "attacks.damage", "abilities.name", "abilities.text", "rules"]'>
         <input class='searchField buttonObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
         <input class='deleteParameterButton buttonObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
     </div>
@@ -117,7 +117,7 @@
     }
     .buttonObject:active {
         background-color: var(--midBlue60);
-        transform: translateY(1px);
+        transform: translateY(2px);
     }
     .scaledbuttonObject {
         width: calc(var(--scaledCardHeight) / 3);
@@ -134,7 +134,7 @@
     }
     .scaledbuttonObject:active {
         background-color: var(--midBlue60);
-        transform: translateY(1px);
+        transform: translateY(2px);
     }
     #title {
         z-index: 500;
@@ -275,6 +275,7 @@
         position: absolute;
         width: 100%;
         height: 100%;
+        pointer-events: none;
     }
     .decklistCardHoverButtonAdd {
         position: absolute;
@@ -290,6 +291,7 @@
         left: calc(var(--scaledCardHeight) / 32);
         margin: auto;
         cursor: pointer;
+        pointer-events: all;
     }
     .decklistCardHoverButtonRemove {
         position: absolute;
@@ -305,6 +307,7 @@
         right: calc(var(--scaledCardHeight) / 32);
         margin: auto;
         cursor: pointer;
+        pointer-events: all;
     }
     .disableHighlight {
         -webkit-touch-callout: none;
@@ -336,6 +339,7 @@
         font-weight: bold;
         border: calc(var(--cardHeight) / 48) solid var(--lightBlue30);
         cursor: pointer;
+        pointer-events: all;
     }
     #sidebarArrow {
         position: absolute;
@@ -462,6 +466,7 @@
         position: absolute;
         left: 0;
         object-fit: inherit;
+        pointer-events: none;
     }
     .holo {
         width: 100%;
@@ -911,6 +916,7 @@
             'id': data['id'],
             'class': 'card fadeIn',
             'oncontextmenu': 'event.preventDefault(); focusCard(this)',
+            'onclick': 'if(event.target === this) {focusCard(this)}',
             'onmouseenter': 'sidebarCardHover(this)',
             'ontouchstart': 'sidebarCardHover(this)',
             'onmouseleave': "if (this.getElementsByClassName('cardHoverMenu')[0]) {fadeOut(this.getElementsByClassName('cardHoverMenu')[0]);}"
@@ -990,15 +996,12 @@
             card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
         }
         currentFocused = card
-        //create focused
         var focused
         var focusedContainer
-        var focusedClickbox
         var focusedPrice
         if (document.getElementById('focused')) {
             focused = document.getElementById('focused')
             focusedContainer = document.getElementById('focusedContainer')
-            focusedClickbox = document.getElementById('focusedContainer')
             focusedPrice = document.getElementById('focusedPrice')
             focusedPrice.setAttribute('value', 'No Prices Available')
             focusedPrice.setAttribute('title', 'https://www.tcgplayer.com')
@@ -1009,15 +1012,10 @@
             focused = document.body.appendChild(
                 createElement('div', null, {
                     'id': 'focused',
-                    'class': 'fadeIn'
+                    'class': 'fadeIn',
+                    'onclick': 'if(event.target === this) {fadeOut(this); currentFocused = null}'
                 })
             )
-            focusedClickbox = focused.appendChild(createElement('div', null, {
-                'id': 'focusedClickbox',
-                'class': 'focusedClickbox',
-                'style': 'width: 100%; height: 100%;',
-                'onclick': 'fadeOut(this.parentNode); currentFocused = null'
-            }))
             focusedContainer = focused.appendChild(createElement('div', null, {
                 'id': 'focusedContainer',
                 'class': 'focusedContainer',
@@ -1452,7 +1450,6 @@
         else {
             newCard = cloneCard(card, {
                     'class': 'card decklistCard fadeIn',
-                    'oncontextmenu': 'event.preventDefault(); focusCard(this)',
                     'onmouseenter': 'decklistCardHover(this)',
                     'ontouchstart': 'decklistCardHover(this)',
                     'onmouseleave': 'if (this.getElementsByClassName("cardHoverMenu")[0]) {fadeOut(this.getElementsByClassName("cardHoverMenu")[0]);}',
