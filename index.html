@@ -117,7 +117,7 @@
     }
     .buttonObject:active {
         background-color: var(--midBlue60);
-        transform: translateY(2px);
+        transform: translateY(4%);
     }
     .scaledbuttonObject {
         width: calc(var(--scaledCardHeight) / 3);
@@ -134,7 +134,7 @@
     }
     .scaledbuttonObject:active {
         background-color: var(--midBlue60);
-        transform: translateY(2px);
+        transform: translateY(4%);
     }
     #title {
         z-index: 500;
@@ -766,7 +766,7 @@
         }
 
         //sets div
-        var setsButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'setsButtons', 'style': 'background-color: var(--midBlue60)'}))
+        var setsButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'setsButtons'}))
 
         sets = json['data']
         for (i=0; i<sets.length; i++) {
