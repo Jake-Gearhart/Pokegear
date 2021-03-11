@@ -415,6 +415,11 @@
         background-color: var(--darkBlue60);
         transition: 0.5s;
         transition-delay: 0.15s;
+    }
+    .parameterButtonsSubContainer {
+        position: absolute; 
+        height: 100%;
+        width: 50%;
         overflow-x: hidden;
         overflow-y: auto;
     }
@@ -432,6 +437,11 @@
     }
     .parameterButtonDivSelected {
         background-color: rgba(0, 255, 0, 0.6)
+    }
+    .parameterButtonSpacer {
+        display: inline-block;
+        width: 100%; 
+        height: calc(var(--cardHeight) / 3);
     }
     .parameterButton {
         position: absolute;
@@ -733,7 +743,7 @@
         const json = await response.json()
 
         //types div
-        var typesButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'typesButtons'}))
+        var leftButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'leftButtons', 'class': 'parameterButtonsSubContainer', 'style': 'left: 0;'}))
 
         var types = [
             'Grass',
@@ -749,7 +759,7 @@
             'Colorless'
         ]
         for (i=0; i<types.length; i++) {
-            typesButtons.appendChild(
+            leftButtons.appendChild(
                 createElement('div', null, {
                     'id': 'types:' + types[i].toLocaleLowerCase(),
                     'class': 'parameterButtonDiv',
@@ -766,14 +776,14 @@
         }
 
         //sets div
-        var setsButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'setsButtons'}))
+        var rightButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'rightButtons', 'class': 'parameterButtonsSubContainer', 'style': 'right: 0;'}))
 
         sets = json['data']
         for (i=0; i<sets.length; i++) {
             if (sets[i]['ptcgoCode'] && !setIdTranslations[sets[i]['ptcgoCode'].toLowerCase()]) {
                 setIdTranslations[sets[i]['ptcgoCode'].toLowerCase()] = sets[i]['id']
             }
-            setsButtons.appendChild(
+            rightButtons.appendChild(
                 createElement('div', null, {
                     'id': 'set.id:' + sets[i]['id'],
                     'class': 'parameterButtonDiv',
@@ -858,10 +868,11 @@
         ]
 
         //sets div
-        var combinationSetsButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'combinationSetsButtons'}))
+        // var combinationSetsButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'combinationSetsButtons'}))
+        leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
 
         for (i=0; i<combinationButtons.length; i++) {
-            var newButton = combinationSetsButtons.appendChild(
+            var newButton = leftButtons.appendChild(
                 createElement('div', null, {
                     'id': combinationButtons[i]['combinationId'],
                     'class': 'parameterButtonDiv fadeIn',
