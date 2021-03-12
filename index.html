@@ -9,7 +9,7 @@
         <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
     </div>
     <input id='lockDecklist' class='buttonObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
-    <input id='importDecklist' class='buttonObject decklistButton' title='Import Decklist' onclick='if(setsLoaded == true) {navigator.clipboard.readText().then(text => importDecklist(text))}' type='button' value='↥'>
+    <input id='importDecklist' class='buttonObject decklistButton' title='Import Decklist' onclick='if(setsLoaded == true) {try {navigator.clipboard.readText().then(text => importDecklist(text))} catch {alert("This browser does not support importing from the clipboard.")}}' type='button' value='↥'>
     <input id='exportDecklist' class='buttonObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
     <input id='sortDecklist' class='buttonObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
     <div id='scaleSliderContainer'>
