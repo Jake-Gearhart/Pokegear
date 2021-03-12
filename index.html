@@ -113,10 +113,12 @@
         text-shadow: 0px 0px 8px var(--darkBlue);
         background-color: var(--darkBlue60);
         color: rgba(255, 255, 255, 0.8);
-        transition: 0.125s;
+        transition: background-color 0.25s, transform 0.125s;
+    }
+    .buttonObject:hover {
+        background-color: var(--midBlue60);
     }
     .buttonObject:active {
-        background-color: var(--midBlue60);
         transform: translateY(4%);
     }
     .scaledbuttonObject {
@@ -130,10 +132,12 @@
         text-shadow: 0px 0px calc(8px * var(--cardScale)) var(--darkBlue);
         background-color: var(--darkBlue60);
         color: rgba(255, 255, 255, 0.8);
-        transition: 0.125s;
+        transition: background-color 0.25s, transform 0.125s;
+    }
+    .scaledbuttonObject:hover {
+        background-color: var(--midBlue60);
     }
     .scaledbuttonObject:active {
-        background-color: var(--midBlue60);
         transform: translateY(4%);
     }
     #title {
@@ -739,8 +743,19 @@
     populateSets()
 
     async function populateSets () {
-        const response = await fetch('https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate', header)
-        const json = await response.json()
+        var url = 'https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate'
+        loadingAlertStart(url)
+        var response
+        var json
+        try {
+            response = await fetch(url, header)
+            json = await response.json()
+            loadingAlertEnd(url, true)
+        }
+        catch {
+            loadingAlertEnd(url, false)
+            return
+        }
 
         //types div
         var leftButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'leftButtons', 'class': 'parameterButtonsSubContainer', 'style': 'left: 0;'}))
@@ -807,14 +822,14 @@
                 'combinationTitle': 'Red & Blue Era',
                 'setA_img': document.getElementById('set.id:base1').getElementsByClassName('parameterButton')[0].src,
                 'setB_img': document.getElementById('set.id:gym2').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:basep", "set.id:base1", "set.id:base2", "set.id:base3", "set.id:base4", "set.id:base5", "set.id:gym1", "set.id:gym2", "set.id:base6"]'
+                'sets': '["set.id:basep", "set.id:base1", "set.id:base2", "set.id:base3", "set.id:base4", "set.id:base5", "set.id:gym1", "set.id:gym2"]'
             },
             {
                 'combinationId': 'bs-g2',
                 'combinationTitle': 'Gold & Silver Era',
                 'setA_img': document.getElementById('set.id:neo1').getElementsByClassName('parameterButton')[0].src,
                 'setB_img': document.getElementById('set.id:ecard3').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:neo1", "set.id:neo2", "set.id:neo3", "set.id:neo4", "set.id:ecard1", "set.id:ecard2", "set.id:ecard3", "set.id:si1" ]'
+                'sets': '["set.id:neo1", "set.id:neo2", "set.id:neo3", "set.id:neo4", "set.id:base6", "set.id:ecard1", "set.id:ecard2", "set.id:ecard3", "set.id:si1" ]'
             },
             {
                 'combinationId': 'rs-pk',
@@ -921,11 +936,27 @@
         }, 250)
     }
 
-    async function fetchCards (url) {
-        //fetching alert
+    function loadingAlertStart (url) {
         loadingQueue = loadingQueue + 1
         console.log(`Fetching ${url}`)
         document.getElementById('loadingGif').setAttribute('style', 'visibility: visible')
+    }
+
+    function loadingAlertEnd (url, succeeded) {
+        loadingQueue = loadingQueue - 1
+        if (loadingQueue == 0) {
+            document.getElementById('loadingGif').setAttribute('style', 'visibility: hidden')
+        }
+        if (succeeded == true) {
+            console.log(`Recieved ${url}`)
+        }
+        else {
+            console.error(`Failed to recieve ${url}`)
+        }
+    }
+
+    async function fetchCards (url) {
+        loadingAlertStart(url)
 
         currentFetchID++
         const id = currentFetchID
@@ -934,12 +965,7 @@
             const response = await fetch(url, header)
             const json = await response.json()
 
-            //recieved alert
-            loadingQueue = loadingQueue - 1
-            // console.log(`Recieved ${url}`)
-            if (loadingQueue == 0) {
-                document.getElementById('loadingGif').setAttribute('style', 'visibility: hidden')
-            }
+            loadingAlertEnd(url, true)
 
             return {
                 'id': id,
@@ -950,12 +976,7 @@
             }
         }
         catch {
-            //failed alert
-            loadingQueue = loadingQueue - 1
-            console.error(`Failed to recieve ${url}`)
-            if (loadingQueue == 0) {
-                document.getElementById('loadingGif').setAttribute('style', 'visibility: hidden')
-            }
+            loadingAlertEnd(url, false)
         }
     }
 
@@ -1769,6 +1790,7 @@
             'supporter': [],
             'item': [],
             'tool': [],
+            'flare-tool': [],
             'stadium': [],
             'acespec': [],
             'specialEnergy': [],
@@ -1816,6 +1838,10 @@
                 }
                 else if (subtypes && subtypes.includes('Stadium')) {
                     sortTypes['stadium'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Pokémon Tool F')) {
+                    sortTypes['flare-tool'].push(card)
                     continue
                 }
             }
@@ -1901,6 +1927,7 @@
         newDecklist = newDecklist.concat(sortTypes['supporter'])
         newDecklist = newDecklist.concat(sortTypes['item'])
         newDecklist = newDecklist.concat(sortTypes['tool'])
+        newDecklist = newDecklist.concat(sortTypes['flare-tool'])
         newDecklist = newDecklist.concat(sortTypes['stadium'])
         newDecklist = newDecklist.concat(sortTypes['acespec'])
         newDecklist = newDecklist.concat(sortTypes['specialEnergy'])
