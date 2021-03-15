@@ -572,6 +572,18 @@
         font-size: calc(var(--cardHeight) * 5/12);
         pointer-events: all;
     }
+    #focusedDownload {
+        position: absolute;
+        top: 10%;
+        height: 7.5vw;
+        width: 7.5%;
+        right: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
     
     .fadeIn {
         animation: fadeIn 0.25s;
@@ -1072,6 +1084,26 @@
         return newCard
     }
 
+    function downloadResource(url, filename) {
+        fetch(url, {
+            headers: new Headers({
+            'Origin': location.origin
+            }),
+            mode: 'cors'
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            let blobUrl = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.download = filename;
+            a.href = blobUrl;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        })
+        .catch(e => console.error(e));
+    }
+
     //CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS
 
     function focusCard (card) {
@@ -1085,6 +1117,7 @@
         if (document.getElementById('focused')) {
             focused = document.getElementById('focused')
             focusedContainer = document.getElementById('focusedContainer')
+            focusedDownload = document.getElementById('focusedDownload')
             focusedPrice = document.getElementById('focusedPrice')
             focusedPrice.setAttribute('value', 'No Prices Available')
             focusedPrice.setAttribute('title', 'https://www.tcgplayer.com')
@@ -1092,23 +1125,28 @@
             document.getElementsByClassName('focusedCard')[0].remove()
         }
         else {
-            focused = document.body.appendChild(
-                createElement('div', null, {
+            focused = document.body.appendChild(createElement('div', null, {
                     'id': 'focused',
                     'class': 'fadeIn',
                     'onclick': 'if(event.target === this) {fadeOut(this); currentFocused = null}'
-                })
-            )
+            }))
             focusedContainer = focused.appendChild(createElement('div', null, {
                 'id': 'focusedContainer',
                 'class': 'focusedContainer',
                 'style': 'pointer-events: none'
             }))
+            focusedDownload = focusedContainer.appendChild(createElement('input', null, {
+                    'id': 'focusedDownload',
+                    'class': 'fadeIn buttonObject',
+                    'title': 'Download Image',
+                    'type': 'submit',
+                    'value': '↧'
+            }))
             focusedPrice = focusedContainer.appendChild(createElement('input', null, {
                 'id': 'focusedPrice',
                 'class': 'buttonObject',
-                'type': 'submit',
                 'title': 'https://www.tcgplayer.com',
+                'type': 'submit',
                 'value': 'No Prices Available'
             }))
         }
@@ -1168,6 +1206,9 @@
                 newCard.getElementsByClassName(remove[i])[0].remove()
             }
         }
+
+        //download
+        focusedDownload.setAttribute('onclick', `downloadResource("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').toLowerCase()}-${card.id}.png")`)
 
         //add price data
         if (dataContainer.getAttribute('tcgplayer') && JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices'] && Object.keys(JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']).length != 0) {
