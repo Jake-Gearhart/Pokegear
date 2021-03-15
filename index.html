@@ -1240,7 +1240,7 @@
         elem.classList.add('parameterButtonDivSelected')
         if (group.length < 1) {
             elem.setAttribute('onclick', 'deselectButton(this, true, [])')
-            elem.classList.add('searchSet')
+            elem.classList.add('selectedButton')
         }
         else {
             for (i=0; i<group.length; i++) {
@@ -1257,7 +1257,7 @@
         elem.classList.remove('parameterButtonDivSelected')
         if (group.length < 1) {
             elem.setAttribute('onclick', 'selectButton(this, true, [])')
-            elem.classList.remove('searchSet')
+            elem.classList.remove('selectedButton')
         }
         else {
             for (i=0; i<group.length; i++) {
@@ -1320,15 +1320,24 @@
             }
         }
 
-        const setButtons = document.getElementsByClassName('searchSet')
-        if (setButtons.length > 0) {
-            q = q + '(' + setButtons[0].id
-            if (setButtons.length > 1) {
-                for (var i = 1; i < setButtons.length; i++) {
-                    q = q + '+OR+' + setButtons[i].id
+        //compile selected buttons
+        const selectedButtons = document.getElementsByClassName('selectedButton')
+        var splitSelectedButtons = {}
+        for (i=0; i<selectedButtons.length; i++) {
+            if (!splitSelectedButtons[selectedButtons[i].id.split(':')[0]]) {
+                splitSelectedButtons[selectedButtons[i].id.split(':')[0]] = []
+            }
+            splitSelectedButtons[selectedButtons[i].id.split(':')[0]].push(selectedButtons[i].id)
+        }
+        for (groupKey in splitSelectedButtons) {
+            var group = splitSelectedButtons[groupKey]
+            q = q + '(' + group[0]
+            if (group.length > 1) {
+                for (var i = 1; i < group.length; i++) {
+                    q = q + '+OR+' + group[i]
                 }
             } 
-            q = q + ')'
+            q = q + ')+'
         }
 
         //check for blank search
