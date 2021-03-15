@@ -1208,7 +1208,7 @@
         }
 
         //download
-        focusedDownload.setAttribute('onclick', `downloadResource("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').toLowerCase()}-${card.id}.png")`)
+        focusedDownload.setAttribute('onclick', `downloadResource("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').replace(' ', '-').toLowerCase()}-${card.id}.png")`)
 
         //add price data
         if (dataContainer.getAttribute('tcgplayer') && JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices'] && Object.keys(JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']).length != 0) {
