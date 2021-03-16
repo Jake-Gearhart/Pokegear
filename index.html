@@ -10,7 +10,6 @@
     </div>
     <input id='lockDecklist' class='buttonObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
     <input id='importDecklist' class='buttonObject decklistButton' title='Import Decklist' onclick='importDecklist()' type='button' value='↥'>
-    <!-- if(setsLoaded == true) {try {navigator.clipboard.readText().then(text => importDecklist(text))} catch {alert("This browser does not support importing from the clipboard.")}} -->
     <input id='exportDecklist' class='buttonObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
     <input id='sortDecklist' class='buttonObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
     <div id='scaleSliderContainer'>
@@ -1667,6 +1666,7 @@
         var clipboardText
         var errorOccurred = false
         if(setsLoaded == false) {
+            console.error('Sets were not loaded before import was attempted.')
             alert('Please wait for a few seconds for sets to load.')
             return
         }
@@ -1675,7 +1675,8 @@
                 clipboardText = await navigator.clipboard.readText().catch(error => {alert(error); errorOccurred = true})
             }
             catch {
-                alert("This browser does not support importing from the clipboard.")
+                console.error('Browser does not support importing from clipboard.')
+                alert('This browser does not support importing from the clipboard.')
                 return
             }
         }
