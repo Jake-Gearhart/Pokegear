@@ -9,7 +9,8 @@
         <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
     </div>
     <input id='lockDecklist' class='buttonObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
-    <input id='importDecklist' class='buttonObject decklistButton' title='Import Decklist' onclick='if(setsLoaded == true) {try {navigator.clipboard.readText().then(text => importDecklist(text))} catch {alert("This browser does not support importing from the clipboard.")}}' type='button' value='↥'>
+    <input id='importDecklist' class='buttonObject decklistButton' title='Import Decklist' onclick='importDecklist()' type='button' value='↥'>
+    <!-- if(setsLoaded == true) {try {navigator.clipboard.readText().then(text => importDecklist(text))} catch {alert("This browser does not support importing from the clipboard.")}} -->
     <input id='exportDecklist' class='buttonObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
     <input id='sortDecklist' class='buttonObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
     <div id='scaleSliderContainer'>
@@ -1445,25 +1446,6 @@
             sidebarCards.append(newCard)
         }
 
-        //spacer
-        // if (response['totalCardCount'] > response['page'] * response['pageSize']) {
-        //     sidebarCards.appendChild(
-        //         createElement('div', null, {
-        //             'class': 'sidebarCardsSpacer',
-        //             'loaded': 'false',
-        //             'style': `position: absolute; width: 100%; height: calc(var(--cardHeight) * 2); transform: translateY(calc(-1 * var(--cardHeight))); pointer-events: none; background-color: rgba(0, 0, 255, 0.5)`
-        //         })
-        //     )
-        // }
-        // else {
-        //     sidebarCards.appendChild(
-        //         createElement('div', null, {
-        //             'id': 'sidebarCardsBottom',
-        //             'style': `position: absolute; width: 100%; height: var(--cardHeight); ointer-events: none; background-color: rgba(255, 0, 0, 0.5)`
-        //         })
-        //     )
-        // }
-
         sidebarCards.appendChild(
             createElement('div', null, {
                 'id': 'sidebarCardsBottom',
@@ -1681,125 +1663,145 @@
         }
     }
 
-    async function importDecklist (text) {
-        if (!decklistCards.firstChild || confirm('Are you sure you want to overwrite the existing decklist?')) {
-            removeDecklistCards()
-            text = text.split('\n')
-            var cardsToSearch = []
-            for (i=0; i<text.length; i++) {
-                text[i] = text[i].replace('(', '').replace(')', '')
-                var line = text[i].split(' ')
+    async function importDecklist () {
+        var clipboardText
+        var errorOccurred = false
+        if(setsLoaded == false) {
+            alert('Please wait for a few seconds for sets to load.')
+            return
+        }
+        else {
+            try {
+                clipboardText = await navigator.clipboard.readText().catch(error => {alert(error); errorOccurred = true})
+            }
+            catch {
+                alert("This browser does not support importing from the clipboard.")
+                return
+            }
+        }
+        if (errorOccurred == true) {
+            return
+        }
 
-                //remove * from beginning of line
-                if (line[0] == '*') {
-                    line.shift()
-                }
+        text = clipboardText.split('\n')
+        var cardsToSearch = []
+        for (i=0; i<text.length; i++) {
+            text[i] = text[i].replace('(', '').replace(')', '')
+            var line = text[i].split(' ')
 
-                //format line
-                if (isNaN(Number(line[0])) || line.length < 4) {
-                    continue
-                }
-                else if (line.length == 4) {
-                    for (basicEnergy in basicEnergies) {
-                        if (line[1].toLowerCase() == basicEnergy) {
-                            line[3] = basicEnergies[basicEnergy][0]
-                            line.push(basicEnergies[basicEnergy][1])
-                        }
-                    }
-                }
-                else if (line.length == 5 && line[2] == 'Energy' && line[3] == 'Energy') {
-                    for (basicEnergy in basicEnergies) {
-                        if (line[1].toLowerCase() == basicEnergy) {
-                            line[3] = basicEnergies[basicEnergy][0]
-                            line[4] = basicEnergies[basicEnergy][1]
-                        }
-                    }
-                }
-
-                //set code translation
-                line[line.length -2] = line[line.length -2].toLowerCase()
-                for (input in setIdTranslations) {
-                    if (line[line.length -2] == input) {
-                        line[line.length -2] = setIdTranslations[input]
-                        break
-                    }
-                }
-
-                //fix set numbers
-                var brokenSetNumbers = {
-                    'swshp': ['SWSH', '00'],
-                    'smp': ['SM', '0'],
-                    'xyp': ['XY', '0'],
-                    'bwp': ['BW', '0'],
-                    'hsp': ['HGSS', '0'],
-                    'dpp': ['DP', '0'],
-                    'swsh45sv': ['SV', '00'],
-                    'bw11': ['RC', 115],
-                    'g1': ['RC', 100]
-                }
-
-                for (brokenSetNumber in brokenSetNumbers) {
-                    if (line[line.length -2] == brokenSetNumber && !line[line.length -1].includes(brokenSetNumbers[brokenSetNumber][0])) {
-                        //00x
-                        if (brokenSetNumbers[brokenSetNumber][1] == '00') {
-                            if (Number(line[line.length -1]) < 10) {
-                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '00' + line[line.length -1]
-                            }
-                            else if (Number(line[line.length -1]) < 100) {
-                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
-                            }
-                            else {
-                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
-                            }
-                        }
-                        //0x
-                        else if (brokenSetNumbers[brokenSetNumber][1] == '0') {
-                            if (Number(line[line.length -1]) < 10) {
-                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
-                            }
-                            else {
-                                line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
-                            }
-                        }
-                        //RC
-                        else if (Number(line[line.length -1]) > brokenSetNumbers[brokenSetNumber][1]) {
-                            line[line.length -1] = 'RC' + (Number(line[line.length -1]) - brokenSetNumbers[brokenSetNumber][1])
-                        }
-                    }
-                }
-
-                //shiny vault
-                if (line[line.length -2] == 'swsh45' && line[line.length -1].includes('SV')) {
-                    line[line.length -2] = 'swsh45sv'
-                }
-
-                cardsToSearch.push({
-                    'id': `${line[line.length -2]}-${line[line.length -1]}`,
-                    'count': Number(line[0])
-                })
+            //remove * from beginning of line
+            if (line[0] == '*') {
+                line.shift()
             }
 
-            if (cardsToSearch.length > 1) {
-                var url = 'https://api.pokemontcg.io/v2/cards?q='
-                setIDs = []
-                for (i=0; i<cardsToSearch.length; i++) {
-                    setIDs.push(cardsToSearch[i]['id'])
+            //format line
+            if (isNaN(Number(line[0])) || line.length < 4) {
+                continue
+            }
+            else if (line.length == 4) {
+                for (basicEnergy in basicEnergies) {
+                    if (line[1].toLowerCase() == basicEnergy) {
+                        line[3] = basicEnergies[basicEnergy][0]
+                        line.push(basicEnergies[basicEnergy][1])
+                    }
                 }
-                var url = `https://api.pokemontcg.io/v2/cards?q=id:${setIDs.join('+OR+id:')}`
-
-                const response = await fetchCards(url, header)
-                var cardData = response['cards']
-
-                for (i=0; i<cardsToSearch.length; i++) {
-                    var newCard = cardData.filter(function(card) {
-                        return card.id == cardsToSearch[i]['id'];
-                    })[0]
-                    if (!newCard) {
-                        console.error(`Failed to import ${cardsToSearch[i]['id']}`)
+            }
+            else if (line.length == 5 && line[2] == 'Energy' && line[3] == 'Energy') {
+                for (basicEnergy in basicEnergies) {
+                    if (line[1].toLowerCase() == basicEnergy) {
+                        line[3] = basicEnergies[basicEnergy][0]
+                        line[4] = basicEnergies[basicEnergy][1]
                     }
-                    else {
-                        addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
+                }
+            }
+
+            //set code translation
+            line[line.length -2] = line[line.length -2].toLowerCase()
+            for (input in setIdTranslations) {
+                if (line[line.length -2] == input) {
+                    line[line.length -2] = setIdTranslations[input]
+                    break
+                }
+            }
+
+            //fix set numbers
+            var brokenSetNumbers = {
+                'swshp': ['SWSH', '00'],
+                'smp': ['SM', '0'],
+                'xyp': ['XY', '0'],
+                'bwp': ['BW', '0'],
+                'hsp': ['HGSS', '0'],
+                'dpp': ['DP', '0'],
+                'swsh45sv': ['SV', '00'],
+                'bw11': ['RC', 115],
+                'g1': ['RC', 100]
+            }
+
+            for (brokenSetNumber in brokenSetNumbers) {
+                if (line[line.length -2] == brokenSetNumber && !line[line.length -1].includes(brokenSetNumbers[brokenSetNumber][0])) {
+                    //00x
+                    if (brokenSetNumbers[brokenSetNumber][1] == '00') {
+                        if (Number(line[line.length -1]) < 10) {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '00' + line[line.length -1]
+                        }
+                        else if (Number(line[line.length -1]) < 100) {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
+                        }
+                        else {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
+                        }
                     }
+                    //0x
+                    else if (brokenSetNumbers[brokenSetNumber][1] == '0') {
+                        if (Number(line[line.length -1]) < 10) {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
+                        }
+                        else {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
+                        }
+                    }
+                    //RC
+                    else if (Number(line[line.length -1]) > brokenSetNumbers[brokenSetNumber][1]) {
+                        line[line.length -1] = 'RC' + (Number(line[line.length -1]) - brokenSetNumbers[brokenSetNumber][1])
+                    }
+                }
+            }
+
+            //shiny vault
+            if (line[line.length -2] == 'swsh45' && line[line.length -1].includes('SV')) {
+                line[line.length -2] = 'swsh45sv'
+            }
+
+            cardsToSearch.push({
+                'id': `${line[line.length -2]}-${line[line.length -1]}`,
+                'count': Number(line[0])
+            })
+        }
+
+        if (cardsToSearch.length < 1 ) {
+            alert('No cards were found on the clipboard:\n\n' + clipboardText)
+        }
+        else if (!decklistCards.firstChild || confirm('Are you sure you want to overwrite the existing decklist?')) {
+            removeDecklistCards()
+            var url = 'https://api.pokemontcg.io/v2/cards?q='
+            setIDs = []
+            for (i=0; i<cardsToSearch.length; i++) {
+                setIDs.push(cardsToSearch[i]['id'])
+            }
+            var url = `https://api.pokemontcg.io/v2/cards?q=id:${setIDs.join('+OR+id:')}`
+
+            const response = await fetchCards(url, header)
+            var cardData = response['cards']
+
+            for (i=0; i<cardsToSearch.length; i++) {
+                var newCard = cardData.filter(function(card) {
+                    return card.id == cardsToSearch[i]['id'];
+                })[0]
+                if (!newCard) {
+                    console.error(`Failed to import ${cardsToSearch[i]['id']}`)
+                }
+                else {
+                    addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
                 }
             }
         }
