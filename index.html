@@ -1684,6 +1684,10 @@
             return
         }
 
+        if (decklistCards.firstChild && !confirm('Are you sure you want to overwrite the existing decklist?')) {
+            return
+        }
+
         text = clipboardText.split('\n')
         var cardsToSearch = []
         for (i=0; i<text.length; i++) {
@@ -1784,7 +1788,7 @@
             alert('No cards were found on the clipboard:\n\n' + clipboardText)
         }
         //begin import
-        else if (!decklistCards.firstChild || confirm('Are you sure you want to overwrite the existing decklist?')) {
+        else {
             var url = 'https://api.pokemontcg.io/v2/cards?q='
             cardIDs = []
             for (i=0; i<cardsToSearch.length; i++) {
@@ -1793,6 +1797,8 @@
             var url = `https://api.pokemontcg.io/v2/cards?q=id:${cardIDs.join('+OR+id:')}+`
 
             const response = await fetchCards(url, header)
+            //TEMP
+            console.log(response)
             var cardData
             //if response did not contain card data
             if (!response['cards']) {
@@ -1805,16 +1811,15 @@
             //match requests to fetched data
             var cardsToAdd = []
             for (i=0; i<cardsToSearch.length; i++) {
-                for (k=0; k<cardData.length; k++) {
-                    if (cardData[k].id == cardsToSearch[i]['id']) {
-                        cardsToAdd.push([cardData[k], cardsToSearch[i]['count']])
-                        cardData.splice(k, 1)
-                        break
-                    }
-                    if (k+1 == cardData.length) {
-                        console.error(`Failed to import ${cardsToSearch[i]['id']}`)
-                        importedCorrectly = false
-                    }
+                var newCard = cardData.filter(function(card) {
+                    return card.id == cardsToSearch[i]['id']
+                })[0]
+                if (newCard) {
+                    cardsToAdd.push([newCard, cardsToSearch[i]['count']])
+                }
+                else {
+                    console.error(`Failed to import ${cardsToSearch[i]['id']}`)
+                    importedCorrectly = false 
                 }
             }
 
@@ -1833,7 +1838,7 @@
             }
         }
         if (importedCorrectly == false) {
-            alert('One or more cards failed to import. See the console for more details.')
+            // alert('One or more cards failed to import. See the console for more details.')
         }
     }
 
