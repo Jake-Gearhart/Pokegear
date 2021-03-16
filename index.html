@@ -1779,41 +1779,60 @@
             })
         }
 
-        var failedToImport = false
-        try {
-            if (cardsToSearch.length < 1 ) {
-                alert('No cards were found on the clipboard:\n\n' + clipboardText)
-            }
-            else if (!decklistCards.firstChild || confirm('Are you sure you want to overwrite the existing decklist?')) {
-                removeDecklistCards()
-                var url = 'https://api.pokemontcg.io/v2/cards?q='
-                setIDs = []
-                for (i=0; i<cardsToSearch.length; i++) {
-                    setIDs.push(cardsToSearch[i]['id'])
-                }
-                var url = `https://api.pokemontcg.io/v2/cards?q=id:${setIDs.join('+OR+id:')}`
-
-                const response = await fetchCards(url, header)
-                var cardData = response['cards']
-
-                for (i=0; i<cardsToSearch.length; i++) {
-                    var newCard = cardData.filter(function(card) {
-                        return card.id == cardsToSearch[i]['id'];
-                    })[0]
-                    if (!newCard) {
-                        console.error(`Failed to import ${cardsToSearch[i]['id']}`)
-                        failedToImport = true
-                    }
-                    else {
-                        addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
-                    }
-                }
-            }
-        }
-        catch {
+        var importedCorrectly = true
+        if (cardsToSearch.length == 0) {
             alert('No cards were found on the clipboard:\n\n' + clipboardText)
         }
-        if (failedToImport == true) {
+        //begin import
+        else if (!decklistCards.firstChild || confirm('Are you sure you want to overwrite the existing decklist?')) {
+            var url = 'https://api.pokemontcg.io/v2/cards?q='
+            cardIDs = []
+            for (i=0; i<cardsToSearch.length; i++) {
+                cardIDs.push(cardsToSearch[i]['id'])
+            }
+            var url = `https://api.pokemontcg.io/v2/cards?q=id:${cardIDs.join('+OR+id:')}+`
+
+            const response = await fetchCards(url, header)
+            var cardData
+            //if response did not contain card data
+            if (!response['cards']) {
+                alert('The decklist you tried to import was malformed.')
+            }
+            else {
+                cardData = response['cards']
+            }
+
+            //match requests to fetched data
+            var cardsToAdd = []
+            for (i=0; i<cardsToSearch.length; i++) {
+                for (k=0; k<cardData.length; k++) {
+                    if (cardData[k].id == cardsToSearch[i]['id']) {
+                        cardsToAdd.push([cardData[k], cardsToSearch[i]['count']])
+                        cardData.splice(k, 1)
+                        break
+                    }
+                    if (k+1 == cardData.length) {
+                        console.error(`Failed to import ${cardsToSearch[i]['id']}`)
+                        importedCorrectly = false
+                    }
+                }
+            }
+
+            //add cards to decklist
+            if (cardsToAdd.length == 0) {
+                for (i=0; i<cardsToSearch.length; i++) {
+                    console.error(`Failed to import ${cardsToSearch[i]['id']}`)
+                }
+                alert('All cards failed to import. See the console for more details.')
+            }
+            else {
+                removeDecklistCards()
+                for (i=0; i<cardsToAdd.length; i++) {
+                    addDecklistCard(createCard(cardsToAdd[i][0]), cardsToAdd[i][1])
+                }
+            }
+        }
+        if (importedCorrectly == false) {
             alert('One or more cards failed to import. See the console for more details.')
         }
     }
