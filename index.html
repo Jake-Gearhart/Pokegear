@@ -1779,32 +1779,42 @@
             })
         }
 
-        if (cardsToSearch.length < 1 ) {
+        var failedToImport = false
+        try {
+            if (cardsToSearch.length < 1 ) {
+                alert('No cards were found on the clipboard:\n\n' + clipboardText)
+            }
+            else if (!decklistCards.firstChild || confirm('Are you sure you want to overwrite the existing decklist?')) {
+                removeDecklistCards()
+                var url = 'https://api.pokemontcg.io/v2/cards?q='
+                setIDs = []
+                for (i=0; i<cardsToSearch.length; i++) {
+                    setIDs.push(cardsToSearch[i]['id'])
+                }
+                var url = `https://api.pokemontcg.io/v2/cards?q=id:${setIDs.join('+OR+id:')}`
+
+                const response = await fetchCards(url, header)
+                var cardData = response['cards']
+
+                for (i=0; i<cardsToSearch.length; i++) {
+                    var newCard = cardData.filter(function(card) {
+                        return card.id == cardsToSearch[i]['id'];
+                    })[0]
+                    if (!newCard) {
+                        console.error(`Failed to import ${cardsToSearch[i]['id']}`)
+                        failedToImport = true
+                    }
+                    else {
+                        addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
+                    }
+                }
+            }
+        }
+        catch {
             alert('No cards were found on the clipboard:\n\n' + clipboardText)
         }
-        else if (!decklistCards.firstChild || confirm('Are you sure you want to overwrite the existing decklist?')) {
-            removeDecklistCards()
-            var url = 'https://api.pokemontcg.io/v2/cards?q='
-            setIDs = []
-            for (i=0; i<cardsToSearch.length; i++) {
-                setIDs.push(cardsToSearch[i]['id'])
-            }
-            var url = `https://api.pokemontcg.io/v2/cards?q=id:${setIDs.join('+OR+id:')}`
-
-            const response = await fetchCards(url, header)
-            var cardData = response['cards']
-
-            for (i=0; i<cardsToSearch.length; i++) {
-                var newCard = cardData.filter(function(card) {
-                    return card.id == cardsToSearch[i]['id'];
-                })[0]
-                if (!newCard) {
-                    console.error(`Failed to import ${cardsToSearch[i]['id']}`)
-                }
-                else {
-                    addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
-                }
-            }
+        if (failedToImport == true) {
+            alert('One or more cards failed to import. See the console for more details.')
         }
     }
 
