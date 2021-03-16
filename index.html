@@ -676,17 +676,7 @@
         'metal': ['evo', '98'],
         'fairy': ['evo', '99']
     }
-    // var basicEnergies = {
-    //     'grass': ['hs', '115'],
-    //     'fire': ['hs', '116'],
-    //     'water': ['hs', '117'],
-    //     'lightning': ['hs', '118'],
-    //     'psychic': ['hs', '119'],
-    //     'fighting': ['hs', '120'],
-    //     'darkness': ['hs', '121'],
-    //     'metal': ['hs', '122'],
-    //     'fairy': ['gen', '83']
-    // }
+
     var setIdTranslations = {
         'shf': 'swsh45',
         'si': 'si1',
@@ -1666,7 +1656,6 @@
         var clipboardText
         var errorOccurred = false
         if(setsLoaded == false) {
-            console.error('Sets were not loaded before import was attempted.')
             alert('Please wait for a few seconds for sets to load.')
             return
         }
@@ -1809,36 +1798,26 @@
             }
 
             //match requests to fetched data
-            var cardsToAdd = []
+            var removedCards = false
             for (i=0; i<cardsToSearch.length; i++) {
                 var newCard = cardData.filter(function(card) {
                     return card.id == cardsToSearch[i]['id']
                 })[0]
                 if (newCard) {
-                    cardsToAdd.push([newCard, cardsToSearch[i]['count']])
+                    if (removedCards == false) {
+                        removeDecklistCards(true)
+                        removedCards = true
+                    }
+                    addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
                 }
                 else {
                     console.error(`Failed to import ${cardsToSearch[i]['id']}`)
                     importedCorrectly = false 
                 }
             }
-
-            //add cards to decklist
-            if (cardsToAdd.length == 0) {
-                for (i=0; i<cardsToSearch.length; i++) {
-                    console.error(`Failed to import ${cardsToSearch[i]['id']}`)
-                }
-                alert('All cards failed to import. See the console for more details.')
-            }
-            else {
-                removeDecklistCards()
-                for (i=0; i<cardsToAdd.length; i++) {
-                    addDecklistCard(createCard(cardsToAdd[i][0]), cardsToAdd[i][1])
-                }
-            }
         }
         if (importedCorrectly == false) {
-            // alert('One or more cards failed to import. See the console for more details.')
+            alert('One or more cards failed to import. See the console for more details.')
         }
     }
 
@@ -2058,13 +2037,20 @@
             alert('There are no cards to delete.')
         }
         else if (confirm('Are you sure you want to delete the decklist?')) {
-            removeDecklistCards()
+            removeDecklistCards(false)
         }
     }
 
-    function removeDecklistCards () {
-        for (i=0; i<decklistCards.children.length; i++) {
-            fadeOut(decklistCards.children[i])
+    function removeDecklistCards (immediate) {
+        if (immediate == true) {
+            while (decklistCards.firstChild) {
+                decklistCards.firstChild.remove()
+            }
+        }
+        else {
+            for (i=0; i<decklistCards.children.length; i++) {
+                fadeOut(decklistCards.children[i])
+            }
         }
         decklistCardCount.value = 0;
         decklistCardCount.setAttribute('style', 'color: white')
