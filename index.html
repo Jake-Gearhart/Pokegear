@@ -1124,6 +1124,8 @@
         var focused
         var focusedContainer
         var focusedPrice
+        var leftButton
+        var rightButton
         if (document.getElementById('focused')) {
             focused = document.getElementById('focused')
             focusedContainer = document.getElementById('focusedContainer')
@@ -1132,6 +1134,8 @@
             focusedPrice.setAttribute('value', 'No Prices Available')
             focusedPrice.setAttribute('title', 'https://www.tcgplayer.com')
             focusedPrice.setAttribute('onclick', null)
+            leftButton = document.getElementById('focusedButtonLeft')
+            rightButton = document.getElementById('focusedButtonRight')
             document.getElementsByClassName('focusedCard')[0].remove()
         }
         else {
@@ -1159,38 +1163,37 @@
                 'type': 'submit',
                 'value': 'No Prices Available'
             }))
+            leftButton = focusedContainer.appendChild(createElement('input', null, {
+                'id': 'focusedButtonLeft',
+                'class': 'buttonObject',
+                'type': 'button',
+                'title': 'Click, or Press W, A, Up Arrow, or Left Arrow Key',
+                'value': '❮',
+                'onclick': 'event.preventDefault(); cycleFocused("left")'
+            }))
+            rightButton = focusedContainer.appendChild(createElement('input', null, {
+                'id': 'focusedButtonRight',
+                'class': 'buttonObject',
+                'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
+                'type': 'button',
+                'value': '❯',
+                'onclick': 'cycleFocused("right")'
+            }))
         }
 
         //left and right buttons
         if (currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
-            if (!document.getElementById('focusedButtonLeft')) {
-                focusedContainer.appendChild(createElement('input', null, {
-                    'id': 'focusedButtonLeft',
-                    'class': 'buttonObject',
-                    'type': 'button',
-                    'title': 'Click, or Press W, A, Up Arrow, or Left Arrow Key',
-                    'value': '❮',
-                    'onclick': 'event.preventDefault(); cycleFocused("left")'
-                }))
-            }
+            leftButton.setAttribute('style', 'cursor: pointer')
         }
-        else if (document.getElementById('focusedButtonLeft')) {
-            document.getElementById('focusedButtonLeft').remove()
+        else {
+            leftButton.setAttribute('style', 'cursor: not-allowed')
         }
+
         if (currentFocused.nextElementSibling && currentFocused.nextElementSibling.classList.contains('card')) {
-            if (!document.getElementById('focusedButtonRight')) {
-                focusedContainer.appendChild(createElement('input', null, {
-                    'id': 'focusedButtonRight',
-                    'class': 'buttonObject',
-                    'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
-                    'type': 'button',
-                    'value': '❯',
-                    'onclick': 'cycleFocused("right")'
-                }))
-            }
+            rightButton.setAttribute('style', 'cursor: pointer')
         }
-        else if (document.getElementById('focusedButtonRight')) {
-            document.getElementById('focusedButtonRight').remove()
+        else {
+            rightButton.setAttribute('style', 'cursor: not-allowed')
         }
 
         var dataContainer = card.getElementsByClassName('data')[0]
