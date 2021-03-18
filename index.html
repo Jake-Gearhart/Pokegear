@@ -1177,7 +1177,7 @@
             focusedPrice = focused.appendChild(createElement('input', null, {
                 'id': 'focusedPrice',
                 'class': 'buttonObject',
-                'title': 'https://www.tcgplayer.com',
+                'title': 'Open Card In TCGPlayer',
                 'type': 'submit',
                 'value': 'No Prices Available'
             }))
@@ -1279,7 +1279,6 @@
             }
             prices = prices.join(' ')
             focusedPrice.setAttribute('value', prices)
-            focusedPrice.setAttribute('title', JSON.parse(dataContainer.getAttribute('tcgplayer'))['url'])
             focusedPrice.setAttribute('onclick', `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`)
         }
     }
