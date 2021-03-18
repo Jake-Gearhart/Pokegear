@@ -546,6 +546,30 @@
             transform: translateY(-3%);
         }
     }
+    #focusedAdd {
+        position: absolute;
+        top: 10%;
+        height: calc(100% / 6);
+        width: 7.5%;
+        left: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
+    #focusedDownload {
+        position: absolute;
+        top: 10%;
+        height: calc(100% / 6);
+        width: 7.5%;
+        right: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
     #focusedButtonLeft {
         position: absolute;
         height: calc(100% / 3);
@@ -563,18 +587,6 @@
         height: calc(100% / 3);
         width: 7.5%;
         top: calc(100% / 3);
-        right: 20%;
-        cursor: pointer;
-        object-fit: contain;
-        text-align: center;
-        font-size: calc(var(--cardHeight) * 5/12);
-        pointer-events: all;
-    }
-    #focusedDownload {
-        position: absolute;
-        top: 10%;
-        height: calc(100% / 6);
-        width: 7.5%;
         right: 20%;
         cursor: pointer;
         object-fit: contain;
@@ -738,13 +750,13 @@
     document.addEventListener('keydown', keyDown);
     
     function keyDown (event) {
-        if (currentFocused && (event.keyCode == 39 || event.keyCode == 40 || event.keyCode == 68 || event.keyCode == 83)) {
-            //left arrow, down arrow, D key, S key
+        if (currentFocused && (event.keyCode == 39 || event.keyCode == 68)) {
+            //left arrow, D key
             event.preventDefault()
             cycleFocused('right')
         }
-        else if (currentFocused && (event.keyCode == 37 || event.keyCode == 38 || event.keyCode == 65 || event.keyCode == 87)) {
-            //right arrow, up arrow, A key, W key
+        else if (currentFocused && (event.keyCode == 37 || event.keyCode == 65)) {
+            //right arrow, A key
             event.preventDefault()
             cycleFocused('left')
         }
@@ -1081,7 +1093,7 @@
                     createElement('img', null, {
                         'src': mod,
                         'class': 'cardImage',
-                        'onload': 'this.parentNode.getElementsByClassName("cardImage")[1].remove()'
+                        'onload': 'if(this.parentNode && this.parentNode.getElementsByClassName("cardImage")[1]) {this.parentNode.getElementsByClassName("cardImage")[1].remove()}'
                     })
                 )
             }
@@ -1147,6 +1159,14 @@
                 'class': 'focusedContainer',
                 'style': 'pointer-events: none'
             }))
+            focusedAdd = focusedContainer.appendChild(createElement('input', null, {
+                    'id': 'focusedAdd',
+                    'class': 'fadeIn buttonObject',
+                    'title': 'Add Card To Deck',
+                    'type': 'submit',
+                    'onclick': "if(isDecklistLocked == false) {addDecklistCard(cloneCard(document.getElementsByClassName('focusedCard')[0], {'style': '', 'image': JSON.parse(document.getElementsByClassName('focusedCard')[0].getElementsByClassName('data')[0].getAttribute('images'))['small']}), +1)}",
+                    'value': '+'
+            }))
             focusedDownload = focusedContainer.appendChild(createElement('input', null, {
                     'id': 'focusedDownload',
                     'class': 'fadeIn buttonObject',
@@ -1165,18 +1185,26 @@
                 'id': 'focusedButtonLeft',
                 'class': 'buttonObject',
                 'type': 'button',
-                'title': 'Click, or Press W, A, Up Arrow, or Left Arrow Key',
+                'title': 'See Next Card',
                 'value': '❮',
                 'onclick': 'event.preventDefault(); cycleFocused("left")'
             }))
             rightButton = focusedContainer.appendChild(createElement('input', null, {
                 'id': 'focusedButtonRight',
                 'class': 'buttonObject',
-                'title': 'Click, or Press S, D, Down Arrow, or Right Arrow Key',
+                'title': 'See Previous Card',
                 'type': 'button',
                 'value': '❯',
                 'onclick': 'cycleFocused("right")'
             }))
+        }
+
+        //focused add button
+        if (isDecklistLocked == false) {
+            focusedAdd.setAttribute('style', 'cursor: pointer')
+        }
+        else {
+            focusedAdd.setAttribute('style', 'cursor: not-allowed')
         }
 
         //left and right buttons
@@ -1204,9 +1232,6 @@
         var newCard = focusedContainer.appendChild(cloneCard(card, {
                 'style': `transform: translateY(5%) rotate(${rotation}deg);`,
                 'class': 'focusedCard',
-                'onclick': null,
-                'oncontextmenu': null,
-                'onmouseenter': null,
                 'image': JSON.parse(dataContainer.getAttribute('images'))['large']
         }))
 
