@@ -1246,39 +1246,45 @@
         focusedDownload.setAttribute('onclick', `downloadResource("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').replace(' ', '-').toLowerCase()}-${card.id}.png")`)
 
         //add price data
-        if (dataContainer.getAttribute('tcgplayer') && JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices'] && Object.keys(JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']).length != 0) {
-            var prices = []
-            var pricesData = JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']
-            for (priceData in pricesData) {
-                if (pricesData[priceData]['directLow'] || pricesData[priceData]['low'] || pricesData[priceData]['market']) {
-                    if (priceDataTranslations[priceData]) {
-                        prices.push(priceDataTranslations[priceData])
-                    }
-                    else {
-                        prices.push(priceData)
-                    }
-                    var price
-                    if (pricesData[priceData]['directLow']) {
-                        price = `$${pricesData[priceData]['directLow']}`
-                    }
-                    else if (pricesData[priceData]['low']) {
-                        price = `$${pricesData[priceData]['low']}`
-                    }
-                    else if (pricesData[priceData]['market']) {
-                        price = `$${pricesData[priceData]['market']}`
-                    }
-                    if (!price.split('.')[1]) {
-                        price = price + '.00'
-                    }
-                    else if (price.split('.')[1].length == 1) {
-                        price = price + '0'
-                    }
-                    prices.push(price)
-                }
-            }
-            prices = prices.join(' ')
-            focusedPrice.setAttribute('value', prices)
+        if (dataContainer.getAttribute('tcgplayer')) {
             focusedPrice.setAttribute('onclick', `window.open('${JSON.parse(dataContainer.getAttribute('tcgplayer'))['url']}', '_blank');`)
+            focusedPrice.setAttribute('style', 'cursor: pointer')
+            if (JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices'] && Object.keys(JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']).length != 0) {
+                var prices = []
+                var pricesData = JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']
+                for (priceData in pricesData) {
+                    if (pricesData[priceData]['directLow'] || pricesData[priceData]['low'] || pricesData[priceData]['market']) {
+                        if (priceDataTranslations[priceData]) {
+                            prices.push(priceDataTranslations[priceData])
+                        }
+                        else {
+                            prices.push(priceData)
+                        }
+                        var price
+                        if (pricesData[priceData]['directLow']) {
+                            price = `$${pricesData[priceData]['directLow']}`
+                        }
+                        else if (pricesData[priceData]['low']) {
+                            price = `$${pricesData[priceData]['low']}`
+                        }
+                        else if (pricesData[priceData]['market']) {
+                            price = `$${pricesData[priceData]['market']}`
+                        }
+                        if (!price.split('.')[1]) {
+                            price = price + '.00'
+                        }
+                        else if (price.split('.')[1].length == 1) {
+                            price = price + '0'
+                        }
+                        prices.push(price)
+                    }
+                }
+                prices = prices.join(' ')
+                focusedPrice.setAttribute('value', prices)
+            }
+        }
+        else {
+            focusedPrice.setAttribute('style', 'cursor: not-allowed')
         }
     }
 
