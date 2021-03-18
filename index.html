@@ -1226,29 +1226,30 @@
             var prices = []
             var pricesData = JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']
             for (priceData in pricesData) {
-                if (pricesData[priceData]['directLow'] || pricesData[priceData]['market'] || pricesData[priceData]['mid'] || pricesData[priceData]['low'] || pricesData[priceData]['high']) {
+                if (pricesData[priceData]['directLow'] || pricesData[priceData]['low'] || pricesData[priceData]['market']) {
                     if (priceDataTranslations[priceData]) {
                         prices.push(priceDataTranslations[priceData])
                     }
                     else {
                         prices.push(priceData)
                     }
+                    var price
                     if (pricesData[priceData]['directLow']) {
-                        prices.push(`$${pricesData[priceData]['directLow']}`)
-                    }
-                    else if (pricesData[priceData]['market']) {
-                        prices.push(`$${pricesData[priceData]['market']}`)
-                    }
-                    else if (pricesData[priceData]['mid']) {
-                        prices.push(`$${pricesData[priceData]['mid']}`)
+                        price = `$${pricesData[priceData]['directLow']}`
                     }
                     else if (pricesData[priceData]['low']) {
-                        prices.push(`$${pricesData[priceData]['low']}`)
+                        price = `$${pricesData[priceData]['low']}`
                     }
-                    else if (pricesData[priceData]['high']) {
-                        prices.push(`$${pricesData[priceData]['high']}`)
+                    else if (pricesData[priceData]['market']) {
+                        price = `$${pricesData[priceData]['market']}`
                     }
-                    prices.push('')
+                    if (!price.split('.')[1]) {
+                        price = price + '.00'
+                    }
+                    else if (price.split('.')[1].length == 1) {
+                        price = price + '0'
+                    }
+                    prices.push(price)
                 }
             }
             prices = prices.join(' ')
