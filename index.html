@@ -13,7 +13,7 @@
     <input id='exportDecklist' class='buttonObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
     <input id='sortDecklist' class='buttonObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
     <div id='scaleSliderContainer'>
-        <input id='scaleSlider' class='' title='Zoom Decklist' type='range' oninput='changeCardScale(this.value)' min='0' value='0' max='2' step='0.01'></input>
+        <input id='scaleSlider' class='' title='Zoom Decklist' type='range' oninput='changeCardScale(this.value)' min='-1' value='0' max='1' step='0.000000000000000001'></input>
     </div>
     <input id='deleteDecklist' class='buttonObject decklistButton' title='Delete Decklist' onclick='deleteDecklist()' type='button' value='🗑'></input>
     <div id='decklist' ontouchstart='fullScreenSidebar(false)'>
@@ -63,6 +63,7 @@
         --midBlue60: rgba(46, 51, 101, 0.6);
         --holoSpeed: 20;
         --holoFPS: 15;
+        --focusedHoloFPS: 60;
     }
     @media only screen and (max-device-width: 600px) {
         :root {
@@ -270,7 +271,7 @@
         width: calc(100% - var(--scaledCardWidth) - var(--cardHeight) * 10/12);
         height: calc(100% - var(--scaledCardHeight));
 
-        padding-top: calc(var(--scaledCardHeight) / 2);
+        padding-top: calc(max(var(--cardHeight), var(--scaledCardHeight)) / 2);
         padding-bottom: calc(var(--scaledCardHeight) / 2);
         padding-left: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
         padding-right: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
@@ -495,7 +496,9 @@
         background-image: url('images/holo_overlay.png');
         animation: holo calc(1s * var(--holoSpeed)) infinite steps(calc(var(--holoSpeed) * var(--holoFPS)));
     }
-
+    .focusedHolo {
+        animation: holo calc(1s * var(--holoSpeed)) infinite steps(calc(var(--holoSpeed) * var(--focusedHoloFPS)));
+    }
     @keyframes holo {
         from { background-position: 200% 200%; }
 	    to { background-position: 0 0; }
@@ -1234,12 +1237,17 @@
                 'image': JSON.parse(dataContainer.getAttribute('images'))['large']
         }))
 
-        //remove individualCardCount, cardHoverMenu, and holo
+        //remove individualCardCount, and cardHoverMenu
         var remove = ['individualCardCount', 'cardHoverMenu']
         for (i=0; i<remove.length; i++) {
             if (newCard.getElementsByClassName(remove[i])[0]) {
                 newCard.getElementsByClassName(remove[i])[0].remove()
             }
+        }
+
+        //change holo speed
+        if (newCard.getElementsByClassName('holo')[0]) {
+            newCard.getElementsByClassName('holo')[0].classList.add('focusedHolo')
         }
 
         //download
@@ -1614,6 +1622,7 @@
                 newCard.getElementsByClassName('cardHoverMenu')[0].remove()
             }
             if (newCard.getElementsByClassName('holo')[0]) {
+                newCard.getElementsByClassName('holo')[0].classList.remove('focusedHolo')
                 const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
                 const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
                 newCard.getElementsByClassName('holo')[0].setAttribute('style', `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`)
