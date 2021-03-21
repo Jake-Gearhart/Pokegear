@@ -1528,6 +1528,21 @@
 
     //DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST
 
+    var cardDropTarget
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function drop(elem, target) {
+        var siblings = target.parentElement.children
+        if(Array.prototype.indexOf.call(siblings, target) > Array.prototype.indexOf.call(siblings, elem)) {
+            cardDropTarget.after(elem);
+        }
+        else {
+            cardDropTarget.before(elem);
+        }
+    }
+
     function addDecklistCard(card, count) {
         //if card exists in decklist
         if (decklistCards.querySelector(`#${card['id']}`)) {
@@ -1540,6 +1555,10 @@
                     'onmouseenter': 'decklistCardHover(this)',
                     'ontouchstart': 'decklistCardHover(this)',
                     'onmouseleave': 'if (this.getElementsByClassName("cardHoverMenu")[0]) {fadeOut(this.getElementsByClassName("cardHoverMenu")[0]);}',
+                    'draggable': 'true',
+                    'ondragstart': 'this.setAttribute("style", "transform: scale(1); box-shadow: none")',
+                    'ondragend': 'drop(this, cardDropTarget); this.removeAttribute("style")',
+                    'ondragover': 'allowDrop(event); cardDropTarget = this',
                     'count': count
 
                 })
