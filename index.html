@@ -635,7 +635,7 @@
         'Rare Shiny GX',
         'Rare Ultra'
     ]
-    const translations = {
+    const urlTranslations = {
         'é': '%C3%A9',
         '◇': '%E2%97%87',
         '◊': '%E2%97%87',
@@ -643,7 +643,7 @@
         'delta': '%CE%B4'
     }
 
-    const header = {headers:{'X-Api-Key': 'c937592b-dbe9-47de-a29f-194bce94c11b'}}
+    const header = {headers: {'X-Api-Key': 'c937592b-dbe9-47de-a29f-194bce94c11b'}}
 
     //sidebar
     const sidebarDiv = document.getElementById('sidebar')
@@ -656,10 +656,9 @@
     const decklistCardCount = document.getElementById('decklistCardCount')
     var isDecklistLocked = false
 
-    //Focused card
+    //focused card
     var currentFocused
     var currentFetchID = 0
-
     const priceDataTranslations = {
         'normal': 'Regular:',
         'holofoil': 'Holo:',
@@ -668,7 +667,7 @@
         '1stEditionNormal': '1st Edition:'
     }
 
-    //Search variables
+    //search variables
     var previousSearch
     var cooldown = false
     var queuedSearch = false
@@ -677,7 +676,7 @@
     //loading queue
     var loadingQueue = 0
 
-    //Import decklist variables
+    //import decklist variables
     var basicEnergies = {
         'grass': ['evo', '91'],
         'fire': ['evo', '92'],
@@ -689,7 +688,6 @@
         'metal': ['evo', '98'],
         'fairy': ['evo', '99']
     }
-
     var setIdTranslations = {
         'shf': 'swsh45',
         'si': 'si1',
@@ -709,66 +707,24 @@
         'p8': 'pop8',
         'p9': 'pop9'
     }
-
-    //Export decklist variables
-    var exportTranslations = {
-        'pop1': 'POP1',
-        'pop2': 'POP2',
-        'pop3': 'POP3',
-        'pop4': 'POP4',
-        'pop5': 'POP5',
-        'pop6': 'POP6',
-        'pop7': 'POP7',
-        'pop8': 'POP8',
-        'pop9': 'POP9'
+    var brokenSetNumbers = {
+        'swshp': ['SWSH', '00'],
+        'smp': ['SM', '0'],
+        'xyp': ['XY', '0'],
+        'bwp': ['BW', '0'],
+        'hsp': ['HGSS', '0'],
+        'dpp': ['DP', '0'],
+        'swsh45sv': ['SV', '00'],
+        'bw11': ['RC', 115],
+        'g1': ['RC', 100]
     }
 
-    //combination buttons
-    var RSPK_sets = [
-        'set.id:ex1',
-        'set.id:ex2',
-        'set.id:ex3',
-        'set.id:ex4',
-        'set.id:ex5',
-        'set.id:ex6',
-        'set.id:ex7',
-        'set.id:ex8',
-        'set.id:ex9',
-        'set.id:ex10',
-        'set.id:ex11',
-        'set.id:ex12',
-        'set.id:ex13',
-        'set.id:ex14',
-        'set.id:ex15',
-        'set.id:ex16',
-        'set.id:np',
-        'set.id:pop1',
-        'set.id:pop2',
-        'set.id:pop3',
-        'set.id:pop4',
-        'set.id:pop5'
-    ]
-
-    //Add event listeners
+    //add event listeners
     document.addEventListener('keydown', keyDown);
-    
-    function keyDown (event) {
-        if (currentFocused && (event.keyCode == 39 || event.keyCode == 68)) {
-            //left arrow, D key
-            event.preventDefault()
-            cycleFocused('right')
-        }
-        else if (currentFocused && (event.keyCode == 37 || event.keyCode == 65)) {
-            //right arrow, A key
-            event.preventDefault()
-            cycleFocused('left')
-        }
-    }
 
+    //sopulate sets
     var setsLoaded = false
-    //Populate set buttons
     populateSets()
-
     async function populateSets () {
         var url = 'https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate'
         loadingAlertStart(url)
@@ -820,94 +776,46 @@
         //sets div
         var rightButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'rightButtons', 'class': 'parameterButtonsSubContainer', 'style': 'right: 0;'}))
 
-        sets = json['data']
+        var sets = json['data']
+        var combinationButtons = {}
         for (i=0; i<sets.length; i++) {
-            if (sets[i]['ptcgoCode'] && !setIdTranslations[sets[i]['ptcgoCode'].toLowerCase()]) {
-                setIdTranslations[sets[i]['ptcgoCode'].toLowerCase()] = sets[i]['id']
+            var set = sets[i]
+            var reverseSet = sets[sets.length -1 -i]
+            if (set['ptcgoCode'] && !setIdTranslations[set['ptcgoCode'].toLowerCase()]) {
+                setIdTranslations[set['ptcgoCode'].toLowerCase()] = set['id']
+            }
+            if (!combinationButtons[reverseSet['series']]) {
+                combinationButtons[reverseSet['series']] = {
+                    'setA_img': reverseSet['images']['symbol'],
+                    'setB_img': reverseSet['images']['symbol'],
+                    'sets': ['set.id:' + reverseSet['id']]
+                }
+            }
+            else {
+                //prevent promo from being image
+                if(combinationButtons[reverseSet['series']]['setA_img'].split('/symbol.png')[0].slice(-1) != '1') {
+                    combinationButtons[reverseSet['series']]['setA_img'] = reverseSet['images']['symbol']
+                }
+                combinationButtons[reverseSet['series']]['setB_img'] = reverseSet['images']['symbol']
+                combinationButtons[reverseSet['series']]['sets'].push('set.id:' + reverseSet['id'])
             }
             rightButtons.appendChild(
                 createElement('div', null, {
-                    'id': 'set.id:' + sets[i]['id'],
+                    'id': 'set.id:' + set['id'],
                     'class': 'parameterButtonDiv',
-                    'title': sets[i]['name'],
+                    'title': set['name'],
                     'onclick': 'selectButton(this, true, [])'
                 })
             ).appendChild(
                 createElement('img', null, {
                     'class': 'parameterButton fadeIn',
-                    'src': sets[i]['images']['symbol'],
-                    'alt': 'set.id:' + sets[i]['id'],
+                    'src': set['images']['symbol'],
+                    'alt': 'set.id:' + set['id'],
                     'style': 'pointer-events: none;'
                 })
             )
         }
         setsLoaded = true
-        
-        var combinationButtons = [
-            {
-                'combinationId': 'bs-g2',
-                'combinationTitle': 'Red & Blue Era',
-                'setA_img': document.getElementById('set.id:base1').getElementsByClassName('parameterButton')[0].src,
-                'setB_img': document.getElementById('set.id:gym2').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:basep", "set.id:base1", "set.id:base2", "set.id:base3", "set.id:base4", "set.id:base5", "set.id:gym1", "set.id:gym2"]'
-            },
-            {
-                'combinationId': 'bs-g2',
-                'combinationTitle': 'Gold & Silver Era',
-                'setA_img': document.getElementById('set.id:neo1').getElementsByClassName('parameterButton')[0].src,
-                'setB_img': document.getElementById('set.id:ecard3').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:neo1", "set.id:neo2", "set.id:neo3", "set.id:neo4", "set.id:base6", "set.id:ecard1", "set.id:ecard2", "set.id:ecard3", "set.id:si1" ]'
-            },
-            {
-                'combinationId': 'rs-pk',
-                'combinationTitle': 'Ruby & Sapphire Era',
-                'setA_img': document.getElementById('set.id:ex1').getElementsByClassName('parameterButton')[0].src,
-                'setB_img': document.getElementById('set.id:ex16').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:np", "set.id:ex1", "set.id:ex2", "set.id:ex3", "set.id:ex4", "set.id:ex5", "set.id:ex6", "set.id:ex7", "set.id:ex8", "set.id:ex9", "set.id:ex10", "set.id:ex11", "set.id:ex12", "set.id:ex13", "set.id:ex14", "set.id:ex15", "set.id:ex16", "set.id:pop1", "set.id:pop2", "set.id:pop3", "set.id:pop4", "set.id:pop5"]'
-            },
-            {
-                'combinationId': 'dp-ar',
-                'combinationTitle': 'Diamond & Pearl Era',
-                'setA_img': document.getElementById('set.id:dp1').getElementsByClassName('parameterButton')[0].src,
-                'setB_img': document.getElementById('set.id:pl4').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:dpp", "set.id:dp1", "set.id:dp2", "set.id:dp3", "set.id:dp4", "set.id:dp5", "set.id:dp6", "set.id:dp7", "set.id:pl1", "set.id:pl2", "set.id:pl3", "set.id:pl4", "set.id:ru1", "set.id:pop6", "set.id:pop7", "set.id:pop8", "set.id:pop9"]'
-            },
-            {
-                'combinationId': 'hgss-col',
-                'combinationTitle': 'Heart Gold & Soul Silver Era',
-                'setA_img': document.getElementById('set.id:hgss1').getElementsByClassName('parameterButton')[0].src,
-                'setB_img': document.getElementById('set.id:col1').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:hsp", "set.id:hgss1", "set.id:hgss2", "set.id:hgss3", "set.id:hgss4", "set.id:col1"]'
-            },
-            {
-                'combinationId': 'blw-ltr',
-                'combinationTitle': 'Black & White Era',
-                'setA_img': document.getElementById('set.id:bw1').getElementsByClassName('parameterButton')[0].src,
-                'setB_img': document.getElementById('set.id:bw11').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:bwp", "set.id:bw1", "set.id:bw2", "set.id:bw3", "set.id:bw4", "set.id:bw5", "set.id:bw6", "set.id:bw7", "set.id:bw8", "set.id:bw9", "set.id:bw10", "set.id:bw11", "set.id:mcd11", "set.id:mcd12", "set.id:dv1"]'
-            },
-            {
-                'combinationId': 'xy-evo',
-                'combinationTitle': 'X & Y Era',
-                'setA_img': document.getElementById('set.id:xy1').getElementsByClassName('parameterButton')[0].src,
-                'setB_img': document.getElementById('set.id:xy12').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:xyp", "set.id:xy0", "set.id:xy1", "set.id:xy2", "set.id:xy3", "set.id:xy4", "set.id:xy5", "set.id:xy6", "set.id:xy7", "set.id:xy8", "set.id:xy9", "set.id:xy10", "set.id:xy11", "set.id:xy12", "set.id:dc1", "set.id:g1", "set.id:mcd16"]'
-            },
-            {
-                'combinationId': 'sum-cec',
-                'combinationTitle': 'Sun & Moon Era',
-                'setA_img': document.getElementById('set.id:sm1').getElementsByClassName('parameterButton')[0].src,
-                'setB_img': document.getElementById('set.id:sm12').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:smp", "set.id:sm1", "set.id:sm2", "set.id:sm3", "set.id:sm35", "set.id:sm4", "set.id:sm5", "set.id:sm6", "set.id:sm7", "set.id:sm75", "set.id:sm8", "set.id:sm9", "set.id:sm10", "set.id:sm11", "set.id:sm12", "set.id:det1", "set.id:sma", "set.id:sm115", "set.id:mcd19"]'
-            },
-            {
-                'combinationId': 'ssh-shf',
-                'combinationTitle': 'Sword & Shield Era',
-                'setA_img': document.getElementById('set.id:swsh1').getElementsByClassName('parameterButton')[0].src,
-                'setB_img': document.getElementById('set.id:swsh5').getElementsByClassName('parameterButton')[0].src,
-                'sets': '["set.id:swshp", "set.id:swsh1", "set.id:swsh2", "set.id:swsh3", "set.id:swsh35", "set.id:swsh4", "set.id:swsh45", "set.id:swsh45sv", "set.id:swsh5"]'
-            }
-        ]
 
         leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
         var legalities = [
@@ -933,25 +841,29 @@
 
         leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
 
-        for (i=0; i<combinationButtons.length; i++) {
+        for (key in combinationButtons) {
+            var combinationButton = combinationButtons[key]
+            if (combinationButton['sets'].length == 1) {
+                continue
+            }
             var newButton = leftButtons.appendChild(
                 createElement('div', null, {
-                    'id': combinationButtons[i]['combinationId'],
+                    'id': key,
                     'class': 'parameterButtonDiv fadeIn',
-                    'title': combinationButtons[i]['combinationTitle'],
-                    'onclick': `selectButton(this, true, ${combinationButtons[i]['sets']})`
+                    'title': key,
+                    'onclick': `selectButton(this, true, ['${combinationButton['sets'].join("','")}'])`
                 }))
             newButton.appendChild(
                 createElement('img', null, {
                     'class': 'parameterButton',
-                    'src': combinationButtons[i]['setB_img'],
+                    'src': combinationButton['setB_img'],
                     'style': 'pointer-events: none; transform: translateX(calc(var(--cardWidth)/12)) translateY(calc(-1 * var(--cardWidth)/12)) scale(0.85)'
                 })
             )
             newButton.appendChild(
                 createElement('img', null, {
                     'class': 'parameterButton',
-                    'src': combinationButtons[i]['setA_img'],
+                    'src': combinationButton['setA_img'],
                     'style': 'pointer-events: none; transform: translateX(calc(-1 * var(--cardWidth)/12)) translateY(calc(var(--cardWidth)/12)) scale(0.85)'
                 })
             )
@@ -960,6 +872,19 @@
     
     //UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS
 
+    function keyDown (event) {
+        if (currentFocused && (event.keyCode == 39 || event.keyCode == 68)) {
+            //left arrow, D key
+            event.preventDefault()
+            cycleFocused('right')
+        }
+        else if (currentFocused && (event.keyCode == 37 || event.keyCode == 65)) {
+            //right arrow, A key
+            event.preventDefault()
+            cycleFocused('left')
+        }
+    }
+    
     function randomInteger(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
@@ -1388,8 +1313,8 @@
             if (searchField.length == 0) {
                 continue
             }
-            for (translation in translations) {
-                searchField = searchField.replace(translation, translations[translation])
+            for (translation in urlTranslations) {
+                searchField = searchField.replace(translation, urlTranslations[translation])
             }
             searchField = searchField.split(' ')
             for (j = 0; j < searchField.length; j++) {
@@ -1779,18 +1704,6 @@
             }
 
             //fix set numbers
-            var brokenSetNumbers = {
-                'swshp': ['SWSH', '00'],
-                'smp': ['SM', '0'],
-                'xyp': ['XY', '0'],
-                'bwp': ['BW', '0'],
-                'hsp': ['HGSS', '0'],
-                'dpp': ['DP', '0'],
-                'swsh45sv': ['SV', '00'],
-                'bw11': ['RC', 115],
-                'g1': ['RC', 100]
-            }
-
             for (brokenSetNumber in brokenSetNumbers) {
                 if (line[line.length -2] == brokenSetNumber && !line[line.length -1].includes(brokenSetNumbers[brokenSetNumber][0])) {
                     //00x
@@ -1894,16 +1807,13 @@
             var count = cards[i].getElementsByClassName('individualCardCount')[0].value
             var name = dataContainer.getAttribute('name')
             var code
+            //if ptcgoCode
             if (JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']) {
                 code = JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']
             }
+            //else, use ID
             else {
-                id = JSON.parse(dataContainer.getAttribute('set'))['id']
-                for (translation in exportTranslations) {
-                    if (id == translation) {
-                        code = exportTranslations[translation]
-                    }
-                }
+                code = JSON.parse(dataContainer.getAttribute('set'))['id'].toUpperCase()
             }
             var number = dataContainer.getAttribute('number')
             text.push(
