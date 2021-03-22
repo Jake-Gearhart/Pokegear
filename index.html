@@ -26,7 +26,7 @@
         <div id='sidebarCards' onscroll='scrollSidebarCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
             <br class='helpText'>
             <br class='helpText'>
-            <p class='helpText'>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Click any of the set symbols at the bottom to filter by set or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. Click a card to view it in fullscreen.</p>
+            <p class='helpText'>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Search for cards by using the buttons at the bottom or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. Click any card to view it in fullscreen. Once a card is in the decklist, you can move it around by dragging it.</p>
         </div>
         <div id='parameterButtons'></div>
         <div class='searchParameter'>
@@ -269,7 +269,7 @@
         overflow-y: auto;
 
         width: calc(100% - var(--scaledCardWidth) - var(--cardHeight) * 10/12);
-        height: calc(100% - var(--scaledCardHeight));
+        height: calc(100% - max(var(--cardHeight) * 0.75, var(--scaledCardHeight)));
 
         padding-top: calc(max(var(--cardHeight), var(--scaledCardHeight)) / 2);
         padding-bottom: calc(var(--scaledCardHeight) / 2);
@@ -696,7 +696,6 @@
         'exp': 'ecard1',
         'aqp': 'ecard2',
         'skr': 'ecard3',
-        'tr': 'ex7',
         'p1': 'pop1',
         'p2': 'pop2',
         'p3': 'pop3',
