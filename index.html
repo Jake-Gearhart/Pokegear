@@ -268,11 +268,12 @@
         overflow-x: hidden;
         overflow-y: auto;
 
+        /* 100% - padding */
         width: calc(100% - var(--scaledCardWidth) - var(--cardHeight) * 10/12);
-        height: calc(100% - max(var(--cardHeight) * 0.75, var(--scaledCardHeight)));
+        height: calc(100% - max(var(--cardHeight), var(--scaledCardHeight)) / 2 - max(var(--cardHeight) / 2, var(--scaledCardHeight)) / 2);
 
         padding-top: calc(max(var(--cardHeight), var(--scaledCardHeight)) / 2);
-        padding-bottom: calc(var(--scaledCardHeight) / 2);
+        padding-bottom: calc(max(var(--cardHeight) / 2, var(--scaledCardHeight)) / 2);
         padding-left: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
         padding-right: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
     }
