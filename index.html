@@ -52,6 +52,7 @@
         --cardScale: 1;
         --scaledCardWidth: calc(var(--cardWidth) * var(--cardScale));
         --scaledCardHeight: calc(var(--cardHeight) * var(--cardScale));
+        --cardSpacing: calc(var(--scaledCardWidth) * 30/734);
         --lightBlue: rgb(207, 239, 255);
         --lightBlue30: rgba(207, 239, 255, 0.3);
         --lightBlue60: rgba(207, 239, 255, 0.6);
@@ -265,17 +266,16 @@
     #decklist {
         position: absolute;
         text-align: center;
-        overflow-x: hidden;
         overflow-y: auto;
 
         /* 100% - padding */
-        width: calc(100% - var(--scaledCardWidth) - var(--cardHeight) * 10/12);
-        height: calc(100% - max(var(--cardHeight), var(--scaledCardHeight)) / 2 - max(var(--cardHeight) / 2, var(--scaledCardHeight)) / 2);
+        width: calc(100% - var(--scaledCardWidth) - var(--cardHeight) * 10/12 + var(--cardSpacing));
+        height: calc(100% - max(var(--cardHeight), var(--scaledCardHeight)) / 2 - max(var(--cardHeight) / 2, var(--scaledCardHeight)) / 2 + var(--cardSpacing));
 
-        padding-top: calc(max(var(--cardHeight), var(--scaledCardHeight)) / 2);
-        padding-bottom: calc(max(var(--cardHeight) / 2, var(--scaledCardHeight)) / 2);
-        padding-left: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
-        padding-right: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
+        padding-top: calc(max(var(--cardHeight), var(--scaledCardHeight)) / 2 - var(--cardSpacing) / 2);
+        padding-bottom: calc(max(var(--cardHeight) / 2, var(--scaledCardHeight)) / 2 - var(--cardSpacing) / 2);
+        padding-left: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12 - var(--cardSpacing) / 2);
+        padding-right: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12 - var(--cardSpacing) / 2);
     }
     .cardHoverMenu {
         position: absolute;
@@ -404,13 +404,18 @@
         position: absolute;
         height: 100%;
         opacity: 100%;
-        overflow-x: hidden;
         overflow-y: auto;
         color: lightgray;
-        padding-top: calc(var(--cardHeight) / 2);
-        padding-left: calc(var(--cardWidth) / 2);
-        padding-right: calc(var(--cardWidth) / 2);
+        padding-top: calc(var(--cardHeight) / 2 - var(--cardSpacing) / 2);
+        padding-left: calc(var(--cardWidth) / 2 - var(--cardSpacing) / 2);
+        padding-right: calc(var(--cardWidth) / 2 - var(--cardSpacing) / 2);
         width: calc(100% - var(--cardWidth) * 19/12);
+    }
+    #sidebarCardsBottom {
+        width: 100%; 
+        height: calc(var(--cardHeight) - var(--cardSpacing)); 
+        transform: translateY(calc(-1 * var(--cardHeight) - var(--cardSpacing) / 2)); 
+        pointer-events: none;
     }
     #parameterButtons {
         z-index: 1000;
@@ -426,7 +431,6 @@
         position: absolute; 
         height: 100%;
         width: 50%;
-        overflow-x: hidden;
         overflow-y: auto;
     }
     #parameterButtons:hover {
@@ -465,6 +469,7 @@
         height: var(--cardHeight);
         background-image: url('images/placeholder.png');
         background-size: 100% 100%;
+        margin: calc(var(--cardSpacing) / 2);
     }
     .decklistCard {
         width: var(--scaledCardWidth);
@@ -480,9 +485,9 @@
     .cardImage {
         width: 100%;
         height: 100%;
+        left: 0;
         border-radius: inherit;
         position: absolute;
-        left: 0;
         object-fit: inherit;
         pointer-events: none;
     }
@@ -535,6 +540,7 @@
         left: 2.5%;
         cursor: pointer;
         background-color: transparent;
+        overflow-y: auto;
     }
     #focusedPrice>p {
         margin: 0;
@@ -1226,7 +1232,6 @@
             price = price + '0'
         }
         return createElement('p', price, {'style': `font-style: italic; text-shadow: 0px 0px 8px var(--darkBlue); color: ${color};`})
-        // here
     }
 
     function cycleFocused (direction) {
@@ -1427,8 +1432,7 @@
 
         sidebarCards.appendChild(
             createElement('div', null, {
-                'id': 'sidebarCardsBottom',
-                'style': `width:100%; height: var(--cardHeight); transform: translateY(calc(-1 * var(--cardHeight))); pointer-events: none;`
+                'id': 'sidebarCardsBottom'
             })
         )
 
