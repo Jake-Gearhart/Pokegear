@@ -1799,8 +1799,8 @@
             //match requests to fetched data
             var removedCards = false
             for (i=0; i<cardsToSearch.length; i++) {
-                var newCard = cardData.filter(function(card) {
-                    return card['id'] == cardsToSearch[i]['id']
+                var newCard = cardData.filter(function(obj) {
+                    return obj['id'] == cardsToSearch[i]['id']
                 })
                 console.log(newCard)
                 newCard = newCard[0]
