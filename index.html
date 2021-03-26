@@ -1801,7 +1801,10 @@
             for (i=0; i<cardsToSearch.length; i++) {
                 var newCard = cardData.filter(function(card) {
                     return card['id'] == cardsToSearch[i]['id']
-                })[0]
+                })
+                console.log(newCard)
+                newCard = newCard[0]
+                console.log(newCard)
                 if (newCard) {
                     if (removedCards == false) {
                         removeDecklistCards(true)
