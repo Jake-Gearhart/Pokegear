@@ -1800,7 +1800,10 @@
             var removedCards = false
             for (i=0; i<cardsToSearch.length; i++) {
                 var newCard = cardData.filter(function(card) {
-                    return card.id == cardsToSearch[i]['id']
+                    console.log('TESTING1 ' + card['id'])
+                    console.log('TESTING2 ' + cardsToSearch[i])
+                    console.log('TESTING3 ' + cardsToSearch[i]['id'])
+                    return card['id'] == cardsToSearch[i]['id']
                 })[0]
                 if (newCard) {
                     if (removedCards == false) {
