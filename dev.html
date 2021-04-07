@@ -613,6 +613,31 @@
             transform: translateY(-3%);
         }
     }
+
+    #toggleShine {
+        position: absolute;
+        top: 10%;
+        height: calc(20vw);
+        width: 20%;
+        left: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
+    #exportConsole {
+        position: absolute;
+        top: 10%;
+        height: calc(20vw);
+        width: 20%;
+        right: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
     
     .fadeIn {
         animation: fadeIn 0.25s;
@@ -1104,17 +1129,54 @@
 
     //SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS
     function openSettings () {
-        document.documentElement.style.setProperty('--holoEnabled', 0);
-        var exportLogs
+        var settingsMenu = document.body.appendChild(createElement('div', null, {
+            'id': 'focused',
+            'class': 'fadeIn',
+            'onclick': 'if(event.target === this) {fadeOut(this); currentFocused = null}'
+        }))
+        var toggleShine = settingsMenu.appendChild(createElement('input', null, {
+            'id': 'toggleShine',
+            'class': 'fadeIn buttonObject',
+            'title': 'Toggle Card Shine Effect',
+            'type': 'submit',
+            'value': '✧',
+            'onclick': 'toggleShine()'
+        }))
+        var exportConsole = settingsMenu.appendChild(createElement('input', null, {
+            'id': 'exportConsole',
+            'class': 'fadeIn buttonObject',
+            'title': 'Export Console to File',
+            'type': 'submit',
+            'value': '🗒 ↧',
+            'onclick': 'exportConsole()'
+        }))
+    }
+
+    function exportConsole() {
+        var exportText
         for (i=0; i<logs.length; i++) {
             if (i == 0) {
-                exportLogs = `${i+1}.\n${JSON.stringify(logs[i])}`
+                exportText = `___\n${i+1}.|\n${JSON.stringify(logs[i])}`
             }
             else {
-                exportLogs = `${exportLogs}\n\n${i+1}.\n${JSON.stringify(logs[i])}`
+                exportText = `${exportText}\n___\n${i+1}.|\n${JSON.stringify(logs[i])}`
             }
         }
-        exportTxt(exportLogs, 'console.txt')
+        exportTxt(exportText, 'console.txt')
+    }
+
+    var shine = true
+    function toggleShine() {
+        if (shine == true) {
+            document.getElementById('toggleShine').value = '✦'
+            document.documentElement.style.setProperty('--holoEnabled', 0);
+            shine = false
+        }
+        else {
+            document.getElementById('toggleShine').value = '✧'
+            document.documentElement.style.setProperty('--holoEnabled', 1);
+            shine = true
+        }
     }
 
     //CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS
@@ -1838,8 +1900,7 @@
             var url = `https://api.pokemontcg.io/v2/cards?q=id:${cardIDs.join('+OR+id:')}+`
 
             const response = await fetchCards(url, header)
-            //TEMP
-            log(response, false, 'normal')
+
             var cardData
             //if response did not contain card data
             if (!response['cards']) {
@@ -1851,9 +1912,15 @@
 
             //match requests to fetched data
             var removedCards = false
+
+            // TEST
+            // log(cardData, false, 'normal')
+            // log(cardsToSearch, false, 'normal')
+
             for (i=0; i<cardsToSearch.length; i++) {
                 var newCard = cardData.filter(function(card) {
-                    return card.id == cardsToSearch[i]['id']
+                    // return card['id'] == cardsToSearch[i]['id']
+                    return `${card['set']['id']}-${card['number']}` == cardsToSearch[i]['id']
                 })[0]
                 if (newCard) {
                     if (removedCards == false) {
