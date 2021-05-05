@@ -1,1 +1,2231 @@
+<head>
+    <link rel="shortcut icon" type="image/png" href='images/favicon.png'>
+    <meta charset="utf-8">
+</head>
+<html>
+    <body onresize='windowResize()'>
+        <div id='title'>
+            <img id='titleIcon' src='images/favicon.png'>
+            <h1 id='titleText'>Pokegear.app</h1>
+            <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
+        </div>
+        <input id='settings' class='buttonObject decklistButton' title='Settings' onclick='openSettings()' type='button' value='⚙'></input>
+        <input id='lockDecklist' class='buttonObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
+        <input id='importDecklist' class='buttonObject decklistButton' title='Import Decklist' onclick='importDecklist()' type='button' value='↥'>
+        <input id='exportDecklist' class='buttonObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
+        <input id='sortDecklist' class='buttonObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
+        <div id='scaleSliderContainer'>
+            <input id='scaleSlider' class='' title='Zoom Decklist' type='range' oninput='changeCardScale(this.value)' min='-0.5' value='0' max='0.5' step='0.000000000000000001'></input>
+        </div>
+        <input id='deleteDecklist' class='buttonObject decklistButton' title='Delete Decklist' onclick='deleteDecklist()' type='button' value='🗑'></input>
+        <div id='decklist' ontouchstart='fullScreenSidebar(false)'>
+            <input id='decklistCardCount' class='buttonObject' type='button' value='0'>
+            <div id='decklistCards'></div>
+        </div>
+        <div id='sidebar' ontouchstart='fullScreenSidebar(true)'>
+            <img id='loadingGif' src='images/loading.gif'>
+            <input id='sidebarArrow' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
+            <div id='sidebarCards' onscroll='scrollSidebarCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
+                <br class='helpText'>
+                <br class='helpText'>
+                <p class='helpText'>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Search for cards by using the buttons at the bottom or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. Click any card to view it in fullscreen. Once a card is in the decklist, you can move it around by dragging it.</p>
+            </div>
+            <div id='parameterButtons'></div>
+            <div class='searchParameter'>
+                <input class='searchType buttonObject' type='button' value='Name' searchType='["name"]'>
+                <input class='searchField buttonObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
+                <input class='deleteParameterButton buttonObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
+            </div>
+            <input class='addParameterButton buttonObject' title='Add Parameter' type='button' value='＋' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
+        </div>
+    </body>
+</html>
+<template>
+    <div class='searchParameter'>
+        <input class='searchType buttonObject' type='button' value='Card Text' searchType='["attacks.name", "attacks.text", "attacks.damage", "abilities.name", "abilities.text", "rules"]'>
+        <input class='searchField buttonObject' type='text' placeholder='Search...' onkeyup='constructSearchUrl()'>
+        <input class='deleteParameterButton buttonObject' title='Remove Parameter' type='button' value='－' onclick='this.parentNode.remove(); constructSearchUrl()'>
+    </div>
+</template>
+<style>
+    :root {
+        --cardHeight: 4.4cm;
+        --cardDimensionRatio: 367/512;
+        --cardWidth: calc(var(--cardHeight) * var(--cardDimensionRatio));
 
+        --cardScale: 1;
+        --scaledCardHeight: calc(var(--cardHeight) * var(--cardScale));
+        --scaledCardWidth: calc(var(--cardWidth) * var(--cardScale));
+        --cardSpacing: calc(var(--scaledCardWidth) * 30/734);
+
+        --focusedHeight: min(100vw, 100vh);
+        --focusedWidth: calc(min(100vw, 100vh) * var(--cardDimensionRatio));
+
+        --lightBlue: rgb(207, 239, 255);
+        --lightBlue30: rgba(207, 239, 255, 0.3);
+        --lightBlue60: rgba(207, 239, 255, 0.6);
+        --darkBlue: rgb(15, 15, 71);
+        --darkBlue30: rgba(15, 15, 71, 0.3);
+        --darkBlue60: rgba(15, 15, 71, 0.6);
+        --midBlue: rgb(46, 51, 101);
+        --midBlue30: rgba(46, 51, 101, 0.3);
+        --midBlue60: rgba(46, 51, 101, 0.6);
+
+        --holoSpeed: 20;
+        --holoFPS: 15;
+        --focusedHoloFPS: 60;
+        --holoEnabled: 1;
+    }
+    @media only screen and (max-device-width: 600px) {
+        :root {
+            --cardWidth: calc(100vw/4.5);
+        }
+    }
+    body {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: var(--lightBlue);
+        font-family: sans-serif;
+        margin: 0;
+        padding: 0;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+    input {
+        text-align: center;
+        -webkit-appearance: none;
+        border-radius: 0;
+        -webkit-border-radius: 0;
+    }
+    #loadingGif {
+        z-index: 2000;
+        position: absolute;
+        width: calc(var(--cardHeight) / 3);
+        height: calc(var(--cardHeight) / 3);
+        top: 0;
+        right: calc(var(--cardHeight) / 24);
+        margin: 0;
+        visibility: hidden;
+    }
+    .buttonObject {
+        width: calc(var(--cardHeight) / 3);
+        height: calc(var(--cardHeight) / 3);
+        font-size: calc(var(--cardHeight) / 6);
+        margin: 0;
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue60);
+        border-radius: calc(var(--cardHeight) / 9) !important;
+        -webkit-border-radius: calc(var(--cardHeight) / 9) !important;
+        text-shadow: 0px 0px 8px var(--darkBlue);
+        background-color: var(--darkBlue60);
+        color: rgba(255, 255, 255, 0.8);
+        transition: background-color 0.25s, transform 0.125s;
+    }
+    .buttonObject:hover {
+        background-color: var(--midBlue60);
+    }
+    .buttonObject:active {
+        transform: translateY(4%);
+    }
+    .scaledbuttonObject {
+        width: calc(var(--scaledCardHeight) / 3);
+        height: calc(var(--scaledCardHeight) / 3);
+        font-size: calc(var(--scaledCardHeight) / 6);
+        margin: 0;
+        border: calc(var(--scaledCardHeight) / 48) solid var(--lightBlue60);
+        border-radius: calc(var(--scaledCardHeight) / 9) !important;
+        -webkit-border-radius: calc(var(--scaledCardHeight) / 9) !important;
+        text-shadow: 0px 0px calc(8px * var(--cardScale)) var(--darkBlue);
+        background-color: var(--darkBlue60);
+        color: rgba(255, 255, 255, 0.8);
+        transition: background-color 0.25s, transform 0.125s;
+    }
+    .scaledbuttonObject:hover {
+        background-color: var(--midBlue60);
+    }
+    .scaledbuttonObject:active {
+        transform: translateY(4%);
+    }
+    #title {
+        z-index: 500;
+        position: absolute;
+        height: calc(var(--cardHeight) / 3);
+        left: calc(var(--cardHeight) * 11/12);
+    }
+    #titleIcon {
+        position: absolute;
+        height: calc(var(--cardHeight) / 3);
+        bottom: calc(-1 * var(--cardHeight) / 12);
+        left: calc(var(--cardHeight) * -5/12);
+    }
+    #titleText {
+        font-family: 'Courier New', Courier, monospace;
+        color: var(--midBlue);
+        font-size: calc(var(--cardHeight) / 6);
+    }
+    #titleLink {
+        position: absolute;
+        font-size: calc(var(--cardHeight) / 12);
+        bottom: calc(-1 * var(--cardHeight) / 12);
+    }
+    #titleIcon:hover {
+        animation: iconBounce 1s ease-in-out infinite;
+    }
+    @keyframes iconBounce {
+    0%, 100% {
+            transform: translateY(0);
+        }
+    50% {
+            transform: translateY(calc(-1 * var(--cardHeight) / 18));
+        }
+    }
+    .decklistButton {
+        z-index: 1000;
+        position: absolute;
+        right: calc(var(--cardHeight) / 12);
+        background-color: var(--midBlue);
+        font-weight: bold;
+        cursor: pointer;
+
+    }
+
+    /* right side items */
+    #settings {
+        top: calc(var(--cardHeight) * 1/12);
+    }
+    #lockDecklist {
+        top: calc(var(--cardHeight) * 6/12);
+    }
+    #importDecklist {
+        top: calc(var(--cardHeight) * 11/12);
+    }
+    #exportDecklist {
+        top: calc(var(--cardHeight) * 16/12);
+    }
+    #sortDecklist {
+        top: calc(var(--cardHeight) * 21/12);
+    }
+    #scaleSliderContainer {
+        z-index: 1000;
+        position: absolute;
+        height: calc(100% - var(--cardHeight) * 32/12);
+        width: calc(var(--cardHeight) / 3);
+        right: calc(var(--cardHeight) / 12);
+        bottom: calc(var(--cardHeight) * 6/12);
+    }
+    #scaleSlider {
+        position: absolute;
+        transform-origin: top left;
+        transform: rotate(270deg);
+        width: calc(100vh - var(--cardHeight) * 32/12);
+        height: calc(var(--cardHeight) / 6);
+        bottom: 0;
+        margin-left: calc(var(--cardHeight) / 12);
+        margin-bottom: calc(-1 * var(--cardHeight) / 6);
+        -webkit-appearance: none;
+        background-color: var(--midBlue);
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue60);
+        border-radius: calc(var(--cardHeight) / 9);
+    }
+    #scaleSlider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: calc(var(--cardHeight) / 5);
+        height: calc(var(--cardHeight) / 9);
+        background: white;
+        border-radius: calc(var(--cardHeight) / 9);
+        cursor: pointer;
+    }
+    #scaleSlider::-moz-range-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: calc(var(--cardHeight) / 8);
+        height: calc(var(--cardHeight) / 8);
+        background: white;
+        border-radius: calc(var(--cardHeight) / 9);
+        cursor: pointer;
+    }
+    #deleteDecklist {
+        bottom: calc(var(--cardHeight) * 1/12);
+    }
+    /* right side items */
+
+    #decklistCardCount {
+        z-index: 500;
+        position: fixed;
+        width: calc(var(--cardHeight) / 2);
+        left: calc(50% - var(--cardHeight) / 4);
+        top: calc(var(--cardHeight) / 12);
+        background-color: var(--lightBlue60);
+        border: calc(var(--cardHeight) / 48) solid var(--darkBlue30);
+        pointer-events: none;
+    }
+    .individualCardCount {
+        position: absolute;
+        bottom: calc(var(--scaledCardHeight) / 32);
+        left: 0;
+        right: 0;
+        margin: auto;
+        background-color: var(--lightBlue60);
+        border: calc(var(--scaledCardHeight) / 48) solid var(--darkBlue30);
+        pointer-events: none;
+    }
+    #decklist {
+        position: absolute;
+        text-align: center;
+        justify-content: center;
+        overflow-y: auto;
+        display: flex;
+        align-items: center; 
+
+        /* 100% - padding */
+        width: calc(100% - var(--scaledCardWidth) - var(--cardHeight) * 10/12 + var(--cardSpacing));
+        height: calc(100% - var(--cardHeight) * 5/12);
+        padding-top: calc(var(--cardHeight) * 5/12);
+        padding-left: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
+        padding-right: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
+    }
+    .cardHoverMenu {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+    .decklistCardHoverButtonAdd {
+        position: absolute;
+        height: calc(var(--scaledCardHeight) / 4);
+        width: calc(var(--scaledCardHeight) / 4);
+        font-size: calc(var(--scaledCardHeight) / (20/3));
+        font-weight: bold;
+        border: calc(var(--scaledCardHeight) / 64) solid var(--lightBlue30);
+        margin: calc(-1 * var(--scaledCardHeight) / 64);
+        border-radius: calc(var(--scaledCardHeight) / 12) !important;
+        -webkit-border-radius: calc(var(--scaledCardHeight) / 12) !important;
+        bottom: calc(7 * var(--scaledCardHeight) / 96);
+        left: calc(var(--scaledCardHeight) / 32);
+        margin: auto;
+        cursor: pointer;
+        pointer-events: all;
+    }
+    .decklistCardHoverButtonRemove {
+        position: absolute;
+        height: calc(var(--scaledCardHeight) / 4);
+        width: calc(var(--scaledCardHeight) / 4);
+        font-size: calc(var(--scaledCardHeight) / (20/3));
+        font-weight: bold;
+        border: calc(var(--scaledCardHeight) / 64) solid var(--lightBlue30);
+        margin: calc(-1 * var(--scaledCardHeight) / 64);
+        border-radius: calc(var(--scaledCardHeight) / 12) !important;
+        -webkit-border-radius: calc(var(--scaledCardHeight) / 12) !important;
+        bottom: calc(7 * var(--scaledCardHeight) / 96);
+        right: calc(var(--scaledCardHeight) / 32);
+        margin: auto;
+        cursor: pointer;
+        pointer-events: all;
+    }
+    .disableHighlight {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    #sidebar {
+        z-index: 1000;
+        position: absolute;
+        width: calc(40% + var(--cardHeight) * 5/12);
+        height: 100%;
+        margin-left: -40%;
+        background-color: var(--darkBlue60);
+        transition: 0.5s;
+        transition-delay: 0.15s;
+    }
+    #sidebar:hover {
+        margin-left: 0%;
+        transition-delay: 0s;
+    }
+    .sidebarCardHoverButton {
+        position: relative;
+        top: 15%;
+        left: calc(50% - var(--cardHeight) / 6);
+        margin: 0 auto;
+        font-weight: bold;
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue30);
+        cursor: pointer;
+        pointer-events: all;
+    }
+    #sidebarArrow {
+        position: absolute;
+        width: calc(var(--cardHeight) * 5/12);
+        height: 100%;
+        margin-left: calc(100% - var(--cardHeight) * 5/12);
+        background-color: var(--darkBlue60);
+        color: white;
+        font-size: calc(var(--cardHeight) * 5/12);
+        cursor: pointer;
+        border: none;
+    }
+    .searchParameter {
+        z-index: 1000;
+        position: relative;
+        font-size: 0;
+        width: calc(100% - var(--cardHeight) * 5/12);
+    }
+    .searchType {
+        display: inline-block;
+        width: var(--cardWidth);
+        margin: 0;
+        vertical-align: top;
+        font-size: calc(var(--cardWidth) / 6);
+        pointer-events: None;
+    }
+    .searchField {
+        width: calc(100% - calc(var(--cardWidth) *  1.5));
+        margin: 0;
+        padding-inline-start: calc(var(--cardWidth) / 4);
+        text-align: left;
+        display: inline-block;
+    }
+    .deleteParameterButton {
+        z-index: 1000;
+        position: relative;
+        width: calc(var(--cardWidth) / 2);
+        margin: 0;
+        vertical-align: top;
+        font-weight: bold;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .addParameterButton {
+        z-index: 1000;
+        position: relative;
+        margin: 0;
+        width: var(--cardWidth);
+        vertical-align: top;
+        font-weight: bold;
+        box-sizing: border-box;
+        display: inline-block;
+        cursor: pointer;
+    }
+    #sidebarCards {
+        position: absolute;
+        height: 100%;
+        opacity: 100%;
+        overflow-y: auto;
+        color: lightgray;
+        padding-top: calc(var(--cardHeight) / 2 - var(--cardSpacing) / 2);
+        padding-left: calc(var(--cardWidth) / 2 - var(--cardSpacing) / 2);
+        padding-right: calc(var(--cardWidth) / 2 - var(--cardSpacing) / 2);
+        width: calc(100% - var(--cardWidth) * 19/12);
+    }
+    #sidebarCardsBottom {
+        width: 100%; 
+        height: calc(var(--cardHeight) - var(--cardSpacing)); 
+        transform: translateY(calc(-1 * var(--cardHeight) - var(--cardSpacing) / 2)); 
+        pointer-events: none;
+    }
+    #parameterButtons {
+        z-index: 1000;
+        position: absolute;
+        width: calc(100% - var(--cardHeight) * 5/12);
+        height: 50%;
+        bottom: calc(-50% + calc(var(--cardHeight) / 3));
+        background-color: var(--darkBlue60);
+        transition: 0.5s;
+        transition-delay: 0.15s;
+    }
+    .parameterButtonsSubContainer {
+        position: absolute; 
+        height: 100%;
+        width: 50%;
+        overflow-y: auto;
+    }
+    #parameterButtons:hover {
+        bottom: 0%;
+        transition-delay: 0s;
+    }
+    .parameterButtonDiv {
+        display: inline-block;
+        width: calc(var(--cardHeight) / 3); 
+        height: calc(var(--cardHeight) / 3);
+        border-radius: calc(var(--cardHeight) / 9);
+        cursor: pointer;
+        transition: 0.125s;
+    }
+    .parameterButtonDivSelected {
+        background-color: rgba(0, 255, 0, 0.6)
+    }
+    .parameterButtonSpacer {
+        display: inline-block;
+        width: 100%; 
+        height: calc(var(--cardHeight) / 3);
+    }
+    .parameterButton {
+        position: absolute;
+        margin: calc(var(--cardHeight) / 18);
+        width: calc(var(--cardHeight) / 4.5); 
+        height: calc(var(--cardHeight) / 4.5);
+    }
+    .card {
+        position: relative;
+        display: inline-block;
+        z-index: 0;
+        border-radius: 0.15cm;
+        transition: transform 0.25s, z-index 0.25s, box-shadow 0.25s;
+        width: var(--cardWidth);
+        height: var(--cardHeight);
+        background-image: url('images/placeholder.png');
+        background-size: 100% 100%;
+        margin: calc(var(--cardSpacing) / 2);
+    }
+    .decklistCard {
+        width: var(--scaledCardWidth);
+        height: var(--scaledCardHeight);
+        border-radius: calc(0.15cm * var(--cardScale));
+    }
+    .card:hover {
+        transform: scale(2);
+        z-index: 999;
+        transition: transform 0.25s, z-index 0s, box-shadow 0.25s;
+        box-shadow: 1em 1em 1em rgba(0, 0, 0, 0.6);
+    }
+    .cardImage {
+        width: 100%;
+        height: 100%;
+        left: 0;
+        border-radius: inherit;
+        position: absolute;
+        object-fit: inherit;
+        pointer-events: none;
+    }
+    /* HERE */
+    .cardImageDuplicate {
+        animation: cardImageDuplicate 0.25s forwards;
+    }
+    @keyframes cardImageDuplicate {
+        from { transform: translateX(0) translateY(0)}
+        to { transform: translateX(unset) translateY(unset) }
+    }
+    .removeCardImageDuplicate {
+        animation: removeCardImageDuplicate 0.25s forwards;
+    }
+    @keyframes removeCardImageDuplicate {
+        from { transform: translateX(unset) translateY(unset)}
+        to { transform: translateX(0) translateY(0) }
+    }
+
+    .holo {
+        width: calc(100% * var(--holoEnabled));
+        height: calc(100% * var(--holoEnabled));
+        border-radius: inherit;
+        position: absolute;
+        pointer-events: none;
+        opacity: 40%;
+        background-size: 200% 200%;
+        background-image: url('images/holo_overlay.png');
+        animation: holo calc(1s * var(--holoSpeed)) infinite steps(calc(var(--holoSpeed) * var(--holoFPS)));
+    }
+    .focusedHolo {
+        animation: holo calc(1s * var(--holoSpeed)) infinite steps(calc(var(--holoSpeed) * var(--focusedHoloFPS)));
+    }
+    @keyframes holo {
+        from { background-position: 200% 200%; }
+	    to { background-position: 0 0; }
+    }
+    #focused {
+        z-index: 2000;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    .focusedCard {
+        position: fixed;
+        height: var(--focusedHeight);
+        width: var(--focusedWidth);
+        top: calc(50% - var(--focusedHeight) / 2);
+        left: calc(50% - var(--focusedWidth) / 2);
+        border-radius: calc(var(--focusedHeight) * 0.027);
+        pointer-events: none;
+    }
+    #focusedAdd {
+        position: absolute;
+        top: 10%;
+        height: calc(100% / 6);
+        width: 7.5%;
+        left: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
+    #focusedDownload {
+        position: absolute;
+        top: 10%;
+        height: calc(100% / 6);
+        width: 7.5%;
+        right: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
+    #focusedButtonLeft {
+        position: absolute;
+        height: calc(100% / 3);
+        width: 7.5%;
+        top: calc(100% / 3);
+        left: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
+    #focusedButtonRight {
+        position: absolute;
+        height: calc(100% / 3);
+        width: 7.5%;
+        top: calc(100% / 3);
+        right: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
+    #focusedPrice {
+        position: absolute;
+        height: 90%;
+        width: calc(45% - min(100vw, 200vh) * 0.3);
+        top: 5%;
+        left: 2.5%;
+        cursor: pointer;
+        background-color: transparent;
+        overflow-y: auto;
+    }
+    #focusedPrice>p {
+        margin: 0;
+        padding: 0;
+    }
+    #focusedPrice:hover {
+        animation: priceBounce 0.5s ease-in-out;
+    }
+    @keyframes priceBounce {
+    0%, 100% {
+            transform: translateY(0);
+        }
+    50% {
+            transform: translateY(-3%);
+        }
+    }
+
+    #toggleShine {
+        position: absolute;
+        top: 10%;
+        height: calc(20vw);
+        width: 20%;
+        left: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
+    #exportConsole {
+        position: absolute;
+        top: 10%;
+        height: calc(20vw);
+        width: 20%;
+        right: 20%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
+    
+    .fadeIn {
+        animation: fadeIn 0.25s;
+    }
+    .fadeOut {
+        animation: fadeOut 0.25s;
+        animation-fill-mode: forwards;
+        pointer-events: none;
+    }
+    @keyframes fadeIn {from {opacity: 0} to {opacity: 1}}
+    @keyframes fadeOut {from {opacity: 1} to {opacity: 0}}
+
+</style>
+<script>
+    //SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP
+    
+    //logs
+    var logs = []
+    
+    var holo_animations = true
+    const holoRarities = [
+        'Amazing Rare',
+        'LEGEND',
+        'Rare ACE',
+        'Rare BREAK',
+        'Rare Holo',
+        'Rare Holo EX',
+        'Rare Holo GX',
+        'Rare Holo LV.X',
+        'Rare Holo Star',
+        'Rare Holo V',
+        'Rare Holo VMAX',
+        'Rare Prime',
+        'Rare Prism Star',
+        'Rare Rainbow',
+        'Rare Secret',
+        'Rare Shining',
+        'Rare Shiny',
+        'Rare Shiny GX',
+        'Rare Ultra'
+    ]
+    const urlTranslations = {
+        'é': '%C3%A9',
+        '◇': '%E2%97%87',
+        '◊': '%E2%97%87',
+        'prism star': '%E2%97%87',
+        'delta': '%CE%B4'
+    }
+
+    const header = {headers: {'X-Api-Key': 'c937592b-dbe9-47de-a29f-194bce94c11b'}}
+
+    //sidebar
+    const sidebarDiv = document.getElementById('sidebar')
+    const sidebarCards = document.getElementById('sidebarCards');
+    const parameterButtonsDiv = document.getElementById('parameterButtons')
+    var checkparameterButtonsHover
+
+    //decklist
+    const decklistCards = document.getElementById('decklistCards')
+    const decklistCardCount = document.getElementById('decklistCardCount')
+    var isDecklistLocked = false
+
+    //focused card
+    var currentFocused
+    var currentFetchID = 0
+    const priceDataTranslations = {
+        'normal': 'Regular',
+        'holofoil': 'Holo',
+        'reverseHolofoil': 'Reverse Holo',
+        '1stEditionHolofoil': '1st Edition Holo',
+        '1stEditionNormal': '1st Edition'
+    }
+
+    //search variables
+    var previousSearch
+    var cooldown = false
+    var queuedSearch = false
+    var loadingMoreCards = false
+
+    //loading queue
+    var loadingQueue = 0
+
+    //import decklist variables
+    var basicEnergies = {
+        'grass': ['evo', '91'],
+        'fire': ['evo', '92'],
+        'water': ['evo', '93'],
+        'lightning': ['evo', '94'],
+        'psychic': ['evo', '95'],
+        'fighting': ['evo', '96'],
+        'darkness': ['evo', '97'],
+        'metal': ['evo', '98'],
+        'fairy': ['evo', '99']
+    }
+    var setIdTranslations = {
+        'shf': 'swsh45',
+        'si': 'si1',
+        'wbsp': 'basep',
+        'bs2': 'base4',
+        'exp': 'ecard1',
+        'aqp': 'ecard2',
+        'skr': 'ecard3',
+        'p1': 'pop1',
+        'p2': 'pop2',
+        'p3': 'pop3',
+        'p4': 'pop4',
+        'p5': 'pop5',
+        'p6': 'pop6',
+        'p7': 'pop7',
+        'p8': 'pop8',
+        'p9': 'pop9'
+    }
+    var brokenSetNumbers = {
+        'swshp': ['SWSH', '00'],
+        'smp': ['SM', '0'],
+        'xyp': ['XY', '0'],
+        'bwp': ['BW', '0'],
+        'hsp': ['HGSS', '0'],
+        'dpp': ['DP', '0'],
+        'swsh45sv': ['SV', '00'],
+        'bw11': ['RC', 115],
+        'g1': ['RC', 100]
+    }
+
+    //add event listeners
+    document.addEventListener('keydown', keyDown);
+
+    //sopulate sets
+    var setsLoaded = false
+    populateSets()
+    async function populateSets () {
+        var url = 'https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate'
+        loadingAlertStart(url)
+        var response
+        var json
+        try {
+            response = await fetch(url, header)
+            json = await response.json()
+            loadingAlertEnd(url, true)
+        }
+        catch {
+            loadingAlertEnd(url, false)
+            return
+        }
+
+        //types div
+        var leftButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'leftButtons', 'class': 'parameterButtonsSubContainer', 'style': 'left: 0;'}))
+
+        var types = [
+            'Grass',
+            'Fire',
+            'Water',
+            'Lightning',
+            'Psychic',
+            'Fighting',
+            'Darkness',
+            'Metal',
+            'Fairy',
+            'Dragon',
+            'Colorless'
+        ]
+        for (i=0; i<types.length; i++) {
+            leftButtons.appendChild(
+                createElement('div', null, {
+                    'id': 'types:' + types[i].toLocaleLowerCase(),
+                    'class': 'parameterButtonDiv',
+                    'title': types[i],
+                    'onclick': 'selectButton(this, true, [])'
+                })
+            ).appendChild(
+                createElement('img', null, {
+                    'class': 'parameterButton fadeIn',
+                    'src': 'images/type_symbols/' + types[i].toLowerCase() + '.png',
+                    'style': 'pointer-events: none;'
+                })
+            )
+        }
+
+        //sets div
+        var rightButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'rightButtons', 'class': 'parameterButtonsSubContainer', 'style': 'right: 0;'}))
+
+        var sets = json['data']
+        var combinationButtons = {}
+        for (i=0; i<sets.length; i++) {
+            var set = sets[i]
+            var reverseSet = sets[sets.length -1 -i]
+            if (set['ptcgoCode'] && !setIdTranslations[set['ptcgoCode'].toLowerCase()]) {
+                setIdTranslations[set['ptcgoCode'].toLowerCase()] = set['id']
+            }
+            if (!combinationButtons[reverseSet['series']]) {
+                combinationButtons[reverseSet['series']] = {
+                    'setA_img': reverseSet['images']['symbol'],
+                    'setB_img': reverseSet['images']['symbol'],
+                    'sets': ['set.id:' + reverseSet['id']]
+                }
+            }
+            else {
+                //prevent promo from being image
+                if(combinationButtons[reverseSet['series']]['setA_img'].split('/symbol.png')[0].slice(-1) != '1') {
+                    combinationButtons[reverseSet['series']]['setA_img'] = reverseSet['images']['symbol']
+                }
+                combinationButtons[reverseSet['series']]['setB_img'] = reverseSet['images']['symbol']
+                combinationButtons[reverseSet['series']]['sets'].push('set.id:' + reverseSet['id'])
+            }
+            rightButtons.appendChild(
+                createElement('div', null, {
+                    'id': 'set.id:' + set['id'],
+                    'class': 'parameterButtonDiv',
+                    'title': set['name'],
+                    'onclick': 'selectButton(this, true, [])'
+                })
+            ).appendChild(
+                createElement('img', null, {
+                    'class': 'parameterButton fadeIn',
+                    'src': set['images']['symbol'],
+                    'alt': 'set.id:' + set['id'],
+                    'style': 'pointer-events: none;'
+                })
+            )
+        }
+        setsLoaded = true
+
+        leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
+        var legalities = [
+            'Standard',
+            'Expanded'
+        ]
+        for (i=0; i<legalities.length; i++) {
+            leftButtons.appendChild(
+                createElement('div', null, {
+                    'id': 'legalities.' + legalities[i].toLowerCase() + ':legal',
+                    'class': 'parameterButtonDiv',
+                    'title': legalities[i],
+                    'onclick': 'selectButton(this, true, [])'
+                })
+            ).appendChild(
+                createElement('img', null, {
+                    'class': 'parameterButton fadeIn',
+                    'src': 'images/legalities/' + legalities[i].toLowerCase() + '.png',
+                    'style': 'pointer-events: none;'
+                })
+            )
+        }
+
+        leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
+
+        for (key in combinationButtons) {
+            var combinationButton = combinationButtons[key]
+            if (combinationButton['sets'].length == 1) {
+                continue
+            }
+            var newButton = leftButtons.appendChild(
+                createElement('div', null, {
+                    'id': key,
+                    'class': 'parameterButtonDiv fadeIn',
+                    'title': key,
+                    'onclick': `selectButton(this, true, ['${combinationButton['sets'].join("','")}'])`
+                }))
+            newButton.appendChild(
+                createElement('img', null, {
+                    'class': 'parameterButton',
+                    'src': combinationButton['setB_img'],
+                    'style': 'pointer-events: none; transform: translateX(calc(var(--cardWidth)/12)) translateY(calc(-1 * var(--cardWidth)/12)) scale(0.85)'
+                })
+            )
+            newButton.appendChild(
+                createElement('img', null, {
+                    'class': 'parameterButton',
+                    'src': combinationButton['setA_img'],
+                    'style': 'pointer-events: none; transform: translateX(calc(-1 * var(--cardWidth)/12)) translateY(calc(var(--cardWidth)/12)) scale(0.85)'
+                })
+            )
+        }
+    }
+    
+    //UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS –––––––– UNIVERSAL FUNCTIONS
+
+    function LOG_normal(text) {
+        console.log(text)
+        logs.push(text)
+    }
+
+    function LOG_error(text) {
+        console.error(text)
+        logs.push(text)
+    }
+
+    function LOG_alertNormal(text) {
+        console.log(text)
+        logs.push(text)
+        alert(text)
+    }
+
+    function LOG_alertError (text) {
+        console.error(text)
+        logs.push(text)
+        alert(text)
+    }
+    
+    function windowResize () {
+        var windowHeight = window.innerHeight
+        var windowWidth = window.innerWidth
+        if (windowHeight > windowWidth) {
+            LOG_normal(true)
+        }
+    }
+
+    function keyDown (event) {
+        if (currentFocused && (event.keyCode == 39 || event.keyCode == 68)) {
+            //left arrow, D key
+            event.preventDefault()
+            cycleFocused('right')
+        }
+        else if (currentFocused && (event.keyCode == 37 || event.keyCode == 65)) {
+            //right arrow, A key
+            event.preventDefault()
+            cycleFocused('left')
+        }
+    }
+    
+    function randomInteger(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function createElement (type, innerHTML, attributes) {
+        var elem = document.createElement(type)
+        elem.innerHTML = innerHTML
+        for (const attr in attributes) {
+            elem.setAttribute(attr, attributes[attr])
+        }
+        return elem
+    }
+
+    function fadeOut (elem) {
+        elem.classList.add('fadeOut')
+        elem.setAttribute('style', 'pointer-events: none')
+        setTimeout(function () {
+            if (elem) {
+                elem.remove()
+            }
+        }, 250)
+    }
+
+    function loadingAlertStart (url) {
+        loadingQueue = loadingQueue + 1
+        LOG_normal(`Fetching ${url}`)
+        document.getElementById('loadingGif').setAttribute('style', 'visibility: visible')
+    }
+
+    function loadingAlertEnd (url, succeeded) {
+        loadingQueue = loadingQueue - 1
+        if (loadingQueue == 0) {
+            document.getElementById('loadingGif').setAttribute('style', 'visibility: hidden')
+        }
+        if (succeeded == true) {
+            LOG_normal(`Recieved ${url}`)
+        }
+        else {
+            LOG_error(`Failed to recieve ${url}`)
+        }
+    }
+
+    async function fetchCards (url) {
+        loadingAlertStart(url)
+
+        currentFetchID++
+        const id = currentFetchID
+        
+        try {
+            const response = await fetch(url, header)
+            const json = await response.json()
+
+            loadingAlertEnd(url, true)
+
+            return {
+                'id': id,
+                'cards': json['data'],
+                'page': json['page'],
+                'pageSize': json['pageSize'],
+                'totalCardCount': json['totalCount']
+            }
+        }
+        catch {
+            loadingAlertEnd(url, false)
+        }
+    }
+
+    function createCard (data) {
+        //TEMPORARY UNOWN FIX
+        data['id'] = data['id'].replace('?', 'question').replace('!', 'exclamation')
+        container = createElement('div', null, {
+            'id': data['id'],
+            'class': 'card fadeIn',
+            'oncontextmenu': 'event.preventDefault(); focusCard(this)',
+            'onclick': 'if(event.target === this) {focusCard(this)}',
+            'onmouseenter': 'sidebarCardHover(this)',
+            'ontouchstart': 'sidebarCardHover(this)',
+            'onmouseleave': 'cardUnhover(this)'
+        })
+
+        container.appendChild(createElement('img', null, {
+            'class': 'cardImage',
+            'src': data['images']['small']
+        }))
+
+        if (holo_animations == true) {
+            var holo = false
+            for (var i=0; i<holoRarities.length; i++) {
+                if (data['rarity'] == holoRarities[i]) {
+                    holo = true
+                    break
+                }
+            }
+            if (holo == false) {
+                if (data['tcgplayer'] && data['tcgplayer']['prices'] && data['tcgplayer']['prices']['holofoil']) {
+                    holo = true
+                }
+            }
+            if (holo === true) {
+                const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
+                const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
+                container.appendChild(createElement('div', null, {
+                    'class': 'holo',
+                    'style': `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`
+                }))
+            }
+        }
+
+        var dataContainer = createElement('div', null, {
+            'class': 'data'
+        })
+        delete data['id']
+        for (const key in data) {
+            if (typeof data[key] != 'string') {
+                data[key] = JSON.stringify(data[key])
+            }
+            dataContainer.setAttribute(key, data[key])
+        }
+
+        container.appendChild(dataContainer)
+        
+        return container
+    }
+
+    function cloneCard (card, modifications) {
+        newCard = card.cloneNode(true)
+        for (const key in modifications) {
+            const mod = modifications[key]
+            if (mod == null) {
+                newCard.removeAttribute(key)
+            }
+            else if (key == 'image') {
+                newCard.prepend(
+                    createElement('img', null, {
+                        'src': mod,
+                        'class': 'cardImage',
+                        'onload': 'if(this.parentNode && this.parentNode.getElementsByClassName("cardImage")[1]) {this.parentNode.getElementsByClassName("cardImage")[1].remove()}'
+                    })
+                )
+            }
+            else {
+                newCard.setAttribute(key, mod)
+            }
+        }
+        return newCard
+    }
+
+    function exportTxt(text, filename) {
+        var elem = document.createElement('a')
+        elem.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text))
+        elem.setAttribute('download', filename)
+        elem.style.display = 'none'
+        document.body.appendChild(elem)
+        elem.click()
+        elem.remove()
+    }
+
+    function downloadResource(url, filename) {
+        fetch(url, {
+            headers: new Headers({
+            'Origin': location.origin
+            }),
+            mode: 'cors'
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            let blobUrl = window.URL.createObjectURL(blob)
+            var elem = document.createElement('a')
+            elem.download = filename
+            elem.href = blobUrl
+            document.body.appendChild(a)
+            elem.click()
+            elem.remove()
+        })
+        .catch(e => LOG_error(e));
+    }
+
+    //SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS
+    function openSettings () {
+        var settingsMenu = document.body.appendChild(createElement('div', null, {
+            'id': 'focused',
+            'class': 'fadeIn',
+            'onclick': 'if(event.target === this) {fadeOut(this); currentFocused = null}'
+        }))
+        var toggleShine = settingsMenu.appendChild(createElement('input', null, {
+            'id': 'toggleShine',
+            'class': 'fadeIn buttonObject',
+            'title': 'Toggle Card Shine Effect',
+            'type': 'submit',
+            'onclick': 'toggleShine()'
+        }))
+        const holoEnabled = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoEnabled'))
+        if (holoEnabled == 0) {
+            toggleShine['value'] = '✧'
+        }
+        else {
+            toggleShine['value'] = '✦'
+        }
+        var exportConsole = settingsMenu.appendChild(createElement('input', null, {
+            'id': 'exportConsole',
+            'class': 'fadeIn buttonObject',
+            'title': 'Export Console to File',
+            'type': 'submit',
+            'value': '🗒 ↧',
+            'onclick': 'exportConsole()'
+        }))
+        LOG_normal('Opened settings')
+    }
+
+    function exportConsole() {
+        var exportText
+        for (i=0; i<logs.length; i++) {
+            if (i == 0) {
+                exportText = `(${i+1})\n\n${JSON.stringify(logs[i])}\n`
+            }
+            else {
+                exportText = `${exportText}\n(${i+1})\n\n${JSON.stringify(logs[i])}\n`
+            }
+        }
+        exportTxt(exportText, 'console.txt')
+        LOG_normal('Exported console')
+    }
+
+    function toggleShine() {
+        const holoEnabled = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoEnabled'))
+        if (holoEnabled == 0) {
+            document.getElementById('toggleShine').value = '✦'
+            document.documentElement.style.setProperty('--holoEnabled', 1);
+            LOG_normal('Enabled holo animations')
+        }
+        else {
+            document.getElementById('toggleShine').value = '✧'
+            document.documentElement.style.setProperty('--holoEnabled', 0);
+            LOG_normal('Disabled holo animations')
+        }
+    }
+
+    //CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS
+    function focusCard (card) {
+        if (!isCardInView(card)) {
+            card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+        }
+        currentFocused = card
+        var focused
+        var focusedPrice
+        var leftButton
+        var rightButton
+        if (document.getElementById('focused')) {
+            focused = document.getElementById('focused')
+            focusedDownload = document.getElementById('focusedDownload')
+            focusedPrice = document.getElementById('focusedPrice')
+            focusedPrice.innerHTML = 'No Prices Available'
+            focusedPrice.setAttribute('onclick', null)
+            leftButton = document.getElementById('focusedButtonLeft')
+            rightButton = document.getElementById('focusedButtonRight')
+            document.getElementsByClassName('focusedCard')[0].remove()
+        }
+        else {
+            focused = document.body.appendChild(createElement('div', null, {
+                    'id': 'focused',
+                    'class': 'fadeIn',
+                    'onclick': 'if(event.target === this) {fadeOut(this); currentFocused = null}'
+            }))
+            focusedAdd = focused.appendChild(createElement('input', null, {
+                    'id': 'focusedAdd',
+                    'class': 'fadeIn buttonObject',
+                    'title': 'Add Card To Deck',
+                    'type': 'submit',
+                    'onclick': "if(isDecklistLocked == false) {addDecklistCard(cloneCard(document.getElementsByClassName('focusedCard')[0], {'style': '', 'image': JSON.parse(document.getElementsByClassName('focusedCard')[0].getElementsByClassName('data')[0].getAttribute('images'))['small']}), +1)}",
+                    'value': '+'
+            }))
+            focusedDownload = focused.appendChild(createElement('input', null, {
+                    'id': 'focusedDownload',
+                    'class': 'fadeIn buttonObject',
+                    'title': 'Download Image',
+                    'type': 'submit',
+                    'value': '↧'
+            }))
+            focusedPrice = focused.appendChild(createElement('button', 'No Prices Available', {
+                'id': 'focusedPrice',
+                'class': 'buttonObject',
+                'title': 'Open Card In TCGPlayer'
+            }))
+            leftButton = focused.appendChild(createElement('input', null, {
+                'id': 'focusedButtonLeft',
+                'class': 'buttonObject',
+                'type': 'button',
+                'title': 'See Next Card',
+                'value': '❮',
+                'onclick': 'event.preventDefault(); cycleFocused("left")'
+            }))
+            rightButton = focused.appendChild(createElement('input', null, {
+                'id': 'focusedButtonRight',
+                'class': 'buttonObject',
+                'title': 'See Previous Card',
+                'type': 'button',
+                'value': '❯',
+                'onclick': 'cycleFocused("right")'
+            }))
+        }
+
+        //focused add button
+        if (isDecklistLocked == false) {
+            focusedAdd.setAttribute('style', 'cursor: pointer')
+        }
+        else {
+            focusedAdd.setAttribute('style', 'cursor: not-allowed')
+        }
+
+        //left and right buttons
+        if (currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
+            leftButton.setAttribute('style', 'cursor: pointer')
+        }
+        else {
+            leftButton.setAttribute('style', 'cursor: not-allowed')
+        }
+
+        if (currentFocused.nextElementSibling && currentFocused.nextElementSibling.classList.contains('card')) {
+            rightButton.setAttribute('style', 'cursor: pointer')
+        }
+        else {
+            rightButton.setAttribute('style', 'cursor: not-allowed')
+        }
+
+        var dataContainer = card.getElementsByClassName('data')[0]
+
+        var rotation = 0
+        if (dataContainer.getAttribute('subtypes') && (dataContainer.getAttribute('subtypes').includes('BREAK') || dataContainer.getAttribute('subtypes').includes('LEGEND'))) {
+            rotation = 90
+        }
+
+        var newCard = focused.appendChild(cloneCard(card, {
+                'style': `transform: rotate(${rotation}deg);`,
+                'class': 'focusedCard',
+                'image': JSON.parse(dataContainer.getAttribute('images'))['large']
+        }))
+
+        //remove individualCardCount, and cardHoverMenu
+        var remove = ['individualCardCount', 'cardHoverMenu']
+        for (i=0; i<remove.length; i++) {
+            if (newCard.getElementsByClassName(remove[i])[0]) {
+                newCard.getElementsByClassName(remove[i])[0].remove()
+            }
+        }
+        while (newCard.getElementsByClassName('cardImageDuplicate')[0]) {
+            newCard.getElementsByClassName('cardImageDuplicate')[0].remove()
+        }
+
+        //change holo speed
+        if (newCard.getElementsByClassName('holo')[0]) {
+            newCard.getElementsByClassName('holo')[0].classList.add('focusedHolo')
+        }
+
+        //download
+        focusedDownload.setAttribute('onclick', `downloadResource("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').replace(' ', '-').toLowerCase()}-${card.id}.png")`)
+
+        //add price data
+        if (dataContainer.getAttribute('tcgplayer')) {
+            var tcgplayerData = JSON.parse(dataContainer.getAttribute('tcgplayer'))
+            focusedPrice.setAttribute('onclick', `window.open('${tcgplayerData['url']}', '_blank');`)
+            focusedPrice.setAttribute('style', 'cursor: pointer')
+            if (JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices'] && Object.keys(tcgplayerData['prices']).length != 0) {
+                focusedPrice.innerHTML = null
+                var prices = []
+                var pricesData = JSON.parse(dataContainer.getAttribute('tcgplayer'))['prices']
+                for (priceData in pricesData) {
+                    if (pricesData[priceData]['directLow'] || pricesData[priceData]['low'] || pricesData[priceData]['market']) {
+                        if (priceDataTranslations[priceData]) {
+                            focusedPrice.appendChild(createElement('p', priceDataTranslations[priceData], {'style': 'font-weight: bold; text-decoration: underline; text-shadow: 0px 0px 8px var(--darkBlue);'}))
+                        }
+                        else {
+                            focusedPrice.appendChild(createElement('p', priceData, {'style': 'font-weight: bold'}))
+                        }
+                        if (pricesData[priceData]['directLow']) {
+                            focusedPrice.appendChild(createPriceElement(`Direct: $${pricesData[priceData]['directLow']}`, 'mediumorchid'))
+                        }
+                        if (pricesData[priceData]['market']) {
+                            focusedPrice.appendChild(createPriceElement(`Market: $${pricesData[priceData]['market']}`, 'paleturquoise'))
+                        }
+                        if (pricesData[priceData]['low']) {
+                            focusedPrice.appendChild(createPriceElement(`Low: $${pricesData[priceData]['low']}`, 'chartreuse'))
+                        }
+                        if (pricesData[priceData]['high']) {
+                            focusedPrice.appendChild(createPriceElement(`High: $${pricesData[priceData]['high']}`, 'crimson'))
+                        }
+                        focusedPrice.appendChild(createElement('br', null, null))
+                    }
+                }
+                focusedPrice.appendChild(createElement('p', 'Last Updated ' + tcgplayerData['updatedAt'], {'style': 'font-style: italic; text-shadow: 0px 0px 8px var(--darkBlue);'}))
+            }
+            focusedPrice.prepend(createElement('p', 'Click To Open In tcgplayer.com', {'style': 'font-style: italic; text-shadow: 0px 0px 8px var(--darkBlue);'}), createElement('br', null, null))
+        }
+        else {
+            focusedPrice.setAttribute('style', 'cursor: not-allowed')
+        }
+    }
+    
+    function createPriceElement (price, color) {
+        if (!price.split('.')[1]) {
+            price = price + '.00'
+        }
+        else if (price.split('.')[1].length == 1) {
+            price = price + '0'
+        }
+        return createElement('p', price, {'style': `font-style: italic; text-shadow: 0px 0px 8px var(--darkBlue); color: ${color};`})
+    }
+
+    function cycleFocused (direction) {
+        var newFocused
+        if (direction == 'left' && currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
+            newFocused = currentFocused.previousElementSibling
+            focusCard(newFocused)
+        }
+        else if (direction == 'right' && currentFocused.nextElementSibling && currentFocused.nextElementSibling.classList.contains('card')) {
+            newFocused = currentFocused.nextElementSibling
+            focusCard(newFocused)
+        }
+    }
+
+    //SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR –––––––– SIDEBAR
+
+    function fullScreenSidebar (fullScreen) {
+        var sidebarArrow = document.getElementById('sidebarArrow')
+        if (fullScreen == true) {
+            sidebarDiv.setAttribute('style', 'width: 100%; margin-left: 0%')
+            sidebarArrow.setAttribute('value', '❮')
+            sidebarArrow.title = 'Click to Minimize'
+            sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(false)')
+        }
+        if (fullScreen == false) {
+            sidebarDiv.style = ''
+            sidebarArrow.setAttribute('value', '❯')
+            sidebarArrow.title = 'Click to Expand'
+            sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(true)')
+        }
+    }
+
+    function selectButton (elem, initiateSearch, group) {
+        elem.classList.add('parameterButtonDivSelected')
+        if (group.length < 1) {
+            elem.setAttribute('onclick', 'deselectButton(this, true, [])')
+            elem.classList.add('selectedButton')
+        }
+        else {
+            for (i=0; i<group.length; i++) {
+                elem.setAttribute('onclick', `deselectButton(this, true, ["${group.join('", "')}"])`)
+                selectButton(document.getElementById(group[i]), false, []);
+            }
+        }
+        if (initiateSearch == true) {
+            constructSearchUrl()
+        }
+    }
+
+    function deselectButton (elem, initiateSearch, group) {
+        elem.classList.remove('parameterButtonDivSelected')
+        if (group.length < 1) {
+            elem.setAttribute('onclick', 'selectButton(this, true, [])')
+            elem.classList.remove('selectedButton')
+        }
+        else {
+            for (i=0; i<group.length; i++) {
+                elem.setAttribute('onclick', `selectButton(this, true, ["${group.join('", "')}"])`)
+                deselectButton(document.getElementById(group[i]), false, []);
+            }
+        }
+        if (initiateSearch == true) {
+            constructSearchUrl()
+        }
+    }
+
+    function constructSearchUrl () {
+        if (cooldown == true) {
+            queuedSearch = true
+            return
+        }
+        cooldown = true
+        queuedSearch = false
+        setTimeout(() => {
+            cooldown = false
+            if (queuedSearch == true) {
+                constructSearchUrl ()
+                queuedSearch = false
+            }
+        }, 1500);
+
+        //construct URL
+        var q = ''
+
+        const parameters = document.getElementsByClassName('searchParameter')
+        for (i = 0; i < parameters.length; i++) {
+            var searchType = JSON.parse(parameters[i].getElementsByClassName('searchType')[0].getAttribute('searchType'))
+            if (searchType.length == 0) {
+                continue
+            }
+            var searchField = parameters[i].getElementsByClassName('searchField')[0].value
+            if (searchField.length == 0) {
+                continue
+            }
+            for (translation in urlTranslations) {
+                searchField = searchField.replace(translation, urlTranslations[translation])
+            }
+            searchField = searchField.split(' ')
+            for (j = 0; j < searchField.length; j++) {
+                if (searchField[j].length > 0) {
+                    for (k = 0; k < searchType.length; k++) {
+                        if (k == 0) {
+                            q = q + '('
+                        }
+                        q = q + searchType[k] + ':%22*' + searchField[j] + '*%22'
+                        if (k + 1 != searchType.length) {
+                            q = q + '+OR+'
+                        }
+                        else {
+                            q = q + ')+'             
+                        }
+                    }
+                }
+            }
+        }
+
+        //compile selected buttons
+        const selectedButtons = document.getElementsByClassName('selectedButton')
+        var splitSelectedButtons = {}
+        for (i=0; i<selectedButtons.length; i++) {
+            if (!splitSelectedButtons[selectedButtons[i].id.split(':')[0]]) {
+                splitSelectedButtons[selectedButtons[i].id.split(':')[0]] = []
+            }
+            splitSelectedButtons[selectedButtons[i].id.split(':')[0]].push(selectedButtons[i].id)
+        }
+        for (groupKey in splitSelectedButtons) {
+            var group = splitSelectedButtons[groupKey]
+            q = q + '(' + group[0]
+            if (group.length > 1) {
+                for (var i = 1; i < group.length; i++) {
+                    q = q + '+OR+' + group[i]
+                }
+            } 
+            q = q + ')+'
+        }
+
+        //check for blank search
+        if (q == '') {
+            for (i=0; i<sidebarCards.children.length; i++) {
+                fadeOut(sidebarCards.children[i])
+            }
+            previousSearch = null
+            currentFetchID++
+            return
+        }
+        url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,number&q=${q}&page=1`
+
+        //prevent repeat searches
+        if (previousSearch == url) {
+            return
+        }
+        else {
+            previousSearch = url
+        }
+
+        fetchNewSidebarCards(url)
+    }
+    
+    async function fetchNewSidebarCards(url) {
+        loadingMoreCards = true
+
+        //fetch URL
+        const response = await fetchCards(url, header)
+
+        //return if not the most recent request
+        if (response['id'] != currentFetchID) {
+            return
+        }
+
+        var cardData = response['cards']
+
+        //remove existing cards
+        if (document.getElementById('sidebarCardsBottom')) {
+            document.getElementById('sidebarCardsBottom').remove()
+        }
+        if (response['page'] == 1) {
+            if (cardData.length == 0) {
+                for (i=0; i<sidebarCards.children.length; i++) {
+                    fadeOut(sidebarCards.children[i])
+                }
+            }
+            else {
+                sidebarCards.innerHTML = null
+                sidebarCards.scrollTop
+            }
+        }
+
+        sidebarCards.setAttribute('url', url)
+        sidebarCards.setAttribute('page', response['page'])
+        sidebarCards.setAttribute('pageSize', response['pageSize'])
+        sidebarCards.setAttribute('totalCardCount', response['totalCardCount'])
+
+        for (i = 0; i < cardData.length; i++) {
+            var newCard = createCard(cardData[i])
+            sidebarCards.append(newCard)
+        }
+
+        sidebarCards.appendChild(
+            createElement('div', null, {
+                'id': 'sidebarCardsBottom'
+            })
+        )
+
+        loadingMoreCards = false
+    }
+
+    function isCardInView (elem) {
+        var rect = elem.getBoundingClientRect();
+        var windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+        if ((rect.top <= windowHeight) && ((rect.top + rect.height) >= 0)) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+
+    function scrollSidebarCheck () {
+        if (loadingMoreCards == false && document.getElementById('sidebarCardsBottom') && isCardInView(sidebarCardsBottom) && (sidebarCards.getAttribute('totalCardCount') > sidebarCards.getAttribute('page') * sidebarCards.getAttribute('pageSize'))) {
+            fetchNewSidebarCards(sidebarCards.getAttribute('url').split('page=')[0] + 'page=' + (Number(sidebarCards.getAttribute('page')) + 1))
+        }
+    }
+
+    // function scrollSidebarCheck () {
+    //     var spacers = sidebarCards.getElementsByClassName('sidebarCardsSpacer')
+    //     var currentSpacer
+    //     var previousSpacer
+    //     var nextSpacer
+    //     for (i=0; i<spacers.length; i++) {
+    //         if (isCardInView(spacers[i]) && spacers[i].getAttribute('loaded') == 'false') {
+    //             currentSpacer = spacers[i]
+    //             if (spacers[i-1] && spacers[i-1].getAttribute('loaded') == 'true') {
+    //                 previousSpacer = spacers[i-1]
+    //             }
+    //             if (spacers[i+1] && spacers[i+1].getAttribute('loaded') == 'true') {
+    //                 nextSpacer = spacers[i+1]
+    //             }
+    //             break
+    //         }
+    //     }
+    //     if (currentSpacer) {
+    //         console.log('Loading Current')
+    //         //Load Current Spacer
+    //         if (!currentSpacer.nextElementSibling && loadingMoreCards == false && (sidebarCards.getAttribute('totalCardCount') > sidebarCards.getAttribute('page') * sidebarCards.getAttribute('pageSize'))) {
+    //             //fetch new cards
+    //             fetchNewSidebarCards(sidebarCards.getAttribute('url').split('page=')[0] + 'page=' + (Number(sidebarCards.getAttribute('page')) + 1))
+    //         }
+    //         else {
+    //             //load current spacer
+    //             currentSpacer.setAttribute('loaded', 'true')
+    //             var selectedElem = currentSpacer
+    //             while (selectedElem.previousElementSibling && !selectedElem.previousElementSibling.classList.contains('sidebarCardsSpacer')) {
+    //                 selectedElem = selectedElem.previousElementSibling
+    //                 selectedElem.setAttribute('style', 'visibility: visible')
+    //             }
+    //             selectedElem = currentSpacer
+    //             while (selectedElem.nextElementSibling && !selectedElem.nextElementSibling.classList.contains('sidebarCardsSpacer')) {
+    //                 selectedElem = selectedElem.nextElementSibling
+    //                 selectedElem.setAttribute('style', 'visibility: visible')
+    //             }
+    //         }
+    //         //Unload Previous Spacer
+    //         if (previousSpacer) {
+    //             console.log('Unloading Previous')
+    //             previousSpacer.setAttribute('loaded', 'false')
+    //             var selectedElem = previousSpacer
+    //             while (selectedElem.previousElementSibling && !selectedElem.previousElementSibling.classList.contains('sidebarCardsSpacer')) {
+    //                 selectedElem = selectedElem.previousElementSibling
+    //                 selectedElem.setAttribute('style', 'visibility: hidden')
+    //             }
+    //         }
+    //         //Unload Next Spacer
+    //         if (nextSpacer) {
+    //             console.log('Unloading Next')
+    //             nextSpacer.setAttribute('loaded', 'false')
+    //             var selectedElem = nextSpacer
+    //             while (selectedElem.nextElementSibling && !selectedElem.nextElementSibling.classList.contains('sidebarCardsSpacer')) {
+    //                 selectedElem = selectedElem.nextElementSibling
+    //                 selectedElem.setAttribute('style', 'visibility: hidden')
+    //             }
+    //         }
+    //     }
+    // }
+
+    function sidebarCardHover (card) {
+        if (isDecklistLocked == true) {
+            return
+        }
+        if (card.getElementsByClassName('cardHoverMenu')[0]) {
+            card.getElementsByClassName('cardHoverMenu')[0].remove()
+        }
+        card.appendChild(createElement('div', null, {
+            'class': 'cardHoverMenu fadeIn'
+        }))
+        hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
+        hoverMenu.appendChild(createElement('input', null, {
+            'type': 'button',
+            'class': 'sidebarCardHoverButton buttonObject',
+            'value': '＋',
+            'onclick': 'addDecklistCard(this.parentNode.parentNode, +1)'
+        }))
+    }
+
+    //DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST
+
+    var cardDropTarget
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function drop(elem, target) {
+        var siblings = target.parentElement.children
+        if(Array.prototype.indexOf.call(siblings, target) > Array.prototype.indexOf.call(siblings, elem)) {
+            cardDropTarget.after(elem);
+        }
+        else {
+            cardDropTarget.before(elem);
+        }
+    }
+
+    function addDecklistCard(card, count) {
+        //if card exists in decklist
+        if (decklistCards.querySelector(`#${card['id']}`)) {
+            modifyDecklistCardCount(decklistCards.querySelector(`#${card['id']}`), count)
+        }
+        //if card does not exist in decklist
+        else {
+            newCard = cloneCard(card, {
+                    'class': 'card decklistCard fadeIn',
+                    'onmouseenter': 'decklistCardHover(this)',
+                    'ontouchstart': 'decklistCardHover(this)',
+                    'onmouseleave': 'cardUnhover(this)',
+                    'draggable': 'true',
+                    'ondragstart': 'if(isDecklistLocked == false) {this.setAttribute("style", "transform: scale(1); box-shadow: none")}',
+                    'ondragend': 'if(isDecklistLocked == false) {drop(this, cardDropTarget); this.removeAttribute("style")}',
+                    'ondragover': 'if(isDecklistLocked == false) {allowDrop(event); cardDropTarget = this}',
+                    'count': count
+
+                })
+            if (newCard.getElementsByClassName('cardHoverMenu')[0]) {
+                newCard.getElementsByClassName('cardHoverMenu')[0].remove()
+            }
+            if (newCard.getElementsByClassName('holo')[0]) {
+                newCard.getElementsByClassName('holo')[0].classList.remove('focusedHolo')
+                const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
+                const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
+                newCard.getElementsByClassName('holo')[0].setAttribute('style', `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`)
+            }
+            newCard.appendChild(createElement('input', null, {
+                'type': 'button',
+                'value': count,
+                'class': 'individualCardCount scaledbuttonObject'
+            }))
+            decklistCards.appendChild(newCard)
+            modifyDecklistCardCount(null, count)
+        }
+    }
+
+    function decklistCardHover (card) {
+        while (card.getElementsByClassName('cardImageDuplicate')[0]) {
+            card.getElementsByClassName('cardImageDuplicate')[0].remove()
+        }
+        var count = card.getAttribute('count')
+        for (i=1; i<count; i++) {
+            var cardImage = card.getElementsByClassName('cardImage')[0].cloneNode(true)
+            cardImage.classList.add('cardImageDuplicate')
+            cardImage.setAttribute('style', `transform: translateX(${15*i/(count-1)}%) translateY(${-15*i/(count-1)}%)`)
+            card.prepend(cardImage)
+        }
+
+        if (isDecklistLocked == false) {
+            if (card.getElementsByClassName('cardHoverMenu')[0]) {
+                card.getElementsByClassName('cardHoverMenu')[0].remove()
+            }
+            card.appendChild(createElement('div', null, {
+                'class': 'cardHoverMenu fadeIn'
+            }))
+            hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
+            hoverMenu.appendChild(createElement('input', null, {
+                'type': 'button',
+                'class': 'decklistCardHoverButtonAdd scaledbuttonObject',
+                'value': '＋',
+                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, +1)}'
+            }))
+            hoverMenu.appendChild(createElement('input', null, {
+                'type': 'button',
+                'class': 'decklistCardHoverButtonRemove scaledbuttonObject',
+                'value': '－',
+                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, -1)}'
+            }))
+        }
+    }
+
+    // HERE
+    function cardUnhover (card) {
+        if (card.getElementsByClassName('cardHoverMenu')[0]) {
+            fadeOut(card.getElementsByClassName('cardHoverMenu')[0])
+        }
+        for (i=0; i<card.getElementsByClassName('cardImageDuplicate').length; i++) {
+            removeCardImageDuplicate(card.getElementsByClassName('cardImageDuplicate')[i])
+        }
+    }
+
+    function removeCardImageDuplicate (elem) {
+        elem.classList.add('removeCardImageDuplicate')
+        setTimeout(function () {
+            if (elem) {
+                elem.remove()
+            }
+        }, 250)
+    }
+
+    function modifyDecklistCardCount (card, value) {
+        if (card && card.getElementsByClassName('individualCardCount')[0].value) {
+            var dataContainer = card.getElementsByClassName('data')[0]
+            const individualCardCount = Number(card.getElementsByClassName('individualCardCount')[0].value)
+            if (individualCardCount + value <= 0) {
+                fadeOut(card)
+            }
+            else if (individualCardCount + value > 1 &&
+            (dataContainer.getAttribute('rarity') && dataContainer.getAttribute('rarity') == 'Rare ACE') ||
+            (dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("◇ (Prism Star) Rule: You can't have more than 1 ◇ card with the same name in your deck. If a ◇ card would go to the discard pile, put it in the Lost Zone instead.")) ||
+            (dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You can't have more than 1 Pokémon Star in your deck."))) {
+                return
+            }
+            else if (individualCardCount + value > 4 && 
+            !(dataContainer.getAttribute('supertype') == 'Energy' && dataContainer.getAttribute('subtypes').includes('Basic')) && 
+            !(dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You may have as many of this card in your deck as you like."))) {
+                return
+            }
+            if (individualCardCount + value > 0) {
+                var newValue = individualCardCount + value
+                card.setAttribute('count', newValue)
+                card.getElementsByClassName('individualCardCount')[0].value = newValue
+            }
+        }
+        
+        decklistCardCount.value = Number(decklistCardCount.value) + value
+        if (decklistCardCount.value > 60) {
+            decklistCardCount.setAttribute('style', 'color: red')
+        }
+        else if (decklistCardCount.value == 60) {
+            decklistCardCount.setAttribute('style', 'color: #00ff00')
+        }
+        else {
+            decklistCardCount.setAttribute('style', 'color: white')
+        }
+    }
+
+    function lockDecklist (button) {
+        if (button.value == '🔓') {
+            button.value = '🔐'
+            button.title ='Enable Editing'
+            isDecklistLocked = true
+            LOG_normal('Locked decklist')
+        }
+        else {
+            button.value = '🔓'
+            button.title ='Disable Editing'
+            isDecklistLocked = false
+            LOG_normal('Unlocked decklist')
+        }
+    }
+
+    async function importDecklist () {
+        if (isDecklistLocked == true) {
+            LOG_alertNormal('Editing decklist is disabled.')
+            return
+        }
+        else if(setsLoaded == false) {
+            LOG_alertNormal('Please wait for a few seconds for sets to load.')
+            return
+        }
+        var clipboardText
+        var encounteredError = false
+        try {
+            clipboardText = await navigator.clipboard.readText().catch(error => {LOG_alertError(error); encounteredError = true})
+            if (encounteredError == true) {
+                return
+            }
+        }
+        catch {
+            LOG_error('This browser does not support importing from clipboard.')
+            return
+        }
+        if (decklistCards.firstChild && !confirm('Are you sure you want to overwrite the existing decklist?')) {
+            return
+        }
+
+        text = clipboardText.split('\n')
+        var cardsToSearch = []
+        for (i=0; i<text.length; i++) {
+            text[i] = text[i].replace('(', '').replace(')', '')
+            var line = text[i].split(' ')
+
+            //remove * from beginning of line
+            if (line[0] == '*') {
+                line.shift()
+            }
+
+            //format line
+            if (isNaN(Number(line[0])) || line.length < 4) {
+                continue
+            }
+            else if (line.length == 4) {
+                for (basicEnergy in basicEnergies) {
+                    if (line[1].toLowerCase() == basicEnergy) {
+                        line[3] = basicEnergies[basicEnergy][0]
+                        line.push(basicEnergies[basicEnergy][1])
+                    }
+                }
+            }
+            else if (line.length == 5 && line[2] == 'Energy' && line[3] == 'Energy') {
+                for (basicEnergy in basicEnergies) {
+                    if (line[1].toLowerCase() == basicEnergy) {
+                        line[3] = basicEnergies[basicEnergy][0]
+                        line[4] = basicEnergies[basicEnergy][1]
+                    }
+                }
+            }
+
+            //set code translation
+            line[line.length -2] = line[line.length -2].toLowerCase()
+            for (input in setIdTranslations) {
+                if (line[line.length -2] == input) {
+                    line[line.length -2] = setIdTranslations[input]
+                    break
+                }
+            }
+
+            //fix set numbers
+            for (brokenSetNumber in brokenSetNumbers) {
+                if (line[line.length -2] == brokenSetNumber && !line[line.length -1].includes(brokenSetNumbers[brokenSetNumber][0])) {
+                    //00x
+                    if (brokenSetNumbers[brokenSetNumber][1] == '00') {
+                        if (Number(line[line.length -1]) < 10) {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '00' + line[line.length -1]
+                        }
+                        else if (Number(line[line.length -1]) < 100) {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
+                        }
+                        else {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
+                        }
+                    }
+                    //0x
+                    else if (brokenSetNumbers[brokenSetNumber][1] == '0') {
+                        if (Number(line[line.length -1]) < 10) {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
+                        }
+                        else {
+                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
+                        }
+                    }
+                    //RC
+                    else if (Number(line[line.length -1]) > brokenSetNumbers[brokenSetNumber][1]) {
+                        line[line.length -1] = 'RC' + (Number(line[line.length -1]) - brokenSetNumbers[brokenSetNumber][1])
+                    }
+                }
+            }
+
+            //shiny vault
+            if (line[line.length -2] == 'swsh45' && line[line.length -1].includes('SV')) {
+                line[line.length -2] = 'swsh45sv'
+            }
+
+            cardsToSearch.push({
+                'id': `${line[line.length -2]}-${line[line.length -1]}`,
+                'count': Number(line[0])
+            })
+        }
+
+        var importedCorrectly = true
+        if (cardsToSearch.length == 0) {
+            LOG_alertNormal('No cards were found on the clipboard:\n\n' + clipboardText)
+        }
+        //begin import
+        else {
+            var url = 'https://api.pokemontcg.io/v2/cards?q='
+            cardIDs = []
+            for (i=0; i<cardsToSearch.length; i++) {
+                // REMOVING NEWLINES
+                cardsToSearch[i]['id'] = cardsToSearch[i]['id'].replace(/[\r\n]+/gm, '')
+                cardIDs.push(cardsToSearch[i]['id'])
+            }
+            var url = `https://api.pokemontcg.io/v2/cards?q=id:${cardIDs.join('+OR+id:')}+`
+
+            const response = await fetchCards(url, header)
+
+            var cardData
+            //if response did not contain card data
+            if (!response['cards']) {
+                LOG_alertNormal('The decklist you tried to import was malformed.')
+            }
+            else {
+                cardData = response['cards']
+            }
+
+            //match requests to fetched data
+            var removedCards = false
+
+            for (i=0; i<cardsToSearch.length; i++) {
+                var newCard = cardData.filter(function(card) {
+                    return card['id'] == cardsToSearch[i]['id']
+                })[0]
+                if (newCard) {
+                    if (removedCards == false) {
+                        removeDecklistCards(true)
+                        removedCards = true
+                    }
+                    addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
+                }
+                else {
+                    LOG_error(`Failed to import ${cardsToSearch[i]['id']}`)
+                    importedCorrectly = false 
+                }
+            }
+        }
+        if (importedCorrectly == false) {
+            LOG_alertNormal('One or more cards failed to import. See the console for more details.')
+        }
+    }
+
+    function exportDecklist () {
+        var cards = decklistCards.childNodes
+        if (cards.length == 0) {
+            LOG_alertNormal('Use this button to export the decklist to your clipboard.')
+            return
+        }
+
+        var text = []
+        for (i=0; i<cards.length; i++) {
+            var dataContainer = cards[i].getElementsByClassName(['data'])[0]
+            var count = cards[i].getElementsByClassName('individualCardCount')[0].value
+            var name = dataContainer.getAttribute('name')
+            var code
+            //if ptcgoCode
+            if (JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']) {
+                code = JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']
+            }
+            //else, use ID
+            else {
+                code = JSON.parse(dataContainer.getAttribute('set'))['id'].toUpperCase()
+            }
+            var number = dataContainer.getAttribute('number')
+            text.push(
+                `${count} ${name} ${code} ${number}`
+            )
+        }
+        text = text.join('\n')
+
+        var dummy = document.createElement('textarea');
+        document.body.appendChild(dummy);
+        dummy.value = text;
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+
+        LOG_alertNormal('Decklist copied to clipboard.\n\n' + text)
+    }
+
+    function sortDecklist () {
+        if (isDecklistLocked == true) {
+            LOG_alertNormal('Editing decklist is disabled.')
+            return
+        }
+        var sortTypes = {
+            'pokemon': [],
+            'supporter': [],
+            'item': [],
+            'tool': [],
+            'flare-tool': [],
+            'stadium': [],
+            'acespec': [],
+            'specialEnergy': [],
+            'basicEnergy': [],
+            'unknown': []
+        }
+        for (i=0; i<decklistCards.children.length; i++) {
+            var card = decklistCards.children[i]
+            var dataContainer = card.getElementsByClassName('data')[0]
+            var supertype = dataContainer.getAttribute('supertype')
+            var subtypes = JSON.parse(dataContainer.getAttribute('subtypes'))
+            var rules = JSON.parse(dataContainer.getAttribute('rules'))
+            if (supertype == 'Pokémon') {
+                sortTypes['pokemon'].push(card)
+                continue
+            }
+            else if (supertype && supertype == 'Trainer') {
+                if (subtypes && subtypes.includes('Supporter')) {
+                    sortTypes['supporter'].push(card)
+                    continue
+                }
+                else if (!subtypes) {
+                    sortTypes['item'].push(card)
+                    continue
+                }
+                else if (rules && rules.includes("You can't have more than 1 ACE SPEC card in your deck.")) {
+                    sortTypes['acespec'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Item')) {
+                    sortTypes['item'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes("Rocket's Secret Machine")) {
+                    sortTypes['item'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Pokémon Tool')) {
+                    sortTypes['tool'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Technical Machine')) {
+                    sortTypes['tool'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Stadium')) {
+                    sortTypes['stadium'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Pokémon Tool F')) {
+                    sortTypes['flare-tool'].push(card)
+                    continue
+                }
+            }
+            else if (supertype && supertype == 'Energy') {
+                if (subtypes && subtypes.includes('Special')) {
+                    sortTypes['specialEnergy'].push(card)
+                    continue
+                }
+                else if (subtypes && subtypes.includes('Basic Energy')) {
+                    sortTypes['basicEnergy'].push(card)
+                    continue
+                }
+            }
+            sortTypes['unknown'].push(card)
+        }
+
+        for (sortType in sortTypes) {
+            sortTypes[sortType] = sortTypes[sortType].sort(function(a,b){
+                return Number(b.getElementsByClassName('individualCardCount')[0].value) - Number(a.getElementsByClassName('individualCardCount')[0].value) || a.getElementsByClassName('data')[0].getAttribute('name').localeCompare(b.getElementsByClassName('data')[0].getAttribute('name'))
+            })
+        }
+
+        var evolutions = [
+            ['Stage 2'],
+            ['BREAK'],
+            ['Level-Up']
+        ]
+
+        //filter out evolutions
+        for (i=0; i<evolutions.length; i++) {
+            // find higher stage evolutions
+            evolutions[i][1] = sortTypes['pokemon'].filter(function(card) {
+                var cardData = card.getElementsByClassName('data')[0]
+                var subtypes = cardData.getAttribute('subtypes')
+                return subtypes.includes(evolutions[i][0])
+            })
+            sortTypes['pokemon'] = sortTypes['pokemon'].filter(function(card) {
+                var cardData = card.getElementsByClassName('data')[0]
+                var subtypes = cardData.getAttribute('subtypes')
+                return !subtypes.includes(evolutions[i][0])
+            })
+        }
+        //find lower stage evolutions
+        evolutions.unshift(['Other', sortTypes['pokemon'].filter(function(card) {
+            var cardData = card.getElementsByClassName('data')[0]
+            return cardData.getAttribute('evolvesfrom')
+        })])
+        sortTypes['pokemon'] = sortTypes['pokemon'].filter(function(card) {
+            var cardData = card.getElementsByClassName('data')[0]
+            return !cardData.getAttribute('evolvesfrom')
+        })
+
+        //add back evolutions
+        for (i=0; i<evolutions.length; i++) {
+            evolutions[i][1] = evolutions[i][1].reverse()
+            for (j=0; j<evolutions[i][1].length; j++) {
+                var preEvolutionIndex = null
+                for (k=0; k<sortTypes['pokemon'].length; k++) {
+                    var name = sortTypes['pokemon'][k].getElementsByClassName('data')[0].getAttribute('name')
+                    if (name.includes(' δ')) {
+                        name = name.split(' δ')[0]
+                    }
+                    if (name == evolutions[i][1][j].getElementsByClassName('data')[0].getAttribute('evolvesfrom')) {
+                        preEvolutionIndex = k
+                    }
+                }
+                if (preEvolutionIndex != null) {
+                    sortTypes['pokemon'].splice(preEvolutionIndex+1, 0, evolutions[i][1][j])
+                }
+                else {
+                    sortTypes['pokemon'].push(evolutions[i][1][j])
+                }
+            }
+        }
+
+        var newDecklist = sortTypes['pokemon']
+        newDecklist = newDecklist.concat(sortTypes['supporter'])
+        newDecklist = newDecklist.concat(sortTypes['item'])
+        newDecklist = newDecklist.concat(sortTypes['tool'])
+        newDecklist = newDecklist.concat(sortTypes['flare-tool'])
+        newDecklist = newDecklist.concat(sortTypes['stadium'])
+        newDecklist = newDecklist.concat(sortTypes['acespec'])
+        newDecklist = newDecklist.concat(sortTypes['specialEnergy'])
+        newDecklist = newDecklist.concat(sortTypes['basicEnergy'])
+        newDecklist = newDecklist.concat(sortTypes['unknown'])
+
+        decklistCards.innerHTML = null
+
+        for (i=0; i<newDecklist.length; i++) {
+            decklistCards.appendChild(newDecklist[i])
+        }
+    }
+
+    function changeCardScale (value) {
+        value = Number(value)
+        if (value < 0) {
+            value = -1 / (value -1)
+        }
+        else {
+            value = value + 1
+        }
+        document.documentElement.style.setProperty('--cardScale', value);
+    }
+
+    function deleteDecklist () {
+        if (!decklistCards.firstChild) {
+            LOG_alertNormal('There are no cards to delete.')
+        }
+        else if (confirm('Are you sure you want to delete the decklist?')) {
+            removeDecklistCards(false)
+        }
+    }
+
+    function removeDecklistCards (immediate) {
+        if (immediate == true) {
+            decklistCards.innerHTML = null
+        }
+        else {
+            for (i=0; i<decklistCards.children.length; i++) {
+                fadeOut(decklistCards.children[i])
+            }
+        }
+        decklistCardCount.value = 0;
+        decklistCardCount.setAttribute('style', 'color: white')
+    }
+</script>
