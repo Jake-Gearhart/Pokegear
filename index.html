@@ -1780,13 +1780,14 @@
             var url = 'https://api.pokemontcg.io/v2/cards?q='
             cardIDs = []
             for (i=0; i<cardsToSearch.length; i++) {
+                // REMOVING NEWLINES
+                cardsToSearch[i]['id'] = cardsToSearch[i]['id'].replace(/[\r\n]+/gm, '')
                 cardIDs.push(cardsToSearch[i]['id'])
             }
             var url = `https://api.pokemontcg.io/v2/cards?q=id:${cardIDs.join('+OR+id:')}+`
 
             const response = await fetchCards(url, header)
-            //TEMP
-            console.log(response)
+
             var cardData
             //if response did not contain card data
             if (!response['cards']) {
@@ -1798,13 +1799,11 @@
 
             //match requests to fetched data
             var removedCards = false
+
             for (i=0; i<cardsToSearch.length; i++) {
-                var newCard = cardData.filter(function(obj) {
-                    return obj['id'] == cardsToSearch[i]['id']
-                })
-                console.log(newCard)
-                newCard = newCard[0]
-                console.log(newCard)
+                var newCard = cardData.filter(function(card) {
+                    return card['id'] == cardsToSearch[i]['id']
+                })[0]
                 if (newCard) {
                     if (removedCards == false) {
                         removeDecklistCards(true)
