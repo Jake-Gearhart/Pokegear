@@ -1720,53 +1720,84 @@
                 }
             }
 
+            var setCode = line[line.length -2].toLowerCase()
+            var setNumber = line[line.length -1]
+
             //set code translation
-            line[line.length -2] = line[line.length -2].toLowerCase()
             for (input in setIdTranslations) {
-                if (line[line.length -2] == input) {
-                    line[line.length -2] = setIdTranslations[input]
+                if (setCode == input) {
+                    setCode = setIdTranslations[input]
                     break
                 }
             }
 
-            //fix set numbers
-            for (brokenSetNumber in brokenSetNumbers) {
-                if (line[line.length -2] == brokenSetNumber && !line[line.length -1].includes(brokenSetNumbers[brokenSetNumber][0])) {
-                    //00x
-                    if (brokenSetNumbers[brokenSetNumber][1] == '00') {
-                        if (Number(line[line.length -1]) < 10) {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '00' + line[line.length -1]
-                        }
-                        else if (Number(line[line.length -1]) < 100) {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
-                        }
-                        else {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
-                        }
-                    }
-                    //0x
-                    else if (brokenSetNumbers[brokenSetNumber][1] == '0') {
-                        if (Number(line[line.length -1]) < 10) {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + '0' + line[line.length -1]
-                        }
-                        else {
-                            line[line.length -1] = brokenSetNumbers[brokenSetNumber][0] + line[line.length -1]
-                        }
-                    }
-                    //RC
-                    else if (Number(line[line.length -1]) > brokenSetNumbers[brokenSetNumber][1]) {
-                        line[line.length -1] = 'RC' + (Number(line[line.length -1]) - brokenSetNumbers[brokenSetNumber][1])
-                    }
+            var brokenSets = {
+                'swshp': {
+                    'prefix': 'SWSH',
+                    'min-length': 3,
+                    'overflow': 0
+                },
+                'smp': {
+                    'prefix': 'SM',
+                    'min-length': 2,
+                    'overflow': 0
+                },
+                'xyp': {
+                    'prefix': 'XY',
+                    'min-length': 2,
+                    'overflow': 0
+                },
+                'bwp': {
+                    'prefix': 'BW',
+                    'min-length': 2,
+                    'overflow': 0
+                },
+                'hsp': {
+                    'prefix': 'HGSS',
+                    'min-length': 2,
+                    'overflow': 0
+                },
+                'dpp': {
+                    'prefix': 'DP',
+                    'min-length': 2,
+                    'overflow': 0
+                },
+                'swsh45': {
+                    'prefix': 'SV',
+                    'min-length': 3,
+                    'overflow': 73,
+                    'subset': 'swsh45sv'
+                },
+                'bw11': {
+                    'prefix': 'RC',
+                    'min-length': 1,
+                    'overflow': 115
+                },
+                'g1': {
+                    'prefix': 'RC',
+                    'min-length': 1,
+                    'overflow': 100
                 }
             }
 
-            //shiny vault
-            if (line[line.length -2] == 'swsh45' && line[line.length -1].includes('SV')) {
-                line[line.length -2] = 'swsh45sv'
+            for (key in brokenSets) {
+                if (setCode == key && !setNumber.includes(brokenSets[key]['prefix']) && Number(setNumber) > brokenSets[key]['overflow']) {
+                    const brokenSet = brokenSets[key]
+                    setNumber = String(Number(setNumber) - brokenSet['overflow'])
+                    while (setNumber.length < brokenSet['min-length']) {
+                        setNumber = '0' + setNumber
+                    }    
+                    setNumber = brokenSet['prefix'] + setNumber
+                }
+            }
+
+            // shiny vault
+            if (setCode == 'swsh45' && setNumber.includes('SV')) {
+                setCode = 'swsh45sv'
             }
 
             cardsToSearch.push({
-                'id': `${line[line.length -2]}-${line[line.length -1]}`,
+                'id': `${setCode}-${setNumber}`,
                 'count': Number(line[0])
             })
         }
