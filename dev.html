@@ -1961,6 +1961,8 @@
             var url = 'https://api.pokemontcg.io/v2/cards?q='
             cardIDs = []
             for (i=0; i<cardsToSearch.length; i++) {
+                // REMOVING NEWLINES
+                cardsToSearch[i]['id'] = cardsToSearch[i]['id'].replace(/[\r\n]+/gm, '')
                 cardIDs.push(cardsToSearch[i]['id'])
             }
             var url = `https://api.pokemontcg.io/v2/cards?q=id:${cardIDs.join('+OR+id:')}+`
@@ -1981,7 +1983,7 @@
 
             for (i=0; i<cardsToSearch.length; i++) {
                 var newCard = cardData.filter(function(card) {
-                    return (card['id'] == cardsToSearch[i]['id'])
+                    return card['id'] == cardsToSearch[i]['id']
                 })[0]
                 if (newCard) {
                     if (removedCards == false) {
