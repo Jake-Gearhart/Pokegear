@@ -1981,8 +1981,7 @@
 
             for (i=0; i<cardsToSearch.length; i++) {
                 var newCard = cardData.filter(function(card) {
-                    // return card['id'] == cardsToSearch[i]['id']
-                    return (`${card['set']['id']}-${card['number']}` == cardsToSearch[i]['id'])
+                    return (card['id'] == cardsToSearch[i]['id'])
                 })[0]
                 if (newCard) {
                     if (removedCards == false) {
