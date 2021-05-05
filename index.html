@@ -960,8 +960,17 @@
     }
 
     function createCard (data) {
-        //TEMPORARY UNOWN FIX
+        //UNOWN FIX
         data['id'] = data['id'].replace('?', 'question').replace('!', 'exclamation')
+        //RESHIRAM & ZEKROM PROMO FIX
+        if (data['images']['small'] == 'https://images.pokemontcg.io/bwp/BW004.png') {
+            data['images']['small'] = 'https://images.pokemontcg.io/bwp/BW04.png'
+        }
+        else if (data['images']['small'] == 'https://images.pokemontcg.io/bwp/BW005.png') {
+            data['images']['small'] = 'https://images.pokemontcg.io/bwp/BW05.png'
+        }
+
+
         container = createElement('div', null, {
             'id': data['id'],
             'class': 'card fadeIn',
@@ -1791,9 +1800,17 @@
                 }
             }
 
-            // shiny vault
+            //shiny vault
             if (setCode == 'swsh45' && setNumber.includes('SV')) {
                 setCode = 'swsh45sv'
+            }
+
+            //RESHIRAM & ZEKROM PROMO FIX
+            if (setCode == 'bwp' && setNumber == 'BW04') {
+                setNumber = 'BW004'
+            }
+            else if (setCode == 'bwp' && setNumber == 'BW05') {
+                setNumber = 'BW005'
             }
 
             cardsToSearch.push({
