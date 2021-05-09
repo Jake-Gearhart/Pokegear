@@ -9,15 +9,16 @@
             <h1 id='titleText'>Pokegear.app</h1>
             <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
         </div>
-        <input id='settings' class='buttonObject decklistButton' title='Settings' onclick='openSettings()' type='button' value='⚙'></input>
-        <input id='lockDecklist' class='buttonObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)' type='button' value='🔓'></input>
-        <input id='importDecklist' class='buttonObject decklistButton' title='Import Decklist' onclick='importDecklist()' type='button' value='↥'>
-        <input id='exportDecklist' class='buttonObject decklistButton' title='Export Decklist' onclick='exportDecklist()' type='button' value='↧'></input>
-        <input id='sortDecklist' class='buttonObject decklistButton' title='Sort Decklist' onclick='sortDecklist()' type='button' value='⟳'></input>
+        <button id='help' class='buttonObject decklistButton' title='Help' onclick='openHelpMenu()'>﹖</button>
+        <button id='settings' class='buttonObject decklistButton' title='Settings' onclick='openSettings()'>⚙</button>
+        <button id='lockDecklist' class='buttonObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)'>🔓</button>
+        <button id='importDecklist' class='buttonObject decklistButton' onmouseenter='importDecklistButtonHover(this)' onmouseleave='this.innerHTML = "↥"'>↥</button>
+        <button id='exportDecklist' class='buttonObject decklistButton' onmouseenter='exportDecklistButtonHover(this)' onmouseleave='this.innerHTML = "↧"'>↧</button>
+        <button id='sortDecklist' class='buttonObject decklistButton' title='Sort Decklist' onclick='sortDecklist()'>⟳</button>
         <div id='scaleSliderContainer'>
             <input id='scaleSlider' class='' title='Zoom Decklist' type='range' oninput='changeCardScale(this.value)' min='-1' value='0' max='1' step='0.000000000000000001'></input>
         </div>
-        <input id='deleteDecklist' class='buttonObject decklistButton' title='Delete Decklist' onclick='deleteDecklist()' type='button' value='🗑'></input>
+        <button id='deleteDecklist' class='buttonObject decklistButton' title='Delete Decklist' onclick='deleteDecklist()'>🗑</button>
         <div id='decklist' ontouchstart='fullScreenSidebar(false)'>
             <input id='decklistCardCount' class='buttonObject' type='button' value='0'>
             <div id='decklistCards'></div>
@@ -192,10 +193,13 @@
         background-color: var(--midBlue);
         font-weight: bold;
         cursor: pointer;
-
     }
 
     /* right side items */
+    #help {
+        top: calc(var(--cardHeight) * 1/12);
+        right: calc(var(--cardHeight) / 2);
+    }
     #settings {
         top: calc(var(--cardHeight) * 1/12);
     }
@@ -204,9 +208,32 @@
     }
     #importDecklist {
         top: calc(var(--cardHeight) * 11/12);
+        transition: background-color 0.25s, width 0.25s;
+        cursor: default;
+    }
+    #importDecklist:hover {
+        width: calc(var(--cardHeight) * 3/4);
+    }
+    .decklistSubButton {
+        background-color: rgba(0,0,0,0);
+        border: none;
+        width: 50%;
+        height: 100%;
+        font-size: calc(var(--cardHeight) / 6);
+        text-shadow: 0px 0px 8px var(--darkBlue);
+        cursor: pointer;
+        transition: text-shadow 0.25s;
+    }
+    .decklistSubButton:hover {
+        text-shadow: 0px 0px 8px var(--lightBlue);
     }
     #exportDecklist {
         top: calc(var(--cardHeight) * 16/12);
+        transition: background-color 0.25s, width 0.25s;
+        cursor: default;
+    }
+    #exportDecklist:hover {
+        width: calc(var(--cardHeight) * 3/4);
     }
     #sortDecklist {
         top: calc(var(--cardHeight) * 21/12);
@@ -459,6 +486,9 @@
         cursor: pointer;
         transition: 0.125s;
     }
+    .parameterButtonDiv:hover:not(.parameterButtonDivSelected) {
+        background-color: var(--lightBlue30)
+    }
     .parameterButtonDivSelected {
         background-color: rgba(0, 255, 0, 0.6)
     }
@@ -542,93 +572,120 @@
     #focused {
         z-index: 2000;
         position: fixed;
-        width: 100%;
         height: 100%;
-        top: 0;
-        left: 0;
+        width: 100%;
         background-color: rgba(0, 0, 0, 0.6);
     }
-    .focusedCard {
-        position: fixed;
-        height: var(--focusedHeight);
-        width: var(--focusedWidth);
-        top: calc(50% - var(--focusedHeight) / 2);
-        left: calc(50% - var(--focusedWidth) / 2);
-        border-radius: calc(var(--focusedHeight) * 0.027);
+    #focusedCenter {
         pointer-events: none;
     }
+    #focusedCenter>* {
+        pointer-events: all;
+    }
+    #focusedCenter.landscape {
+        position: absolute;
+        height: min(60vw, 90vh);
+        width: min(60vw, 90vh);
+        top: calc(50% - min(60vw, 90vh) / 2);
+        left: calc(50% - min(60vw, 90vh) / 2);
+    }
+    #focusedCenter.portrait {
+        position: absolute;
+        height: min(100vw, 60vh);
+        width: min(100vw, 60vh);
+        top: calc(50% - min(100vw, 60vh) / 2);
+        left: calc(50% - min(100vw, 60vh) / 2);
+    }
+    .focusedCard {
+        position: absolute;
+        height: 100%;
+        pointer-events: none !important;
+        border-radius: 2.7%;
+    }
+    .focusedCard.landscape {
+        width: calc(min(60vw, 90vh) * var(--cardDimensionRatio));
+        left: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+    }
+    .focusedCard.portrait {
+        width: calc(min(100vw, 60vh) * var(--cardDimensionRatio));
+        left: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+    }
+
     #focusedAdd {
         position: absolute;
-        top: 10%;
-        height: calc(100% / 6);
-        width: 7.5%;
-        left: 20%;
+        font-size: calc(var(--cardHeight) * 1/3);
         cursor: pointer;
-        object-fit: contain;
-        text-align: center;
-        font-size: calc(var(--cardHeight) * 5/12);
-        pointer-events: all;
     }
+    #focusedAdd.landscape {
+        height: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+        width: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+    }
+    #focusedAdd.portrait {
+        height: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+        width: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+    }
+
     #focusedDownload {
         position: absolute;
-        top: 10%;
-        height: calc(100% / 6);
-        width: 7.5%;
-        right: 20%;
+        right: 0;
+        font-size: calc(var(--cardHeight) * 1/3);
         cursor: pointer;
-        object-fit: contain;
-        text-align: center;
-        font-size: calc(var(--cardHeight) * 5/12);
-        pointer-events: all;
     }
-    #focusedButtonLeft {
-        position: absolute;
-        height: calc(100% / 3);
-        width: 7.5%;
-        top: calc(100% / 3);
-        left: 20%;
-        cursor: pointer;
-        object-fit: contain;
-        text-align: center;
-        font-size: calc(var(--cardHeight) * 5/12);
-        pointer-events: all;
+    #focusedDownload.landscape {
+        height: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+        width: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
     }
-    #focusedButtonRight {
-        position: absolute;
-        height: calc(100% / 3);
-        width: 7.5%;
-        top: calc(100% / 3);
-        right: 20%;
-        cursor: pointer;
-        object-fit: contain;
-        text-align: center;
-        font-size: calc(var(--cardHeight) * 5/12);
-        pointer-events: all;
+    #focusedDownload.portrait {
+        height: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+        width: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
     }
-    #focusedPrice {
+
+    #focusedLeft {
         position: absolute;
-        height: 90%;
-        width: calc(45% - min(100vw, 200vh) * 0.3);
-        top: 5%;
-        left: 2.5%;
+        height: 50%;
+        top: 25%;
+        font-size: calc(var(--cardHeight) * 1/3);
         cursor: pointer;
-        background-color: transparent;
-        overflow-y: auto;
+    }
+    #focusedLeft.landscape {
+        width: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+    }
+    #focusedLeft.portrait {
+        width: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+    }
+
+    #focusedRight {
+        position: absolute;
+        height: 50%;
+        top: 25%;
+        right: 0;
+        font-size: calc(var(--cardHeight) * 1/3);
+        cursor: pointer;
+    }
+    #focusedRight.landscape {
+        width: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+    }
+    #focusedRight.portrait {
+        width: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+    }
+
+    #focusedPrice.landscape {
+        position: absolute;
+        height: 90vh;
+        width: calc(45% - min(60vw, 90vh) / 2);
+        top: 5vh;
+        left: 2.5vw;
+    }
+    #focusedPrice.portrait {
+        position: absolute;
+        height: calc(45% - min(100vw, 60vh) / 2);
+        width: 90vw;
+        top: 2.5vh;
+        left: 5vw;
     }
     #focusedPrice>p {
         margin: 0;
         padding: 0;
-    }
-    #focusedPrice:hover {
-        animation: priceBounce 0.5s ease-in-out;
-    }
-    @keyframes priceBounce {
-    0%, 100% {
-            transform: translateY(0);
-        }
-    50% {
-            transform: translateY(-3%);
-        }
     }
 
     #toggleShine {
@@ -670,6 +727,9 @@
 </style>
 <script>
     //SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP
+    
+    var windowHeight = window.innerHeight
+    var windowWidth = window.innerWidth
     
     //logs
     var logs = []
@@ -944,10 +1004,24 @@
     }
     
     function windowResize () {
-        var windowHeight = window.innerHeight
-        var windowWidth = window.innerWidth
-        if (windowHeight > windowWidth) {
-            LOG_normal(true)
+        windowHeight = window.innerHeight
+        windowWidth = window.innerWidth
+        var orientables = document.getElementsByClassName('orientable')
+        if (orientables.length > 0) {
+            if (windowWidth <= windowHeight) {
+                for (i=0; i<orientables.length; i++) {
+                    var elem = orientables[i]
+                    elem.classList.remove('landscape')
+                    elem.classList.add('portrait')
+                }
+            }
+            else {
+                for (i=0; i<orientables.length; i++) {
+                    var elem = orientables[i]
+                    elem.classList.remove('portrait')
+                    elem.classList.add('landscape')
+                }
+            }
         }
     }
 
@@ -974,6 +1048,16 @@
         for (const attr in attributes) {
             elem.setAttribute(attr, attributes[attr])
         }
+
+        if (elem.classList.contains('orientable')) {
+            if (windowWidth <= windowHeight) {
+                elem.classList.add('portrait')
+            }
+            else {
+                elem.classList.add('landscape') 
+            }
+        }
+
         return elem
     }
 
@@ -1116,6 +1200,19 @@
                 newCard.setAttribute(key, mod)
             }
         }
+
+        if (newCard.getElementsByClassName('cardHoverMenu')[0]) {
+            newCard.getElementsByClassName('cardHoverMenu')[0].remove()
+        }
+
+        if (newCard.classList.contains('orientable')) {
+            if (windowWidth <= windowHeight) {
+                newCard.classList.add('portrait')
+            }
+            else {
+                newCard.classList.add('landscape') 
+            }
+        }
         return newCard
     }
 
@@ -1147,6 +1244,11 @@
             elem.remove()
         })
         .catch(e => LOG_error(e));
+    }
+
+    //HELP MENU
+    function openHelpMenu () {
+        alert('OPEN HELP MENU')
     }
 
     //SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS
@@ -1221,13 +1323,16 @@
         var rightButton
         if (document.getElementById('focused')) {
             focused = document.getElementById('focused')
-            focusedDownload = document.getElementById('focusedDownload')
+            focusedCenter = document.getElementById('focusedCenter')
+
             focusedPrice = document.getElementById('focusedPrice')
             focusedPrice.innerHTML = 'No Prices Available'
             focusedPrice.setAttribute('onclick', null)
-            leftButton = document.getElementById('focusedButtonLeft')
-            rightButton = document.getElementById('focusedButtonRight')
-            document.getElementsByClassName('focusedCard')[0].remove()
+
+            focusedDownload = document.getElementById('focusedDownload')
+            leftButton = document.getElementById('focusedLeft')
+            rightButton = document.getElementById('focusedRight')
+            focusedCenter.getElementsByClassName('focusedCard')[0].remove()
         }
         else {
             focused = document.body.appendChild(createElement('div', null, {
@@ -1235,45 +1340,49 @@
                     'class': 'fadeIn',
                     'onclick': 'if(event.target === this) {fadeOut(this); currentFocused = null}'
             }))
-            focusedAdd = focused.appendChild(createElement('input', null, {
-                    'id': 'focusedAdd',
-                    'class': 'fadeIn buttonObject',
-                    'title': 'Add Card To Deck',
-                    'type': 'submit',
-                    'onclick': "if(isDecklistLocked == false) {addDecklistCard(cloneCard(document.getElementsByClassName('focusedCard')[0], {'style': '', 'image': JSON.parse(document.getElementsByClassName('focusedCard')[0].getElementsByClassName('data')[0].getAttribute('images'))['small']}), +1)}",
-                    'value': '+'
+            focusedCenter = focused.appendChild(createElement('div', null, {
+                'id': 'focusedCenter',
+                'class': 'orientable'
             }))
-            focusedDownload = focused.appendChild(createElement('input', null, {
-                    'id': 'focusedDownload',
-                    'class': 'fadeIn buttonObject',
-                    'title': 'Download Image',
-                    'type': 'submit',
-                    'value': '↧'
+            focusedAdd = focusedCenter.appendChild(createElement('input', null, {
+                'id': 'focusedAdd',
+                'class': 'fadeIn buttonObject orientable',
+                'title': 'Add Card To Deck',
+                'type': 'submit',
+                'onclick': "if(isDecklistLocked == false) {addDecklistCard(cloneCard(document.getElementsByClassName('focusedCard')[0], {'style': '', 'image': JSON.parse(document.getElementsByClassName('focusedCard')[0].getElementsByClassName('data')[0].getAttribute('images'))['small']}), +1)}",
+                'value': '+'
             }))
-            focusedPrice = focused.appendChild(createElement('button', 'No Prices Available', {
-                'id': 'focusedPrice',
-                'class': 'buttonObject',
-                'title': 'Open Card In TCGPlayer'
+            focusedDownload = focusedCenter.appendChild(createElement('input', null, {
+                'id': 'focusedDownload',
+                'class': 'fadeIn buttonObject orientable',
+                'title': 'Download Image',
+                'type': 'submit',
+                'value': '↧'
             }))
-            leftButton = focused.appendChild(createElement('input', null, {
-                'id': 'focusedButtonLeft',
-                'class': 'buttonObject',
+            leftButton = focusedCenter.appendChild(createElement('input', null, {
+                'id': 'focusedLeft',
+                'class': 'buttonObject orientable',
                 'type': 'button',
                 'title': 'See Next Card',
                 'value': '❮',
                 'onclick': 'event.preventDefault(); cycleFocused("left")'
             }))
-            rightButton = focused.appendChild(createElement('input', null, {
-                'id': 'focusedButtonRight',
-                'class': 'buttonObject',
+            rightButton = focusedCenter.appendChild(createElement('input', null, {
+                'id': 'focusedRight',
+                'class': 'buttonObject orientable',
                 'title': 'See Previous Card',
                 'type': 'button',
                 'value': '❯',
                 'onclick': 'cycleFocused("right")'
             }))
+            focusedPrice = focused.appendChild(createElement('button', 'No Prices Available', {
+                'id': 'focusedPrice',
+                'class': 'buttonObject orientable',
+                'title': 'Open Card In TCGPlayer'
+            }))
         }
 
-        //focused add button
+        //add button
         if (isDecklistLocked == false) {
             focusedAdd.setAttribute('style', 'cursor: pointer')
         }
@@ -1281,7 +1390,7 @@
             focusedAdd.setAttribute('style', 'cursor: not-allowed')
         }
 
-        //left and right buttons
+        //left buttpn
         if (currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
             leftButton.setAttribute('style', 'cursor: pointer')
         }
@@ -1289,6 +1398,7 @@
             leftButton.setAttribute('style', 'cursor: not-allowed')
         }
 
+        //right button
         if (currentFocused.nextElementSibling && currentFocused.nextElementSibling.classList.contains('card')) {
             rightButton.setAttribute('style', 'cursor: pointer')
         }
@@ -1303,11 +1413,12 @@
             rotation = 90
         }
 
-        var newCard = focused.appendChild(cloneCard(card, {
+        focusedCenter.prepend(cloneCard(card, {
                 'style': `transform: rotate(${rotation}deg);`,
-                'class': 'focusedCard',
+                'class': 'focusedCard orientable',
                 'image': JSON.parse(dataContainer.getAttribute('images'))['large']
         }))
+        var newCard = focusedCenter.getElementsByClassName('focusedCard')[0]
 
         //remove individualCardCount, and cardHoverMenu
         var remove = ['individualCardCount', 'cardHoverMenu']
@@ -1360,9 +1471,10 @@
                         focusedPrice.appendChild(createElement('br', null, null))
                     }
                 }
-                focusedPrice.appendChild(createElement('p', 'Last Updated ' + tcgplayerData['updatedAt'], {'style': 'font-style: italic; text-shadow: 0px 0px 8px var(--darkBlue);'}))
+                focusedPrice.appendChild(createElement('p', 'Last Updated', {'style': 'font-style: italic; text-shadow: 0px 0px 8px var(--darkBlue);'}))
+                focusedPrice.appendChild(createElement('p', tcgplayerData['updatedAt'], {'style': 'font-style: italic; text-shadow: 0px 0px 8px var(--darkBlue);'}))
             }
-            focusedPrice.prepend(createElement('p', 'Click To Open In tcgplayer.com', {'style': 'font-style: italic; text-shadow: 0px 0px 8px var(--darkBlue);'}), createElement('br', null, null))
+            focusedPrice.prepend(createElement('p', 'Click To Open On tcgplayer.com', {'style': 'font-style: italic; text-shadow: 0px 0px 8px var(--darkBlue);'}), createElement('br', null, null))
         }
         else {
             focusedPrice.setAttribute('style', 'cursor: not-allowed')
@@ -1716,9 +1828,6 @@
                     'count': count
 
                 })
-            if (newCard.getElementsByClassName('cardHoverMenu')[0]) {
-                newCard.getElementsByClassName('cardHoverMenu')[0].remove()
-            }
             if (newCard.getElementsByClassName('holo')[0]) {
                 newCard.getElementsByClassName('holo')[0].classList.remove('focusedHolo')
                 const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
@@ -1790,6 +1899,7 @@
     }
 
     function modifyDecklistCardCount (card, value) {
+        // HERE
         if (card && card.getElementsByClassName('individualCardCount')[0].value) {
             var dataContainer = card.getElementsByClassName('data')[0]
             const individualCardCount = Number(card.getElementsByClassName('individualCardCount')[0].value)
@@ -1827,33 +1937,39 @@
     }
 
     function lockDecklist (button) {
-        if (button.value == '🔓') {
-            button.value = '🔐'
+        if (button.innerHTML == '🔓') {
+            button.innerHTML = '🔐'
             button.title ='Enable Editing'
             isDecklistLocked = true
             LOG_normal('Locked decklist')
         }
         else {
-            button.value = '🔓'
+            button.innerHTML = '🔓'
             button.title ='Disable Editing'
             isDecklistLocked = false
             LOG_normal('Unlocked decklist')
         }
     }
+// HERE
+    function importDecklistButtonHover (button) {
+        button.innerHTML = ''
+        button.appendChild(createElement('button', '📂', {
+            'title': 'Import Saved Decklist',
+            'class': 'decklistSubButton',
+            'onclick': 'importDecklistLocalStorage()'
+        }))
+        button.appendChild(createElement('button', '📋', {
+            'title': 'Import Decklist From Clipboard',
+            'class': 'decklistSubButton',
+            'onclick': 'importDecklistClipboard()'
+        }))
+    }
 
-    async function importDecklist () {
-        if (isDecklistLocked == true) {
-            LOG_alertNormal('Editing decklist is locked.')
-            return
-        }
-        else if(setsLoaded == false) {
-            LOG_alertNormal('Please wait for a few seconds for sets to load.')
-            return
-        }
-        var clipboardText
+    async function importDecklistClipboard () {
+        var text
         var encounteredError = false
         try {
-            clipboardText = await navigator.clipboard.readText().catch(error => {LOG_alertError(error); encounteredError = true})
+            text = await navigator.clipboard.readText().catch(error => {LOG_alertError(error); encounteredError = true})
             if (encounteredError == true) {
                 return
             }
@@ -1862,11 +1978,31 @@
             LOG_error('This browser does not support importing from clipboard.')
             return
         }
+        importDecklist(text)
+    }
+    function importDecklistLocalStorage () {
+        // alert('IMPORT DECKLIST FROM LOCAL STORAGE')
+        var savedDecklists = Object.keys(localStorage)
+        var key = prompt('Which decklist would you like to load?\n\n' + savedDecklists.join('\n'), savedDecklists[0])
+        if (key) {
+            importDecklist(localStorage[key])
+        }
+    }
+
+    async function importDecklist (text) {
+        if (isDecklistLocked == true) {
+            LOG_alertNormal('Editing decklist is locked.')
+            return
+        }
+        else if(setsLoaded == false) {
+            LOG_alertNormal('Please wait for a few seconds for sets to load.')
+            return
+        }
         if (decklistCards.firstChild && !confirm('Are you sure you want to overwrite the existing decklist?')) {
             return
         }
 
-        text = clipboardText.split('\n')
+        text = text.split('\n')
         var cardsToSearch = []
         for (i=0; i<text.length; i++) {
             text[i] = text[i].replace('(', '').replace(')', '')
@@ -1990,7 +2126,7 @@
 
         var importedCorrectly = true
         if (cardsToSearch.length == 0) {
-            LOG_alertNormal('No cards were found on the clipboard:\n\n' + clipboardText)
+            LOG_alertError('No cards were found on the clipboard:\n\n' + text)
         }
         //begin import
         else {
@@ -2039,7 +2175,21 @@
         }
     }
 
-    function exportDecklist () {
+    function exportDecklistButtonHover (button) {
+        button.innerHTML = ''
+        button.appendChild(createElement('button', '💾', {
+            'title': 'Save Decklist',
+            'class': 'decklistSubButton',
+            'onclick': 'exportDecklist("localStorage")'
+        }))
+        button.appendChild(createElement('button', '📋', {
+            'title': 'Copy Decklist To Clipboard',
+            'class': 'decklistSubButton',
+            'onclick': 'exportDecklist("clipboard")'
+        }))
+    }
+
+    function exportDecklist (mode) {
         var cards = decklistCards.childNodes
         if (cards.length == 0) {
             LOG_alertNormal('Use this button to export the decklist to your clipboard.')
@@ -2067,14 +2217,22 @@
         }
         text = text.join('\n')
 
-        var dummy = document.createElement('textarea');
-        document.body.appendChild(dummy);
-        dummy.value = text;
-        dummy.select();
-        document.execCommand('copy');
-        document.body.removeChild(dummy);
+        if (mode == 'clipboard') {
+            var dummy = document.createElement('textarea');
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
 
-        LOG_alertNormal('Decklist copied to clipboard.\n\n' + text)
+            LOG_alertNormal('Decklist copied to clipboard.\n\n' + text)
+        }
+        else if (mode == 'localStorage') {
+            var key = prompt('Save decklist using name:', 'New Deck 1')
+            if (key) {
+                localStorage.setItem(key, text)
+            }
+        }
     }
 
     function sortDecklist () {
