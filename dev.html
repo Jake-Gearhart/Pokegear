@@ -535,7 +535,12 @@
         object-fit: inherit;
         pointer-events: none;
     }
-    /* HERE */
+    .cardImageContainer {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
     .cardImageDuplicate {
         animation: cardImageDuplicate 0.25s forwards;
     }
@@ -832,6 +837,7 @@
 
     //add event listeners
     document.addEventListener('keydown', keyDown);
+    document.addEventListener('mousemove', mousemove);
 
     //sopulate sets
     var setsLoaded = false
@@ -1039,6 +1045,16 @@
             cycleFocused('left')
         }
     }
+
+    function mousemove (event) {
+        var hoveredCards = document.getElementsByClassName('hoveredCard')
+        for (i=0; i<hoveredCards.length; i++) {
+            // if mouse not over card and not over a hover menu button
+            if (event.target != hoveredCards[i] && event.target.parentNode.parentNode != hoveredCards[i]) {
+                cardUnhover(hoveredCards[i])
+            }
+        }
+    }
     
     function randomInteger(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -1128,17 +1144,21 @@
             data['images']['small'] = 'https://images.pokemontcg.io/bwp/BW05.png'
         }
 
-        container = createElement('div', null, {
+        var container = createElement('div', null, {
             'id': data['id'],
             'class': 'card fadeIn',
             'oncontextmenu': 'event.preventDefault(); focusCard(this)',
             'onclick': 'if(event.target === this) {focusCard(this)}',
             'onmouseenter': 'sidebarCardHover(this)',
             'ontouchstart': 'sidebarCardHover(this)',
-            'onmouseleave': 'cardUnhover(this)'
+            // 'onmouseleave': 'cardUnhover(this)'
         })
 
-        container.appendChild(createElement('img', null, {
+        var cardImageContainer = container.appendChild(createElement('div', null, {
+            'class': 'cardImageContainer',
+        }))
+
+        cardImageContainer.appendChild(createElement('img', null, {
             'class': 'cardImage',
             'src': data['images']['small']
         }))
@@ -1159,7 +1179,7 @@
             if (holo === true) {
                 const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
                 const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
-                container.appendChild(createElement('div', null, {
+                cardImageContainer.appendChild(createElement('div', null, {
                     'class': 'holo',
                     'style': `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`
                 }))
@@ -1314,6 +1334,41 @@
     }
 
     //CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS
+    function cardHover (card) {
+        card.classList.add('hoveredCard')
+        if (card.getElementsByClassName('cardHoverMenu')[0]) {
+            card.getElementsByClassName('cardHoverMenu')[0].remove()
+        }
+        while (card.getElementsByClassName('cardImageDuplicate')[0]) {
+            card.getElementsByClassName('cardImageDuplicate')[0].remove()
+        }
+        if (isDecklistLocked == false) {
+            if (card.getElementsByClassName('cardHoverMenu')[0]) {
+                card.getElementsByClassName('cardHoverMenu')[0].remove()
+            }
+            card.appendChild(createElement('div', null, {
+                'class': 'cardHoverMenu fadeIn'
+            }))
+            card.getElementsByClassName('cardHoverMenu')[0]
+        }
+    }
+
+    function cardUnhover (card) {
+        card.classList.remove('hoveredCard')
+        if (card.getElementsByClassName('cardHoverMenu')[0]) {
+            fadeOut(card.getElementsByClassName('cardHoverMenu')[0])
+        }
+        for (i=0; i<card.getElementsByClassName('cardImageDuplicate').length; i++) {
+            var cardImageDuplicate = card.getElementsByClassName('cardImageDuplicate')[i]
+            cardImageDuplicate.classList.add('removeCardImageDuplicate')
+            setTimeout(function () {
+                if (cardImageDuplicate) {
+                    cardImageDuplicate.remove()
+                }
+            }, 250)
+        }
+    }
+    
     function focusCard (card) {
         if (!isCardInView(card)) {
             card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
@@ -1714,77 +1769,8 @@
         }
     }
 
-    // function scrollSidebarCheck () {
-    //     var spacers = sidebarCards.getElementsByClassName('sidebarCardsSpacer')
-    //     var currentSpacer
-    //     var previousSpacer
-    //     var nextSpacer
-    //     for (i=0; i<spacers.length; i++) {
-    //         if (isCardInView(spacers[i]) && spacers[i].getAttribute('loaded') == 'false') {
-    //             currentSpacer = spacers[i]
-    //             if (spacers[i-1] && spacers[i-1].getAttribute('loaded') == 'true') {
-    //                 previousSpacer = spacers[i-1]
-    //             }
-    //             if (spacers[i+1] && spacers[i+1].getAttribute('loaded') == 'true') {
-    //                 nextSpacer = spacers[i+1]
-    //             }
-    //             break
-    //         }
-    //     }
-    //     if (currentSpacer) {
-    //         console.log('Loading Current')
-    //         //Load Current Spacer
-    //         if (!currentSpacer.nextElementSibling && loadingMoreCards == false && (sidebarCards.getAttribute('totalCardCount') > sidebarCards.getAttribute('page') * sidebarCards.getAttribute('pageSize'))) {
-    //             //fetch new cards
-    //             fetchNewSidebarCards(sidebarCards.getAttribute('url').split('page=')[0] + 'page=' + (Number(sidebarCards.getAttribute('page')) + 1))
-    //         }
-    //         else {
-    //             //load current spacer
-    //             currentSpacer.setAttribute('loaded', 'true')
-    //             var selectedElem = currentSpacer
-    //             while (selectedElem.previousElementSibling && !selectedElem.previousElementSibling.classList.contains('sidebarCardsSpacer')) {
-    //                 selectedElem = selectedElem.previousElementSibling
-    //                 selectedElem.setAttribute('style', 'visibility: visible')
-    //             }
-    //             selectedElem = currentSpacer
-    //             while (selectedElem.nextElementSibling && !selectedElem.nextElementSibling.classList.contains('sidebarCardsSpacer')) {
-    //                 selectedElem = selectedElem.nextElementSibling
-    //                 selectedElem.setAttribute('style', 'visibility: visible')
-    //             }
-    //         }
-    //         //Unload Previous Spacer
-    //         if (previousSpacer) {
-    //             console.log('Unloading Previous')
-    //             previousSpacer.setAttribute('loaded', 'false')
-    //             var selectedElem = previousSpacer
-    //             while (selectedElem.previousElementSibling && !selectedElem.previousElementSibling.classList.contains('sidebarCardsSpacer')) {
-    //                 selectedElem = selectedElem.previousElementSibling
-    //                 selectedElem.setAttribute('style', 'visibility: hidden')
-    //             }
-    //         }
-    //         //Unload Next Spacer
-    //         if (nextSpacer) {
-    //             console.log('Unloading Next')
-    //             nextSpacer.setAttribute('loaded', 'false')
-    //             var selectedElem = nextSpacer
-    //             while (selectedElem.nextElementSibling && !selectedElem.nextElementSibling.classList.contains('sidebarCardsSpacer')) {
-    //                 selectedElem = selectedElem.nextElementSibling
-    //                 selectedElem.setAttribute('style', 'visibility: hidden')
-    //             }
-    //         }
-    //     }
-    // }
-
     function sidebarCardHover (card) {
-        if (isDecklistLocked == true) {
-            return
-        }
-        if (card.getElementsByClassName('cardHoverMenu')[0]) {
-            card.getElementsByClassName('cardHoverMenu')[0].remove()
-        }
-        card.appendChild(createElement('div', null, {
-            'class': 'cardHoverMenu fadeIn'
-        }))
+        cardHover(card)
         hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
@@ -1822,7 +1808,7 @@
                     'class': 'card decklistCard fadeIn',
                     'onmouseenter': 'decklistCardHover(this)',
                     'ontouchstart': 'decklistCardHover(this)',
-                    'onmouseleave': 'cardUnhover(this)',
+                    // 'onmouseleave': 'cardUnhover(this)',
                     'draggable': 'true',
                     'ondragstart': 'if(isDecklistLocked == false) {this.setAttribute("style", "transform: scale(1); box-shadow: none")}',
                     'ondragend': 'if(isDecklistLocked == false) {drop(this, cardDropTarget); this.removeAttribute("style")}',
@@ -1847,61 +1833,30 @@
     }
 
     function decklistCardHover (card) {
-        while (card.getElementsByClassName('cardImageDuplicate')[0]) {
-            card.getElementsByClassName('cardImageDuplicate')[0].remove()
-        }
+        cardHover(card)
+        hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
+        hoverMenu.appendChild(createElement('input', null, {
+            'type': 'button',
+            'class': 'decklistCardHoverButtonAdd scaledbuttonObject',
+            'value': '＋',
+            'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, +1)}'
+        }))
+        hoverMenu.appendChild(createElement('input', null, {
+            'type': 'button',
+            'class': 'decklistCardHoverButtonRemove scaledbuttonObject',
+            'value': '－',
+            'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, -1)}'
+        }))
         var count = card.getAttribute('count')
         for (i=1; i<count; i++) {
-            var cardImage = card.getElementsByClassName('cardImage')[0].cloneNode(true)
-            cardImage.classList.add('cardImageDuplicate')
-            cardImage.setAttribute('style', `transform: translateX(${15*i/(count-1)}%) translateY(${-15*i/(count-1)}%)`)
-            card.prepend(cardImage)
+            var cardImageDuplicate = card.getElementsByClassName('cardImageContainer')[0].cloneNode(true)
+            cardImageDuplicate.classList.add('cardImageDuplicate')
+            cardImageDuplicate.setAttribute('style', `transform: translateX(${15*i/(count-1)}%) translateY(${-15*i/(count-1)}%)`)
+            card.prepend(cardImageDuplicate)
         }
-
-        if (isDecklistLocked == false) {
-            if (card.getElementsByClassName('cardHoverMenu')[0]) {
-                card.getElementsByClassName('cardHoverMenu')[0].remove()
-            }
-            card.appendChild(createElement('div', null, {
-                'class': 'cardHoverMenu fadeIn'
-            }))
-            hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
-            hoverMenu.appendChild(createElement('input', null, {
-                'type': 'button',
-                'class': 'decklistCardHoverButtonAdd scaledbuttonObject',
-                'value': '＋',
-                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, +1)}'
-            }))
-            hoverMenu.appendChild(createElement('input', null, {
-                'type': 'button',
-                'class': 'decklistCardHoverButtonRemove scaledbuttonObject',
-                'value': '－',
-                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, -1)}'
-            }))
-        }
-    }
-
-    // HERE
-    function cardUnhover (card) {
-        if (card.getElementsByClassName('cardHoverMenu')[0]) {
-            fadeOut(card.getElementsByClassName('cardHoverMenu')[0])
-        }
-        for (i=0; i<card.getElementsByClassName('cardImageDuplicate').length; i++) {
-            removeCardImageDuplicate(card.getElementsByClassName('cardImageDuplicate')[i])
-        }
-    }
-
-    function removeCardImageDuplicate (elem) {
-        elem.classList.add('removeCardImageDuplicate')
-        setTimeout(function () {
-            if (elem) {
-                elem.remove()
-            }
-        }, 250)
     }
 
     function modifyDecklistCardCount (card, value) {
-        // HERE
         if (card && card.getElementsByClassName('individualCardCount')[0].value) {
             var dataContainer = card.getElementsByClassName('data')[0]
             const individualCardCount = Number(card.getElementsByClassName('individualCardCount')[0].value)
@@ -1952,7 +1907,6 @@
             LOG_normal('Unlocked decklist')
         }
     }
-// HERE
     function importDecklistButtonHover (button) {
         button.innerHTML = ''
         button.appendChild(createElement('button', '📂', {
