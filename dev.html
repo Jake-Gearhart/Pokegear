@@ -6,7 +6,7 @@
     <body onresize='windowResize()'>
         <div id='title'>
             <img id='titleIcon' src='images/favicon.png'>
-            <h1 id='titleText'>Pokegear.app</h1>
+            <h1 id='titleText'>Pokegear.app 1.1.0 Beta</h1>
             <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
         </div>
         <button id='help' class='buttonObject decklistButton' title='Help' onclick='openHelpMenu()'>﹖</button>
@@ -88,7 +88,6 @@
         height: 100%;
         overflow: hidden;
         background-color: var(--lightBlue);
-        font-family: sans-serif;
         margin: 0;
         padding: 0;
         -webkit-touch-callout: none;
@@ -174,6 +173,7 @@
         position: absolute;
         font-size: calc(var(--cardHeight) / 12);
         bottom: calc(-1 * var(--cardHeight) / 12);
+        font-style: italic;
     }
     #titleIcon:hover {
         animation: iconBounce 1s ease-in-out infinite;
@@ -502,6 +502,7 @@
         margin: calc(var(--cardHeight) / 18);
         width: calc(var(--cardHeight) / 4.5); 
         height: calc(var(--cardHeight) / 4.5);
+        object-fit: contain
     }
     .card {
         position: relative;
@@ -526,19 +527,19 @@
         transition: transform 0.25s, z-index 0s, box-shadow 0.25s;
         box-shadow: 1em 1em 1em rgba(0, 0, 0, 0.6);
     }
+    .cardImageContainer {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        border-radius: inherit;
+    }
     .cardImage {
         width: 100%;
         height: 100%;
         left: 0;
         border-radius: inherit;
         position: absolute;
-        object-fit: inherit;
-        pointer-events: none;
-    }
-    .cardImageContainer {
-        position: absolute;
-        width: 100%;
-        height: 100%;
         pointer-events: none;
     }
     .cardImageDuplicate {
@@ -616,11 +617,13 @@
         left: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
     }
 
-    #focusedAdd {
+    .focusedButton {
         position: absolute;
-        left: 2.5%;
         font-size: calc(var(--cardHeight) * 1/3);
         cursor: pointer;
+    }
+    #focusedAdd {
+        left: 2.5%;
     }
     #focusedAdd.landscape {
         height: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
@@ -631,11 +634,21 @@
         width: calc(45% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
     }
 
+    #focusedCount {
+        left: 2.5%;
+        bottom: 0;
+    }
+    #focusedCount.landscape {
+        height: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+        width: calc(45% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+    }
+    #focusedCount.portrait {
+        height: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+        width: calc(45% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+    }
+
     #focusedDownload {
-        position: absolute;
         right: 2.5%;
-        font-size: calc(var(--cardHeight) * 1/3);
-        cursor: pointer;
     }
     #focusedDownload.landscape {
         height: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
@@ -646,13 +659,23 @@
         width: calc(45% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
     }
 
+    #focusedSet {
+        right: 2.5%;
+        bottom: 0;
+    }
+    #focusedSet.landscape {
+        height: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+        width: calc(45% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
+    }
+    #focusedSet.portrait {
+        height: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+        width: calc(45% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
+    }
+
     #focusedLeft {
-        position: absolute;
         height: 50%;
         top: 25%;
         left: 2.5%;
-        font-size: calc(var(--cardHeight) * 1/3);
-        cursor: pointer;
     }
     #focusedLeft.landscape {
         width: calc(45% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
@@ -662,12 +685,9 @@
     }
 
     #focusedRight {
-        position: absolute;
         height: 50%;
         top: 25%;
         right: 2.5%;
-        font-size: calc(var(--cardHeight) * 1/3);
-        cursor: pointer;
     }
     #focusedRight.landscape {
         width: calc(45% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
@@ -676,23 +696,36 @@
         width: calc(45% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
     }
 
-    #focusedPrice.landscape {
-        position: absolute;
+    .focusedSides {
+        background-color: initial;
+        font-size: calc(var(--cardHeight) / 6);
+    }
+    .focusedSides.landscape {
         height: 90vh;
         width: calc(45% - min(60vw, 90vh) / 2);
         top: 5vh;
+    }
+    .focusedSides.portrait {
+        height: calc(45% - min(100vw, 60vh) / 2);
+        width: 95vw;
+    }
+
+    #focusedPrice {
         left: 2.5vw;
     }
     #focusedPrice.portrait {
-        position: absolute;
-        height: calc(45% - min(100vw, 60vh) / 2);
-        width: 90vw;
         top: 2.5vh;
-        left: 5vw;
     }
     #focusedPrice>p {
         margin: 0;
         padding: 0;
+    }
+
+    #focusedAlts {
+        right: 2.5vw;
+    }
+    #focusedAlts.portrait {
+        bottom: 2.5vh;
     }
 
     #toggleShine {
@@ -726,7 +759,7 @@
     .fadeOut {
         animation: fadeOut 0.25s;
         animation-fill-mode: forwards;
-        pointer-events: none;
+        pointer-events: none !important;
     }
     @keyframes fadeIn {from {opacity: 0} to {opacity: 1}}
     @keyframes fadeOut {from {opacity: 1} to {opacity: 0}}
@@ -1075,18 +1108,31 @@
                 elem.classList.add('landscape') 
             }
         }
-
         return elem
+    }
+
+    var elementsToRemove = {}
+    function removeElement (elem, time) {
+        if (elementsToRemove[time]) {
+            elementsToRemove[time].push(elem)
+        }
+        else {
+            elementsToRemove[time] = [elem]
+        }
+        setTimeout(function () {
+            if (elementsToRemove[time][0]) {
+                elementsToRemove[time][0].remove()
+            }
+            elementsToRemove[time].splice(0, 1)
+            if (elementsToRemove[time].length == 0) {
+                delete elementsToRemove[time]
+            }
+        }, time)
     }
 
     function fadeOut (elem) {
         elem.classList.add('fadeOut')
-        elem.setAttribute('style', 'pointer-events: none')
-        setTimeout(function () {
-            if (elem) {
-                elem.remove()
-            }
-        }, 250)
+        removeElement(elem, 250)
     }
 
     function loadingAlertStart (url) {
@@ -1150,8 +1196,7 @@
             'oncontextmenu': 'event.preventDefault(); focusCard(this)',
             'onclick': 'if(event.target === this) {focusCard(this)}',
             'onmouseenter': 'sidebarCardHover(this)',
-            'ontouchstart': 'sidebarCardHover(this)',
-            // 'onmouseleave': 'cardUnhover(this)'
+            'ontouchstart': 'sidebarCardHover(this)'
         })
 
         var cardImageContainer = container.appendChild(createElement('div', null, {
@@ -1257,15 +1302,15 @@
         })
         .then(response => response.blob())
         .then(blob => {
-            let blobUrl = window.URL.createObjectURL(blob)
-            var elem = document.createElement('a')
-            elem.download = filename
-            elem.href = blobUrl
-            document.body.appendChild(a)
-            elem.click()
-            elem.remove()
+            let blobUrl = window.URL.createObjectURL(blob);
+            var temp = document.createElement('a');
+            temp.download = filename;
+            temp.href = blobUrl;
+            document.body.appendChild(temp);
+            temp.click();
+            temp.remove();
         })
-        .catch(e => LOG_error(e));
+        .catch(error => console.error(error));
     }
 
     //HELP MENU
@@ -1360,12 +1405,9 @@
         }
         for (i=0; i<card.getElementsByClassName('cardImageDuplicate').length; i++) {
             var cardImageDuplicate = card.getElementsByClassName('cardImageDuplicate')[i]
+            // HERERE
             cardImageDuplicate.classList.add('removeCardImageDuplicate')
-            setTimeout(function () {
-                if (cardImageDuplicate) {
-                    cardImageDuplicate.remove()
-                }
-            }, 250)
+            removeElement(cardImageDuplicate, 250)
         }
     }
     
@@ -1386,7 +1428,12 @@
             focusedPrice.innerHTML = 'No Prices Available'
             focusedPrice.setAttribute('onclick', null)
 
+            focusedAlts = document.getElementById('focusedAlts')
+
+            focusedAdd = document.getElementById('focusedAdd')
+            focusedCount = document.getElementById('focusedCount')
             focusedDownload = document.getElementById('focusedDownload')
+            focusedSet = document.getElementById('focusedSet')
             leftButton = document.getElementById('focusedLeft')
             rightButton = document.getElementById('focusedRight')
             focusedCenter.getElementsByClassName('focusedCard')[0].remove()
@@ -1401,41 +1448,47 @@
                 'id': 'focusedCenter',
                 'class': 'orientable'
             }))
-            focusedAdd = focusedCenter.appendChild(createElement('input', null, {
+            focusedAdd = focusedCenter.appendChild(createElement('button', '+', {
                 'id': 'focusedAdd',
-                'class': 'fadeIn buttonObject orientable',
+                'class': 'fadeIn buttonObject focusedButton orientable',
                 'title': 'Add Card To Deck',
-                'type': 'submit',
                 'onclick': "if(isDecklistLocked == false) {addDecklistCard(cloneCard(document.getElementsByClassName('focusedCard')[0], {'style': '', 'image': JSON.parse(document.getElementsByClassName('focusedCard')[0].getElementsByClassName('data')[0].getAttribute('images'))['small']}), +1)}",
-                'value': '+'
             }))
-            focusedDownload = focusedCenter.appendChild(createElement('input', null, {
+            focusedCount = focusedCenter.appendChild(createElement('button', 0, {
+                'id': 'focusedCount',
+                'class': 'fadeIn buttonObject focusedButton orientable',
+                'title': 'Amount in Deck'
+            }))
+            focusedDownload = focusedCenter.appendChild(createElement('button', '↧', {
                 'id': 'focusedDownload',
-                'class': 'fadeIn buttonObject orientable',
-                'title': 'Download Image',
-                'type': 'submit',
-                'value': '↧'
+                'class': 'fadeIn buttonObject focusedButton orientable',
+                'title': 'Download Image'
             }))
-            leftButton = focusedCenter.appendChild(createElement('input', null, {
+            focusedSet = focusedCenter.appendChild(createElement('button', null, {
+                'id': 'focusedSet',
+                'class': 'fadeIn buttonObject focusedButton orientable'
+            }))
+            leftButton = focusedCenter.appendChild(createElement('button', '❮', {
                 'id': 'focusedLeft',
-                'class': 'buttonObject orientable',
-                'type': 'button',
-                'title': 'See Next Card',
-                'value': '❮',
+                'class': 'buttonObject focusedButton orientable',
+                'title': 'Next Card',
                 'onclick': 'event.preventDefault(); cycleFocused("left")'
             }))
-            rightButton = focusedCenter.appendChild(createElement('input', null, {
+            rightButton = focusedCenter.appendChild(createElement('button', '❯', {
                 'id': 'focusedRight',
-                'class': 'buttonObject orientable',
-                'title': 'See Previous Card',
-                'type': 'button',
-                'value': '❯',
+                'class': 'buttonObject focusedButton orientable',
+                'title': 'Previous Card',
                 'onclick': 'cycleFocused("right")'
             }))
             focusedPrice = focused.appendChild(createElement('button', 'No Prices Available', {
                 'id': 'focusedPrice',
-                'class': 'buttonObject orientable',
+                'class': 'buttonObject focusedButton focusedSides orientable',
                 'title': 'Open Card In TCGPlayer'
+            }))
+            focusedAlts = focused.appendChild(createElement('button', 'Cards With Same Name', {
+                'id': 'focusedAlts',
+                'class': 'buttonObject focusedButton focusedSides orientable',
+                'title': 'Cards With Same Name'
             }))
         }
 
@@ -1469,6 +1522,13 @@
         if (dataContainer.getAttribute('subtypes') && (dataContainer.getAttribute('subtypes').includes('BREAK') || dataContainer.getAttribute('subtypes').includes('LEGEND'))) {
             rotation = 90
         }
+
+        focusedSet.title = JSON.parse(dataContainer.getAttribute('set'))['name']
+        focusedSet.innerHTML = ''
+        focusedSet.appendChild(createElement('img', null, {
+            'src': JSON.parse(dataContainer.getAttribute('set'))['images']['symbol'],
+            'style': 'height: 75%; width: 75%; object-fit: contain'
+        }))
 
         focusedCenter.prepend(cloneCard(card, {
                 'style': `transform: rotate(${rotation}deg);`,
@@ -1771,13 +1831,15 @@
 
     function sidebarCardHover (card) {
         cardHover(card)
-        hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
-        hoverMenu.appendChild(createElement('input', null, {
-            'type': 'button',
-            'class': 'sidebarCardHoverButton buttonObject',
-            'value': '＋',
-            'onclick': 'addDecklistCard(this.parentNode.parentNode, +1)'
-        }))
+        var hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
+        if (hoverMenu) {
+            hoverMenu.appendChild(createElement('input', null, {
+                'type': 'button',
+                'class': 'sidebarCardHoverButton buttonObject',
+                'value': '＋',
+                'onclick': 'addDecklistCard(this.parentNode.parentNode, +1)'
+            }))
+        }
     }
 
     //DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST
@@ -1808,7 +1870,6 @@
                     'class': 'card decklistCard fadeIn',
                     'onmouseenter': 'decklistCardHover(this)',
                     'ontouchstart': 'decklistCardHover(this)',
-                    // 'onmouseleave': 'cardUnhover(this)',
                     'draggable': 'true',
                     'ondragstart': 'if(isDecklistLocked == false) {this.setAttribute("style", "transform: scale(1); box-shadow: none")}',
                     'ondragend': 'if(isDecklistLocked == false) {drop(this, cardDropTarget); this.removeAttribute("style")}',
@@ -1834,19 +1895,21 @@
 
     function decklistCardHover (card) {
         cardHover(card)
-        hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
-        hoverMenu.appendChild(createElement('input', null, {
-            'type': 'button',
-            'class': 'decklistCardHoverButtonAdd scaledbuttonObject',
-            'value': '＋',
-            'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, +1)}'
-        }))
-        hoverMenu.appendChild(createElement('input', null, {
-            'type': 'button',
-            'class': 'decklistCardHoverButtonRemove scaledbuttonObject',
-            'value': '－',
-            'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, -1)}'
-        }))
+        var hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
+        if (hoverMenu) {
+            hoverMenu.appendChild(createElement('input', null, {
+                'type': 'button',
+                'class': 'decklistCardHoverButtonAdd scaledbuttonObject',
+                'value': '＋',
+                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, +1)}'
+            }))
+            hoverMenu.appendChild(createElement('input', null, {
+                'type': 'button',
+                'class': 'decklistCardHoverButtonRemove scaledbuttonObject',
+                'value': '－',
+                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, -1)}'
+            }))
+        }
         var count = card.getAttribute('count')
         for (i=1; i<count; i++) {
             var cardImageDuplicate = card.getElementsByClassName('cardImageContainer')[0].cloneNode(true)
