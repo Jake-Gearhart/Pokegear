@@ -943,7 +943,7 @@
                     'id': 'types:' + types[i].toLocaleLowerCase(),
                     'class': 'parameterButtonDiv',
                     'title': types[i],
-                    'onclick': 'selectButton(this, true, [])'
+                    'onclick': 'clickParameterButton(this, true, [])'
                 })
             ).appendChild(
                 createElement('img', null, {
@@ -985,7 +985,7 @@
                     'id': 'set.id:' + set['id'],
                     'class': 'parameterButtonDiv',
                     'title': set['name'],
-                    'onclick': 'selectButton(this, true, [])'
+                    'onclick': 'clickParameterButton(this, true, [])'
                 })
             ).appendChild(
                 createElement('img', null, {
@@ -1009,7 +1009,7 @@
                     'id': 'legalities.' + legalities[i].toLowerCase() + ':legal',
                     'class': 'parameterButtonDiv',
                     'title': legalities[i],
-                    'onclick': 'selectButton(this, true, [])'
+                    'onclick': 'clickParameterButton(this, true, [])'
                 })
             ).appendChild(
                 createElement('img', null, {
@@ -1032,7 +1032,7 @@
                     'id': key,
                     'class': 'parameterButtonDiv fadeIn',
                     'title': key,
-                    'onclick': `selectButton(this, true, ['${combinationButton['sets'].join("','")}'])`
+                    'onclick': `clickParameterButton(this, true, ['${combinationButton['sets'].join("','")}'])`
                 }))
             newButton.appendChild(
                 createElement('img', null, {
@@ -1586,12 +1586,11 @@
 
         focusedSet.title = JSON.parse(dataContainer.getAttribute('set'))['name']
         focusedSet.innerHTML = ''
-        focusedSet.setAttribute('query', 'set.id:' + JSON.parse(dataContainer.getAttribute('set'))['id'])
         focusedSet.appendChild(createElement('img', null, {
             'src': JSON.parse(dataContainer.getAttribute('set'))['images']['symbol'],
             'style': 'height: 75%; width: 75%; object-fit: contain'
         }))
-        focusedSet.setAttribute('onclick', `selectButton(document.getElementById('set.id:' + ${JSON.parse(dataContainer.getAttribute('set'))['id']}), true, [])`)
+        focusedSet.setAttribute('onclick', `clickParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true, [])`)
 
         focusedCenter.prepend(cloneCard(card, {
                 'style': `transform: rotate(${rotation}deg);`,
@@ -1701,42 +1700,28 @@
         }
     }
 
-    function selectButton (elem, initiateSearch, group) {
-        elem.classList.add('parameterButtonDivSelected')
-        var focusedSet = document.getElementById('focusedSet')
-        if (focusedSet && focusedSet.getAttribute('query') == elem.id) {
-            focusedSet.setAttribute('onclick', `deselectButton(document.getElementByID('${elem.id}'), true, [])`)
-        }
-        if (group.length < 1) {
-            elem.setAttribute('onclick', 'deselectButton(this, true, [])')
-            elem.classList.add('selectedButton')
+    function clickParameterButton (elem, initiateSearch, group) {
+        var activating
+        if (!elem.classList.contains('parameterButtonDivSelected')) {
+            elem.classList.add('parameterButtonDivSelected')
+            activating = true
         }
         else {
-            for (i=0; i<group.length; i++) {
-                elem.setAttribute('onclick', `deselectButton(this, true, ["${group.join('", "')}"])`)
-                selectButton(document.getElementById(group[i]), false, []);
+            elem.classList.remove('parameterButtonDivSelected')
+            activating = false
+        }
+
+        if (group.length < 1) {
+            if (activating == true) {
+                elem.classList.add('selectedButton')
+            }
+            else {
+                elem.classList.remove('selectedButton')
             }
         }
-        if (initiateSearch == true) {
-            constructSearchUrl()
-        }
-    }
-
-    function deselectButton (elem, initiateSearch, group) {
-        elem.classList.remove('parameterButtonDivSelected')
-        console.log('DESELECTING')
-        var focusedSet = document.getElementById('focusedSet')
-        if (focusedSet && focusedSet.getAttribute('query') == elem.id) {
-            focusedSet.setAttribute('onclick', `selectButton(document.getElementByID('${elem.id}'), true, [])`)
-        }
-        if (group.length < 1) {
-            elem.setAttribute('onclick', 'selectButton(this, true, [])')
-            elem.classList.remove('selectedButton')
-        }
         else {
             for (i=0; i<group.length; i++) {
-                elem.setAttribute('onclick', `selectButton(this, true, ["${group.join('", "')}"])`)
-                deselectButton(document.getElementById(group[i]), false, []);
+                clickParameterButton(document.getElementById(group[i]), false, []);
             }
         }
         if (initiateSearch == true) {
