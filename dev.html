@@ -1,5 +1,6 @@
 <head>
     <link rel="shortcut icon" type="image/png" href='images/favicon.png'>
+    <title>Pokégear</title>
     <meta charset="utf-8">
 </head>
 <html>
@@ -7,29 +8,26 @@
         <div id='title'>
             <img id='titleIcon' src='images/favicon.png'>
             <h1 id='titleText'>Pokegear.app 1.1.0 Beta</h1>
+            <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
         </div>
-        <button id='help' class='buttonObject decklistButton' title='Help' onclick='openHelpMenu()'>﹖</button>
-        <button id='settings' class='buttonObject decklistButton' title='Settings' onclick='openSettings()'>⚙</button>
-        <button id='lockDecklist' class='buttonObject decklistButton' title='Disable Editing' onclick='lockDecklist(this)'>🔓</button>
-        <button id='importDecklist' class='buttonObject decklistButton' onmouseenter='importDecklistButtonHover(this)' onmouseleave='this.innerHTML = "↥"'>↥</button>
-        <button id='exportDecklist' class='buttonObject decklistButton' onmouseenter='exportDecklistButtonHover(this)' onmouseleave='this.innerHTML = "↧"'>↧</button>
-        <button id='sortDecklist' class='buttonObject decklistButton' title='Sort Decklist' onclick='sortDecklist()'>⟳</button>
+        <button id='help' class='buttonObject deckButton' title='Help' onclick='openHelpMenu()'>﹖</button>
+        <button id='settings' class='buttonObject deckButton' title='Settings' onclick='openSettings()'>⚙</button>
+        <button id='lockDeck' class='buttonObject deckButton' title='Disable Editing' onclick='lockDeck(this)'>🔓</button>
+        <button id='importDeck' class='buttonObject deckButton' onmouseenter='importButtonHover(this)' onmouseleave='this.innerHTML = "↥"'>↥</button>
+        <button id='exportDeck' class='buttonObject deckButton' onmouseenter='exportButtonHover(this)' onmouseleave='this.innerHTML = "↧"'>↧</button>
+        <button id='sortDeck' class='buttonObject deckButton' title='Sort Deck' onclick='sortDeck()'>⟳</button>
         <div id='scaleSliderContainer'>
-            <input id='scaleSlider' class='' title='Zoom Decklist' type='range' oninput='changeCardScale(this.value)' min='-1' value='0' max='1' step='0.000000000000000001'></input>
+            <input id='scaleSlider' class='' title='Zoom Deck' type='range' oninput='changeCardScale(this.value)' min='-1' value='0' max='1' step='0.000000000000000001'></input>
         </div>
-        <button id='deleteDecklist' class='buttonObject decklistButton' title='Delete Decklist' onclick='deleteDecklist()'>🗑</button>
-        <div id='decklist' ontouchstart='fullScreenSidebar(false)'>
-            <input id='decklistCardCount' class='buttonObject' type='button' value='0'>
-            <div id='decklistCards'></div>
+        <button id='deleteDeck' class='buttonObject deckButton' onmouseenter='deleteButtonHover(this)' onmouseleave='this.innerHTML = "🗑"'>🗑</button>
+        <div id='deck' ontouchstart='fullScreenSidebar(false)'>
+            <input id='deckCardCount' class='buttonObject' type='button' value='0'>
+            <div id='deckCards'></div>
         </div>
         <div id='sidebar' ontouchstart='fullScreenSidebar(true)'>
             <img id='loadingGif' src='images/loading.gif'>
             <input id='sidebarArrow' title='Click to Expand' type='button' value='❯' onclick='fullScreenSidebar(true)'>
-            <div id='sidebarCards' onscroll='scrollSidebarCheck()' url='' page='0' pageSize='0' totalCardCount='0'>
-                <br class='helpText'>
-                <br class='helpText'>
-                <p class='helpText'>You can search for cards to add to your decklist using this sidebar. Expand it to full screen by clicking on the arrow. Search for cards by using the buttons at the bottom or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. Click any card to view it in fullscreen. Once a card is in the decklist, you can move it around by dragging it.</p>
-            </div>
+            <div id='sidebarCards' onscroll='scrollSidebarCheck()' url='' page='0' pageSize='0' totalCardCount='0'></div>
             <div id='parameterButtons'></div>
             <div class='searchParameter'>
                 <input class='searchType buttonObject' type='button' value='Name' searchType='["name"]'>
@@ -96,6 +94,9 @@
         -ms-user-select: none;
         user-select: none;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+    a {
+        pointer-events: all
     }
     input {
         text-align: center;
@@ -185,7 +186,7 @@
             transform: translateY(calc(-1 * var(--cardHeight) / 18));
         }
     }
-    .decklistButton {
+    .deckButton {
         z-index: 1000;
         position: absolute;
         right: calc(var(--cardHeight) / 12);
@@ -199,21 +200,38 @@
         top: calc(var(--cardHeight) * 1/12);
         right: calc(var(--cardHeight) / 2);
     }
+    #helpMenuTitle {
+        padding: 10% 10% 0 10%;
+        text-align: center;
+        color: lightgray;
+        pointer-events: none;
+    }
+    #helpMenuSubtitle {
+        padding: 0% 10% 0 10%;
+        text-align: center;
+        color: lightgray;
+        pointer-events: none;
+    }
+    #helpMenuText {
+        padding: 0 10% 0 10%;
+        color: lightgray;
+        pointer-events: none;
+    }
     #settings {
         top: calc(var(--cardHeight) * 1/12);
     }
-    #lockDecklist {
+    #lockDeck {
         top: calc(var(--cardHeight) * 6/12);
     }
-    #importDecklist {
+    #importDeck {
         top: calc(var(--cardHeight) * 11/12);
         transition: background-color 0.25s, width 0.25s;
         cursor: default;
     }
-    #importDecklist:hover {
+    #importDeck:hover {
         width: calc(var(--cardHeight) * 3/4);
     }
-    .decklistSubButton {
+    .deckSubButton {
         background-color: rgba(0,0,0,0);
         border: none;
         width: 50%;
@@ -223,18 +241,18 @@
         cursor: pointer;
         transition: text-shadow 0.25s;
     }
-    .decklistSubButton:hover {
+    .deckSubButton:hover {
         text-shadow: 0px 0px 8px var(--lightBlue);
     }
-    #exportDecklist {
+    #exportDeck {
         top: calc(var(--cardHeight) * 16/12);
         transition: background-color 0.25s, width 0.25s;
         cursor: default;
     }
-    #exportDecklist:hover {
+    #exportDeck:hover {
         width: calc(var(--cardHeight) * 3/4);
     }
-    #sortDecklist {
+    #sortDeck {
         top: calc(var(--cardHeight) * 21/12);
     }
     #scaleSliderContainer {
@@ -277,12 +295,17 @@
         border-radius: calc(var(--cardHeight) / 9);
         cursor: pointer;
     }
-    #deleteDecklist {
+    #deleteDeck {
         bottom: calc(var(--cardHeight) * 1/12);
+        transition: background-color 0.25s, width 0.25s;
+        cursor: default;
+    }
+    #deleteDeck:hover {
+        width: calc(var(--cardHeight) * 3/4);
     }
     /* right side items */
 
-    #decklistCardCount {
+    #deckCardCount {
         z-index: 500;
         position: fixed;
         width: calc(var(--cardHeight) / 2);
@@ -302,7 +325,7 @@
         border: calc(var(--scaledCardHeight) / 48) solid var(--darkBlue30);
         pointer-events: none;
     }
-    #decklist {
+    #deck {
         position: absolute;
         text-align: center;
         justify-content: center;
@@ -323,7 +346,7 @@
         height: 100%;
         pointer-events: none;
     }
-    .decklistCardHoverButtonAdd {
+    .deckCardHoverButtonAdd {
         position: absolute;
         height: calc(var(--scaledCardHeight) / 4);
         width: calc(var(--scaledCardHeight) / 4);
@@ -339,7 +362,7 @@
         cursor: pointer;
         pointer-events: all;
     }
-    .decklistCardHoverButtonRemove {
+    .deckCardHoverButtonRemove {
         position: absolute;
         height: calc(var(--scaledCardHeight) / 4);
         width: calc(var(--scaledCardHeight) / 4);
@@ -515,7 +538,7 @@
         background-size: 100% 100%;
         margin: calc(var(--cardSpacing) / 2);
     }
-    .decklistCard {
+    .deckCard {
         width: var(--scaledCardWidth);
         height: var(--scaledCardHeight);
         border-radius: calc(0.15cm * var(--cardScale));
@@ -811,10 +834,10 @@
     const parameterButtonsDiv = document.getElementById('parameterButtons')
     var checkparameterButtonsHover
 
-    //decklist
-    const decklistCards = document.getElementById('decklistCards')
-    const decklistCardCount = document.getElementById('decklistCardCount')
-    var isDecklistLocked = false
+    //deck
+    const deckCards = document.getElementById('deckCards')
+    const deckCardCount = document.getElementById('deckCardCount')
+    var isDeckLocked = false
 
     //focused card
     var currentFocused
@@ -836,7 +859,7 @@
     //loading queue
     var loadingQueue = 0
 
-    //import decklist variables
+    //import deck variables
     var basicEnergies = {
         'grass': ['evo', '91'],
         'fire': ['evo', '92'],
@@ -854,8 +877,11 @@
         'wbsp': 'basep',
         'bs2': 'base4',
         'exp': 'ecard1',
+        'e1': 'ecard1',
         'aqp': 'ecard2',
+        'e2': 'ecard2',
         'skr': 'ecard3',
+        'e3': 'ecard3',
         'p1': 'pop1',
         'p2': 'pop2',
         'p3': 'pop3',
@@ -865,6 +891,12 @@
         'p7': 'pop7',
         'p8': 'pop8',
         'p9': 'pop9'
+    }
+
+    var ptcgoCodeTranslations = {
+        'EX': 'EXP',
+        'AQ': 'AQP',
+        'SK': 'SKR'
     }
 
     //add event listeners
@@ -1115,6 +1147,14 @@
         return elem
     }
 
+    function darkenScreen () {
+        return document.body.appendChild(createElement('div', null, {
+                    'id': 'focused',
+                    'class': 'fadeIn',
+                    'onclick': 'if(event.target === this) {animateRemoveElement(this, "fadeOut"); currentFocused = null}'
+                }))
+    }
+
     var elementsToRemove = {}
     function removeElement (elem, time) {
         if (elementsToRemove[time]) {
@@ -1319,16 +1359,30 @@
 
     //HELP MENU
     function openHelpMenu () {
-        alert('OPEN HELP MENU')
+        var helpMenu = darkenScreen()
+        helpMenu.appendChild(createElement('h1', 'Welcome to Pokegear.app!', {
+            'id': 'helpMenuTitle'
+        }))
+        helpMenu.appendChild(createElement('h3', 'Designed by <a href="https://twitter.com/jakekgearhart">Jake Gearhart</a>', {
+            'id': 'helpMenuSubtitle'
+        }))
+        helpMenu.appendChild(createElement('p', 'The comprehensive deck builder and viewer for the Pokémon Trading Card Game based on the <a href="https://pokemontcg.io">pokemontcg.io</a> API.', {
+            'id': 'helpMenuText'
+        }))
+        helpMenu.appendChild(createElement('p', 'You can search for cards to add to your deck using the sidebar found to the left of the screen. Hover over the blue tab with the arrow to open it. Expand it to full screen by clicking on the arrow. Search for cards by using the buttons at the bottom or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. Click any card to view it in fullscreen. Once a card is in the deck, you can move it around by dragging it.', {
+            'id': 'helpMenuText'
+        }))
+        helpMenu.appendChild(createElement('p', 'You can import or export decks from your clipboard or browser\'s local storage using the ↥/↧ buttons to the right of the screen. The 🔓 button allows you to prevent changes to the deck as well as hides the +/- buttons when hovering over cards (best for recording a video on your decks). You can automatically sort the deck with the ⟳ button, or drag cards in the deck to sort it yourself. The slider allows you to enlarge or shrink the visual size of cards in the deck. Remove all cards in the deck or delete a save deck by using the 🗑 button.', {
+            'id': 'helpMenuText'
+        }))
+        helpMenu.appendChild(createElement('p', 'Clicking the ✦ in the ⚙ (settings) menu will disable the holo effect on cards. Clicking 🗒 ↧ will export the log of actions for this session.', {
+            'id': 'helpMenuText'
+        }))
     }
 
     //SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS
     function openSettings () {
-        var settingsMenu = document.body.appendChild(createElement('div', null, {
-            'id': 'focused',
-            'class': 'fadeIn',
-            'onclick': 'if(event.target === this) {animateRemoveElement(this, "fadeOut"); currentFocused = null}'
-        }))
+        var settingsMenu = darkenScreen()
         var toggleShine = settingsMenu.appendChild(createElement('input', null, {
             'id': 'toggleShine',
             'class': 'fadeIn buttonObject',
@@ -1336,6 +1390,7 @@
             'type': 'submit',
             'onclick': 'toggleShine()'
         }))
+        toggleShine.appendChild(createElement('p', 'TESTING', null))
         const holoEnabled = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoEnabled'))
         if (holoEnabled == 0) {
             toggleShine['value'] = '✧'
@@ -1391,7 +1446,7 @@
         while (card.getElementsByClassName('cardImageDuplicate')[0]) {
             card.getElementsByClassName('cardImageDuplicate')[0].remove()
         }
-        if (isDecklistLocked == false) {
+        if (isDeckLocked == false) {
             if (card.getElementsByClassName('cardHoverMenu')[0]) {
                 card.getElementsByClassName('cardHoverMenu')[0].remove()
             }
@@ -1409,7 +1464,6 @@
         }
         for (i=0; i<card.getElementsByClassName('cardImageDuplicate').length; i++) {
             var cardImageDuplicate = card.getElementsByClassName('cardImageDuplicate')[i]
-            // HERERE
             animateRemoveElement(cardImageDuplicate, 'removeCardImageDuplicate')
         }
     }
@@ -1431,7 +1485,7 @@
             focusedPrice.innerHTML = 'No Prices Available'
             focusedPrice.setAttribute('onclick', null)
 
-            focusedAlts = document.getElementById('focusedAlts')
+            // focusedAlts = document.getElementById('focusedAlts')
 
             focusedAdd = document.getElementById('focusedAdd')
             focusedCount = document.getElementById('focusedCount')
@@ -1442,11 +1496,7 @@
             focusedCenter.getElementsByClassName('focusedCard')[0].remove()
         }
         else {
-            focused = document.body.appendChild(createElement('div', null, {
-                    'id': 'focused',
-                    'class': 'fadeIn',
-                    'onclick': 'if(event.target === this) {animateRemoveElement(this, "fadeOut"); currentFocused = null}'
-            }))
+            focused = darkenScreen()
             focusedCenter = focused.appendChild(createElement('div', null, {
                 'id': 'focusedCenter',
                 'class': 'orientable'
@@ -1455,7 +1505,7 @@
                 'id': 'focusedAdd',
                 'class': 'fadeIn buttonObject focusedButton orientable',
                 'title': 'Add Card To Deck',
-                'onclick': "if(isDecklistLocked == false) {addDecklistCard(cloneCard(document.getElementsByClassName('focusedCard')[0], {'style': '', 'image': JSON.parse(document.getElementsByClassName('focusedCard')[0].getElementsByClassName('data')[0].getAttribute('images'))['small']}), +1)}",
+                'onclick': "if(isDeckLocked == false) {addDeckCard(cloneCard(document.getElementsByClassName('focusedCard')[0], {'style': '', 'image': JSON.parse(document.getElementsByClassName('focusedCard')[0].getElementsByClassName('data')[0].getAttribute('images'))['small']}), +1)}",
             }))
             focusedCount = focusedCenter.appendChild(createElement('button', 0, {
                 'id': 'focusedCount',
@@ -1488,15 +1538,15 @@
                 'class': 'buttonObject focusedButton focusedSides orientable',
                 'title': 'Open Card In TCGPlayer'
             }))
-            focusedAlts = focused.appendChild(createElement('button', 'Cards With Same Name', {
-                'id': 'focusedAlts',
-                'class': 'buttonObject focusedButton focusedSides orientable',
-                'title': 'Cards With Same Name'
-            }))
+            // focusedAlts = focused.appendChild(createElement('button', 'Cards With Same Name', {
+            //     'id': 'focusedAlts',
+            //     'class': 'buttonObject focusedButton focusedSides orientable',
+            //     'title': 'Cards With Same Name'
+            // }))
         }
 
         //add button
-        if (isDecklistLocked == false) {
+        if (isDeckLocked == false) {
             focusedAdd.setAttribute('style', 'cursor: pointer')
         }
         else {
@@ -1520,8 +1570,8 @@
         }
 
         //count
-        if (decklistCards.querySelector(`#${card['id']}`)) {
-            focusedCount.innerHTML = decklistCards.querySelector(`#${card['id']}`).getAttribute('count')
+        if (deckCards.querySelector(`#${card['id']}`)) {
+            focusedCount.innerHTML = deckCards.querySelector(`#${card['id']}`).getAttribute('count')
         }
         else {
             focusedCount.innerHTML = 0
@@ -1534,7 +1584,6 @@
             rotation = 90
         }
 
-        // HERE HERE HERE HERE
         focusedSet.title = JSON.parse(dataContainer.getAttribute('set'))['name']
         focusedSet.innerHTML = ''
         focusedSet.setAttribute('query', 'set.id:' + JSON.parse(dataContainer.getAttribute('set'))['id'])
@@ -1656,7 +1705,6 @@
         elem.classList.add('parameterButtonDivSelected')
         var focusedSet = document.getElementById('focusedSet')
         if (focusedSet && focusedSet.getAttribute('query') == elem.id) {
-            // HERE HERE HERE HERE
             focusedSet.setAttribute('onclick', `deselectButton(document.getElementByID('${elem.id}'), true, [])`)
         }
         if (group.length < 1) {
@@ -1679,7 +1727,6 @@
         console.log('DESELECTING')
         var focusedSet = document.getElementById('focusedSet')
         if (focusedSet && focusedSet.getAttribute('query') == elem.id) {
-            // HERE HERE HERE HERE
             focusedSet.setAttribute('onclick', `selectButton(document.getElementByID('${elem.id}'), true, [])`)
         }
         if (group.length < 1) {
@@ -1862,7 +1909,7 @@
                 'type': 'button',
                 'class': 'sidebarCardHoverButton buttonObject',
                 'value': '＋',
-                'onclick': 'addDecklistCard(this.parentNode.parentNode, +1)'
+                'onclick': 'addDeckCard(this.parentNode.parentNode, +1)'
             }))
         }
     }
@@ -1884,21 +1931,21 @@
         }
     }
 
-    function addDecklistCard(card, count) {
-        //if card exists in decklist
-        if (decklistCards.querySelector(`#${card['id']}`)) {
-            modifyDecklistCardCount(decklistCards.querySelector(`#${card['id']}`), count)
+    function addDeckCard(card, count) {
+        //if card exists in deck
+        if (deckCards.querySelector(`#${card['id']}`)) {
+            modifyDeckCardCount(deckCards.querySelector(`#${card['id']}`), count)
         }
-        //if card does not exist in decklist
+        //if card does not exist in deck
         else {
             newCard = cloneCard(card, {
-                    'class': 'card decklistCard fadeIn',
-                    'onmouseenter': 'decklistCardHover(this)',
-                    'ontouchstart': 'decklistCardHover(this)',
+                    'class': 'card deckCard fadeIn',
+                    'onmouseenter': 'deckCardHover(this)',
+                    'ontouchstart': 'deckCardHover(this)',
                     'draggable': 'true',
-                    'ondragstart': 'if(isDecklistLocked == false) {this.setAttribute("style", "transform: scale(1); box-shadow: none")}',
-                    'ondragend': 'if(isDecklistLocked == false) {drop(this, cardDropTarget); this.removeAttribute("style")}',
-                    'ondragover': 'if(isDecklistLocked == false) {allowDrop(event); cardDropTarget = this}',
+                    'ondragstart': 'if(isDeckLocked == false) {this.setAttribute("style", "transform: scale(1); box-shadow: none")}',
+                    'ondragend': 'if(isDeckLocked == false) {drop(this, cardDropTarget); this.removeAttribute("style")}',
+                    'ondragover': 'if(isDeckLocked == false) {allowDrop(event); cardDropTarget = this}',
                     'count': count
 
                 })
@@ -1913,8 +1960,8 @@
                 'value': count,
                 'class': 'individualCardCount scaledbuttonObject'
             }))
-            decklistCards.appendChild(newCard)
-            modifyDecklistCardCount(null, count)
+            deckCards.appendChild(newCard)
+            modifyDeckCardCount(null, count)
 
             // focused count
             var focusedCard = document.getElementsByClassName('focusedCard')[0]
@@ -1924,21 +1971,21 @@
         }
     }
 
-    function decklistCardHover (card) {
+    function deckCardHover (card) {
         cardHover(card)
         var hoverMenu = card.getElementsByClassName('cardHoverMenu')[0]
         if (hoverMenu) {
             hoverMenu.appendChild(createElement('input', null, {
                 'type': 'button',
-                'class': 'decklistCardHoverButtonAdd scaledbuttonObject',
+                'class': 'deckCardHoverButtonAdd scaledbuttonObject',
                 'value': '＋',
-                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, +1)}'
+                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDeckCardCount(this.parentNode.parentNode, +1)}'
             }))
             hoverMenu.appendChild(createElement('input', null, {
                 'type': 'button',
-                'class': 'decklistCardHoverButtonRemove scaledbuttonObject',
+                'class': 'deckCardHoverButtonRemove scaledbuttonObject',
                 'value': '－',
-                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDecklistCardCount(this.parentNode.parentNode, -1)}'
+                'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDeckCardCount(this.parentNode.parentNode, -1)}'
             }))
         }
         var count = card.getAttribute('count')
@@ -1950,7 +1997,7 @@
         }
     }
 
-    function modifyDecklistCardCount (card, value) {
+    function modifyDeckCardCount (card, value) {
         if (value == 0) {
             return
         }
@@ -1984,7 +2031,7 @@
 
                 // hovered card duplicates
                 var hoveredCard = document.getElementsByClassName('hoveredCard')[0]
-                if (hoveredCard && hoveredCard.parentElement == document.getElementById('decklistCards') && hoveredCard['id'] == card['id']) {
+                if (hoveredCard && hoveredCard.parentElement == document.getElementById('deckCards') && hoveredCard['id'] == card['id']) {
                     while (card.getElementsByClassName('cardImageDuplicate')[0]) {
                         card.getElementsByClassName('cardImageDuplicate')[0].remove()
                     }
@@ -1998,47 +2045,47 @@
             }
         }
         
-        decklistCardCount.value = Number(decklistCardCount.value) + value
-        if (decklistCardCount.value > 60) {
-            decklistCardCount.setAttribute('style', 'color: red')
+        deckCardCount.value = Number(deckCardCount.value) + value
+        if (deckCardCount.value > 60) {
+            deckCardCount.setAttribute('style', 'color: red')
         }
-        else if (decklistCardCount.value == 60) {
-            decklistCardCount.setAttribute('style', 'color: #00ff00')
+        else if (deckCardCount.value == 60) {
+            deckCardCount.setAttribute('style', 'color: #00ff00')
         }
         else {
-            decklistCardCount.setAttribute('style', 'color: white')
+            deckCardCount.setAttribute('style', 'color: white')
         }
     }
 
-    function lockDecklist (button) {
+    function lockDeck (button) {
         if (button.innerHTML == '🔓') {
             button.innerHTML = '🔐'
             button.title ='Enable Editing'
-            isDecklistLocked = true
-            LOG_normal('Locked decklist')
+            isDeckLocked = true
+            LOG_normal('Locked deck')
         }
         else {
             button.innerHTML = '🔓'
             button.title ='Disable Editing'
-            isDecklistLocked = false
-            LOG_normal('Unlocked decklist')
+            isDeckLocked = false
+            LOG_normal('Unlocked deck')
         }
     }
-    function importDecklistButtonHover (button) {
+    function importButtonHover (button) {
         button.innerHTML = ''
         button.appendChild(createElement('button', '📂', {
-            'title': 'Import Saved Decklist',
-            'class': 'decklistSubButton',
-            'onclick': 'importDecklistLocalStorage()'
+            'title': 'Import Saved Deck',
+            'class': 'deckSubButton',
+            'onclick': 'importDeckLocalStorage()'
         }))
         button.appendChild(createElement('button', '📋', {
-            'title': 'Import Decklist From Clipboard',
-            'class': 'decklistSubButton',
-            'onclick': 'importDecklistClipboard()'
+            'title': 'Import Deck From Clipboard',
+            'class': 'deckSubButton',
+            'onclick': 'importDeckClipboard()'
         }))
     }
 
-    async function importDecklistClipboard () {
+    async function importDeckClipboard () {
         var text
         var encounteredError = false
         try {
@@ -2051,27 +2098,26 @@
             LOG_error('This browser does not support importing from clipboard.')
             return
         }
-        importDecklist(text)
+        importDeck(text)
     }
-    function importDecklistLocalStorage () {
-        // alert('IMPORT DECKLIST FROM LOCAL STORAGE')
-        var savedDecklists = Object.keys(localStorage)
-        var key = prompt('Which decklist would you like to load?\n\n' + savedDecklists.join('\n'), savedDecklists[0])
+    function importDeckLocalStorage () {
+        var savedDecks = Object.keys(localStorage)
+        var key = prompt('Which deck would you like to load?\n\n' + savedDecks.join('\n'), savedDecks[0])
         if (key) {
-            importDecklist(localStorage[key])
+            importDeck(localStorage[key])
         }
     }
 
-    async function importDecklist (text) {
-        if (isDecklistLocked == true) {
-            LOG_alertNormal('Editing decklist is locked.')
+    async function importDeck (text) {
+        if (isDeckLocked == true) {
+            LOG_alertNormal('Editing deck is locked.')
             return
         }
         else if(setsLoaded == false) {
             LOG_alertNormal('Please wait for a few seconds for sets to load.')
             return
         }
-        if (decklistCards.firstChild && !confirm('Are you sure you want to overwrite the existing decklist?')) {
+        if (deckCards.firstChild && !confirm('Are you sure you want to overwrite the existing deck?')) {
             return
         }
 
@@ -2217,7 +2263,7 @@
             var cardData
             //if response did not contain card data
             if (!response['cards']) {
-                LOG_alertNormal('The decklist you tried to import was malformed.')
+                LOG_alertNormal('The deck you tried to import was malformed.')
             }
             else {
                 cardData = response['cards']
@@ -2232,10 +2278,10 @@
                 })[0]
                 if (newCard) {
                     if (removedCards == false) {
-                        removeDecklistCards(true)
+                        removeDeckCards(true)
                         removedCards = true
                     }
-                    addDecklistCard(createCard(newCard), cardsToSearch[i]['count'])
+                    addDeckCard(createCard(newCard), cardsToSearch[i]['count'])
                 }
                 else {
                     LOG_error(`Failed to import ${cardsToSearch[i]['id']}`)
@@ -2248,24 +2294,24 @@
         }
     }
 
-    function exportDecklistButtonHover (button) {
+    function exportButtonHover (button) {
         button.innerHTML = ''
         button.appendChild(createElement('button', '💾', {
-            'title': 'Save Decklist',
-            'class': 'decklistSubButton',
-            'onclick': 'exportDecklist("localStorage")'
+            'title': 'Save Deck',
+            'class': 'deckSubButton',
+            'onclick': 'exportDeck("localStorage")'
         }))
         button.appendChild(createElement('button', '📋', {
-            'title': 'Copy Decklist To Clipboard',
-            'class': 'decklistSubButton',
-            'onclick': 'exportDecklist("clipboard")'
+            'title': 'Copy Deck To Clipboard',
+            'class': 'deckSubButton',
+            'onclick': 'exportDeck("clipboard")'
         }))
     }
 
-    function exportDecklist (mode) {
-        var cards = decklistCards.childNodes
+    function exportDeck (mode) {
+        var cards = deckCards.childNodes
         if (cards.length == 0) {
-            LOG_alertNormal('Use this button to export the decklist to your clipboard.')
+            LOG_alertNormal('Use this button to export the deck to your clipboard.')
             return
         }
 
@@ -2278,6 +2324,9 @@
             //if ptcgoCode
             if (JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']) {
                 code = JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']
+                if (ptcgoCodeTranslations[code]) {
+                    code = ptcgoCodeTranslations[code]
+                }
             }
             //else, use ID
             else {
@@ -2298,19 +2347,20 @@
             document.execCommand('copy');
             document.body.removeChild(dummy);
 
-            LOG_alertNormal('Decklist copied to clipboard.\n\n' + text)
+            LOG_alertNormal('Deck copied to clipboard.\n\n' + text)
         }
         else if (mode == 'localStorage') {
-            var key = prompt('Save decklist using name:', 'New Deck 1')
+            var savedDecks = Object.keys(localStorage)
+            var key = prompt(savedDecks.join('\n') + '\n\nSave new deck using name:', 'New Deck 1')
             if (key) {
                 localStorage.setItem(key, text)
             }
         }
     }
 
-    function sortDecklist () {
-        if (isDecklistLocked == true) {
-            LOG_alertNormal('Editing decklist is locked.')
+    function sortDeck () {
+        if (isDeckLocked == true) {
+            LOG_alertNormal('Editing deck is locked.')
             return
         }
         var sortTypes = {
@@ -2325,8 +2375,8 @@
             'basicEnergy': [],
             'unknown': []
         }
-        for (i=0; i<decklistCards.children.length; i++) {
-            var card = decklistCards.children[i]
+        for (i=0; i<deckCards.children.length; i++) {
+            var card = deckCards.children[i]
             var dataContainer = card.getElementsByClassName('data')[0]
             var supertype = dataContainer.getAttribute('supertype')
             var subtypes = JSON.parse(dataContainer.getAttribute('subtypes'))
@@ -2445,21 +2495,21 @@
             }
         }
 
-        var newDecklist = sortTypes['pokemon']
-        newDecklist = newDecklist.concat(sortTypes['supporter'])
-        newDecklist = newDecklist.concat(sortTypes['item'])
-        newDecklist = newDecklist.concat(sortTypes['tool'])
-        newDecklist = newDecklist.concat(sortTypes['flare-tool'])
-        newDecklist = newDecklist.concat(sortTypes['stadium'])
-        newDecklist = newDecklist.concat(sortTypes['acespec'])
-        newDecklist = newDecklist.concat(sortTypes['specialEnergy'])
-        newDecklist = newDecklist.concat(sortTypes['basicEnergy'])
-        newDecklist = newDecklist.concat(sortTypes['unknown'])
+        var newDeck = sortTypes['pokemon']
+        newDeck = newDeck.concat(sortTypes['supporter'])
+        newDeck = newDeck.concat(sortTypes['item'])
+        newDeck = newDeck.concat(sortTypes['tool'])
+        newDeck = newDeck.concat(sortTypes['flare-tool'])
+        newDeck = newDeck.concat(sortTypes['stadium'])
+        newDeck = newDeck.concat(sortTypes['acespec'])
+        newDeck = newDeck.concat(sortTypes['specialEnergy'])
+        newDeck = newDeck.concat(sortTypes['basicEnergy'])
+        newDeck = newDeck.concat(sortTypes['unknown'])
 
-        decklistCards.innerHTML = null
+        deckCards.innerHTML = null
 
-        for (i=0; i<newDecklist.length; i++) {
-            decklistCards.appendChild(newDecklist[i])
+        for (i=0; i<newDeck.length; i++) {
+            deckCards.appendChild(newDeck[i])
         }
     }
 
@@ -2474,25 +2524,48 @@
         document.documentElement.style.setProperty('--cardScale', value);
     }
 
-    function deleteDecklist () {
-        if (!decklistCards.firstChild) {
-            LOG_alertNormal('There are no cards to delete.')
-        }
-        else if (confirm('Are you sure you want to delete the decklist?')) {
-            removeDecklistCards(false)
+    function deleteButtonHover (button) {
+        button.innerHTML = ''
+        button.appendChild(createElement('button', '📂', {
+            'title': 'Delete Saved Deck',
+            'class': 'deckSubButton',
+            'onclick': 'deleteSavedDeck()'
+        }))
+        button.appendChild(createElement('button', '🗑', {
+            'title': 'Delete Deck',
+            'class': 'deckSubButton',
+            'onclick': 'deleteDeck()'
+        }))
+    }
+
+    function deleteSavedDeck () {
+        var savedDecks = Object.keys(localStorage)
+        var key = prompt('Delete saved deck:\n\n' + savedDecks.join('\n'), '')
+        if (key) {
+            localStorage.removeItem(key)
+            alert(key + ' has been deleted.')
         }
     }
 
-    function removeDecklistCards (immediate) {
+    function deleteDeck () {
+        if (!deckCards.firstChild) {
+            LOG_alertNormal('There are no cards to delete.')
+        }
+        else if (confirm('Are you sure you want to delete the deck?')) {
+            removeDeckCards(false)
+        }
+    }
+
+    function removeDeckCards (immediate) {
         if (immediate == true) {
-            decklistCards.innerHTML = null
+            deckCards.innerHTML = null
         }
         else {
-            for (i=0; i<decklistCards.children.length; i++) {
-                animateRemoveElement(decklistCards.children[i], 'fadeOut')
+            for (i=0; i<deckCards.children.length; i++) {
+                animateRemoveElement(deckCards.children[i], 'fadeOut')
             }
         }
-        decklistCardCount.value = 0;
-        decklistCardCount.setAttribute('style', 'color: white')
+        deckCardCount.value = 0;
+        deckCardCount.setAttribute('style', 'color: white')
     }
 </script>
