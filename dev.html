@@ -508,11 +508,14 @@
         cursor: pointer;
         transition: 0.125s;
     }
-    .parameterButtonDiv:hover:not(.parameterButtonDivSelected) {
+    .parameterButtonDiv:hover {
         background-color: var(--lightBlue30);
     }
     .parameterButtonDivSelected {
         background-color: rgba(0, 255, 0, 0.6)
+    }
+    .parameterButtonDivSelected:hover {
+        background-color: rgba(127, 255, 127, 0.6)
     }
     .parameterButtonSpacer {
         display: inline-block;
@@ -1590,7 +1593,10 @@
             'src': JSON.parse(dataContainer.getAttribute('set'))['images']['symbol'],
             'style': 'height: 75%; width: 75%; object-fit: contain'
         }))
-        focusedSet.setAttribute('onclick', `clickParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true, [])`)
+        if (document.getElementById(`set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}`).classList.contains('selectedButton')) {
+            focusedSet.classList.add('parameterButtonDivSelected')
+        }
+        focusedSet.setAttribute('onclick', `clickParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true, []); if (this.classList.contains('parameterButtonDivSelected')) {this.classList.remove('parameterButtonDivSelected')} else {this.classList.add('parameterButtonDivSelected')}`)
 
         focusedCenter.prepend(cloneCard(card, {
                 'style': `transform: rotate(${rotation}deg);`,
