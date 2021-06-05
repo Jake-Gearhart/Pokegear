@@ -7,7 +7,7 @@
     <body onresize='windowResize()'>
         <div id='title'>
             <img id='titleIcon' src='images/favicon.png'>
-            <h1 id='titleText'>Pokegear.app 1.1.0</h1>
+            <h1 id='titleText'>Pokegear.app 1.2.0</h1>
             <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
         </div>
         <button id='help' class='buttonObject deckButton' title='Help' onclick='openHelpMenu()'>﹖</button>
@@ -50,11 +50,12 @@
         --cardHeight: 4.4cm;
         --cardDimensionRatio: 367/512;
         --cardWidth: calc(var(--cardHeight) * var(--cardDimensionRatio));
+        --cardSpacing: calc(var(--cardWidth) * 30/734);
 
         --cardScale: 1;
         --scaledCardHeight: calc(var(--cardHeight) * var(--cardScale));
         --scaledCardWidth: calc(var(--cardWidth) * var(--cardScale));
-        --cardSpacing: calc(var(--scaledCardWidth) * 30/734);
+        --scaledCardSpacing: calc(var(--scaledCardWidth) * 30/734);
 
         --focusedHeight: min(100vw, 100vh);
         --focusedWidth: calc(min(100vw, 100vh) * var(--cardDimensionRatio));
@@ -84,7 +85,8 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background-color: var(--lightBlue);
+        /* background-color: var(--lightBlue); */
+        background: linear-gradient(to right bottom, var(--lightBlue), white, var(--lightBlue));
         margin: 0;
         padding: 0;
         -webkit-touch-callout: none;
@@ -311,8 +313,8 @@
         width: calc(var(--cardHeight) / 2);
         left: calc(50% - var(--cardHeight) / 4);
         top: calc(var(--cardHeight) / 12);
-        background-color: var(--lightBlue60);
-        border: calc(var(--cardHeight) / 48) solid var(--darkBlue30);
+        background-color: var(--midBlue);
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue60);
         pointer-events: none;
     }
     .individualCardCount {
@@ -334,7 +336,7 @@
         align-items: center; 
 
         /* 100% - padding */
-        width: calc(100% - var(--scaledCardWidth) - var(--cardHeight) * 10/12 + var(--cardSpacing));
+        width: calc(100% - var(--scaledCardWidth) - var(--cardHeight) * 10/12 + var(--scaledCardSpacing));
         height: calc(100% - var(--cardHeight) * 5/12);
         padding-top: calc(var(--cardHeight) * 5/12);
         padding-left: calc(var(--scaledCardWidth) / 2 + var(--cardHeight) * 5/12);
@@ -545,6 +547,7 @@
         width: var(--scaledCardWidth);
         height: var(--scaledCardHeight);
         border-radius: calc(0.15cm * var(--cardScale));
+        margin: calc(var(--scaledCardSpacing) / 2);
     }
     .card:hover {
         transform: scale(2);
@@ -647,14 +650,14 @@
         font-size: calc(var(--cardHeight) * 1/3);
         cursor: pointer;
     }
-    #focusedAdd {
+    #focusedShine {
         left: 2.5%;
     }
-    #focusedAdd.landscape {
+    #focusedShine.landscape {
         height: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
         width: calc(45% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
     }
-    #focusedAdd.portrait {
+    #focusedShine.portrait {
         height: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
         width: calc(45% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
     }
@@ -753,7 +756,7 @@
         bottom: 2.5vh;
     }
 
-    #toggleShine {
+    #toggleShineGlobal {
         position: absolute;
         top: 10%;
         height: calc(20vw);
@@ -799,7 +802,6 @@
     //logs
     var logs = []
     
-    var holo_animations = true
     const holoRarities = [
         'Amazing Rare',
         'LEGEND',
@@ -903,10 +905,59 @@
     }
 
     //add event listeners
-    document.addEventListener('keydown', keyDown);
-    document.addEventListener('mousemove', mousemove);
+    document.addEventListener('keydown', e => {
+        if (currentFocused && (event.keyCode == 39 || event.keyCode == 68)) {
+            //left arrow, D key
+            event.preventDefault()
+            cycleFocused('right')
+        }
+        else if (currentFocused && (event.keyCode == 37 || event.keyCode == 65)) {
+            //right arrow, A key
+            event.preventDefault()
+            cycleFocused('left')
+        }
+        else if (document.getElementById('focused') && (event.keyCode == 27)) {
+            // escape
+            animateRemoveElement(document.getElementById('focused'), 'fadeOut'); 
+            currentFocused = null
+        }
+    });
+    document.addEventListener('mousemove', e => {
+        var hoveredCards = document.getElementsByClassName('hoveredCard')
+        for (i=0; i<hoveredCards.length; i++) {
+            // if mouse not over card and not over a hover menu button
+            if (e.target != hoveredCards[i] && e.target.parentNode.parentNode != hoveredCards[i]) {
+                cardUnhover(hoveredCards[i])
+            }
+        }
+    });
+    document.addEventListener("dragover", e => {
+        e.preventDefault()
+    });
+    document.getElementById('deck').addEventListener('drop', e => {
+        e.preventDefault()
+        if (isDeckLocked == false) {
+            var inputFiles = e['dataTransfer']['files']
+            for (i=0; i<inputFiles.length; i++) {
+                var fileReader = new FileReader()
+                fileReader.filename = 'custom-card-' + inputFiles[i]['name']
+                fileReader.onload = function (event) {
+                    addDeckCard(createCard({
+                        'id': fileReader['filename'],
+                        'name': fileReader['filename'],
+                        'custom-card': true,
+                        'images': {'small': fileReader['result']}
+                    }), +1)
+                }
+                fileReader.readAsDataURL(inputFiles[i])
+            }
+        }
+        else {
+            LOG_alertNormal('The deck is locked!')
+        }
+    })
 
-    //sopulate sets
+    //populate sets
     var setsLoaded = false
     populateSets()
     async function populateSets () {
@@ -1099,34 +1150,6 @@
             }
         }
     }
-
-    function keyDown (event) {
-        if (currentFocused && (event.keyCode == 39 || event.keyCode == 68)) {
-            //left arrow, D key
-            event.preventDefault()
-            cycleFocused('right')
-        }
-        else if (currentFocused && (event.keyCode == 37 || event.keyCode == 65)) {
-            //right arrow, A key
-            event.preventDefault()
-            cycleFocused('left')
-        }
-        else if (document.getElementById('focused') && (event.keyCode == 27)) {
-            // escape
-            animateRemoveElement(document.getElementById('focused'), "fadeOut"); 
-            currentFocused = null
-        }
-    }
-
-    function mousemove (event) {
-        var hoveredCards = document.getElementsByClassName('hoveredCard')
-        for (i=0; i<hoveredCards.length; i++) {
-            // if mouse not over card and not over a hover menu button
-            if (event.target != hoveredCards[i] && event.target.parentNode.parentNode != hoveredCards[i]) {
-                cardUnhover(hoveredCards[i])
-            }
-        }
-    }
     
     function randomInteger(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -1226,9 +1249,20 @@
         }
     }
 
+    function createHoloAnimation () {
+        const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
+        const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
+        return createElement('div', null, {
+            'class': 'holo',
+            'style': `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`
+        })
+    }
+
     function createCard (data) {
         //UNOWN FIX
-        data['id'] = data['id'].replace('?', 'question').replace('!', 'exclamation')
+        if (data['id']) {
+            data['id'] = data['id'].replace('?', 'question').replace('!', 'exclamation')
+        }
         //RESHIRAM & ZEKROM PROMO FIX
         if (data['images']['small'] == 'https://images.pokemontcg.io/bwp/BW004.png') {
             data['images']['small'] = 'https://images.pokemontcg.io/bwp/BW04.png'
@@ -1255,27 +1289,20 @@
             'src': data['images']['small']
         }))
 
-        if (holo_animations == true) {
-            var holo = false
-            for (var i=0; i<holoRarities.length; i++) {
-                if (data['rarity'] == holoRarities[i]) {
-                    holo = true
-                    break
-                }
+        var holo = false
+        for (var i=0; i<holoRarities.length; i++) {
+            if (data['rarity'] == holoRarities[i]) {
+                holo = true
+                break
             }
-            if (holo == false) {
-                if (data['tcgplayer'] && data['tcgplayer']['prices'] && data['tcgplayer']['prices']['holofoil']) {
-                    holo = true
-                }
+        }
+        if (holo == false) {
+            if (data['tcgplayer'] && data['tcgplayer']['prices'] && data['tcgplayer']['prices']['holofoil']) {
+                holo = true
             }
-            if (holo === true) {
-                const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
-                const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
-                cardImageContainer.appendChild(createElement('div', null, {
-                    'class': 'holo',
-                    'style': `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`
-                }))
-            }
+        }
+        if (holo === true) {
+            cardImageContainer.appendChild(createHoloAnimation())
         }
 
         var dataContainer = createElement('div', null, {
@@ -1375,7 +1402,7 @@
         helpMenu.appendChild(createElement('p', 'You can search for cards to add to your deck using the sidebar found to the left of the screen. Hover over the blue tab with the arrow to open it. Expand it to full screen by clicking on the arrow. Search for cards by using the buttons at the bottom or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. Click any card to view it in fullscreen. Once a card is in the deck, you can move it around by dragging it.', {
             'id': 'helpMenuText'
         }))
-        helpMenu.appendChild(createElement('p', 'You can import or export decks from your clipboard or browser\'s local storage using the ↥/↧ buttons to the right of the screen. The 🔓 button allows you to prevent changes to the deck as well as hides the +/- buttons when hovering over cards (best for recording a video on your decks). You can automatically sort the deck with the ⟳ button, or drag cards in the deck to sort it yourself. The slider allows you to enlarge or shrink the visual size of cards in the deck. Remove all cards in the deck or delete a save deck by using the 🗑 button.', {
+        helpMenu.appendChild(createElement('p', 'You can import or export decks from your clipboard or browser\'s local storage using the ↥/↧ buttons to the right of the screen. The 🔓 button allows you to prevent changes to the deck as well as hides the +/- buttons when hovering over cards (best for recording a video on your decks). You can automatically sort the deck with the ⟳ button, or drag cards in the deck to sort it yourself. The slider allows you to enlarge or shrink the visual size of cards in the deck. Remove all cards in the deck or delete a saved deck by using the 🗑 button.', {
             'id': 'helpMenuText'
         }))
         helpMenu.appendChild(createElement('p', 'Clicking the ✦ in the ⚙ (settings) menu will disable the holo effect on cards. Clicking 🗒 ↧ will export the log of actions for this session.', {
@@ -1386,20 +1413,20 @@
     //SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS –––––––– SETTINGS
     function openSettings () {
         var settingsMenu = darkenScreen()
-        var toggleShine = settingsMenu.appendChild(createElement('input', null, {
-            'id': 'toggleShine',
+        var toggleShineGlobal = settingsMenu.appendChild(createElement('input', null, {
+            'id': 'toggleShineGlobal',
             'class': 'fadeIn buttonObject',
             'title': 'Toggle Card Shine Effect',
             'type': 'submit',
-            'onclick': 'toggleShine()'
+            'onclick': 'toggleShineGlobal()'
         }))
-        toggleShine.appendChild(createElement('p', 'TESTING', null))
+        toggleShineGlobal.appendChild(createElement('p', 'TESTING', null))
         const holoEnabled = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoEnabled'))
         if (holoEnabled == 0) {
-            toggleShine['value'] = '✧'
+            toggleShineGlobal['value'] = '✧'
         }
         else {
-            toggleShine['value'] = '✦'
+            toggleShineGlobal['value'] = '✦'
         }
         var exportConsole = settingsMenu.appendChild(createElement('input', null, {
             'id': 'exportConsole',
@@ -1426,21 +1453,39 @@
         LOG_normal('Exported console')
     }
 
-    function toggleShine() {
+    function toggleShineGlobal() {
         const holoEnabled = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoEnabled'))
         if (holoEnabled == 0) {
-            document.getElementById('toggleShine').value = '✦'
+            document.getElementById('toggleShineGlobal').value = '✦'
             document.documentElement.style.setProperty('--holoEnabled', 1);
             LOG_normal('Enabled holo animations')
         }
         else {
-            document.getElementById('toggleShine').value = '✧'
+            document.getElementById('toggleShineGlobal').value = '✧'
             document.documentElement.style.setProperty('--holoEnabled', 0);
             LOG_normal('Disabled holo animations')
         }
     }
 
     //CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS
+    function toggleShine(cardsToToggle) {
+        for (i=0; i<cardsToToggle.length; i++) {
+            var cardToToggle = cardsToToggle[i]
+            if (cardToToggle.getElementsByClassName('holo')[0]) {
+                cardToToggle.getElementsByClassName('holo')[0].remove()
+                if (cardToToggle.classList.contains('focusedCard')) {
+                    document.getElementById('focusedShine').innerHTML = '✧'
+                }
+            }
+            else {
+                cardToToggle.getElementsByClassName('cardImageContainer')[0].appendChild(createHoloAnimation())
+                if (cardToToggle.classList.contains('focusedCard')) {
+                    document.getElementById('focusedShine').innerHTML = '✦'
+                }
+            }
+        }
+    }
+    
     function cardHover (card) {
         card.classList.add('hoveredCard')
         if (card.getElementsByClassName('cardHoverMenu')[0]) {
@@ -1475,6 +1520,12 @@
         if (!isCardInView(card)) {
             card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
         }
+        var oldFocusedOrigin = document.querySelectorAll('.focusedOrigin')
+        for (i=0; i<oldFocusedOrigin.length; i++) {
+            oldFocusedOrigin[i].classList.remove('focusedOrigin')
+        }
+        card.classList.add('focusedOrigin')
+
         currentFocused = card
         var focused
         var focusedPrice
@@ -1490,7 +1541,7 @@
 
             // focusedAlts = document.getElementById('focusedAlts')
 
-            focusedAdd = document.getElementById('focusedAdd')
+            focusedShine = document.getElementById('focusedShine')
             focusedCount = document.getElementById('focusedCount')
             focusedDownload = document.getElementById('focusedDownload')
             focusedSet = document.getElementById('focusedSet')
@@ -1504,16 +1555,19 @@
                 'id': 'focusedCenter',
                 'class': 'orientable'
             }))
-            focusedAdd = focusedCenter.appendChild(createElement('button', '+', {
-                'id': 'focusedAdd',
+            focusedShine = focusedCenter.appendChild(createElement('button', '', {
+                'id': 'focusedShine',
                 'class': 'fadeIn buttonObject focusedButton orientable',
-                'title': 'Add Card To Deck',
-                'onclick': "if(isDeckLocked == false) {addDeckCard(cloneCard(document.getElementsByClassName('focusedCard')[0], {'style': '', 'image': JSON.parse(document.getElementsByClassName('focusedCard')[0].getElementsByClassName('data')[0].getAttribute('images'))['small']}), +1)}",
+                'onclick': 'toggleShine([document.getElementsByClassName("focusedCard")[0], document.getElementsByClassName("focusedOrigin")[0]])'
             }))
             focusedCount = focusedCenter.appendChild(createElement('button', 0, {
                 'id': 'focusedCount',
                 'class': 'fadeIn buttonObject focusedButton orientable',
-                'title': 'Amount in Deck'
+                'title': 'Amount in Deck',
+                'count': 0,
+                'onmouseenter': 'this.innerHTML = "+"',
+                'onmouseleave': 'this.innerHTML = this.getAttribute("count")',
+                'onclick': "if(isDeckLocked == false) {addDeckCard(cloneCard(document.getElementsByClassName('focusedOrigin')[0], {}), +1)}",
             }))
             focusedDownload = focusedCenter.appendChild(createElement('button', '↧', {
                 'id': 'focusedDownload',
@@ -1548,14 +1602,6 @@
             // }))
         }
 
-        //add button
-        if (isDeckLocked == false) {
-            focusedAdd.setAttribute('style', 'cursor: pointer')
-        }
-        else {
-            focusedAdd.setAttribute('style', 'cursor: not-allowed')
-        }
-
         //left buttpn
         if (currentFocused.previousElementSibling && currentFocused.previousElementSibling.classList.contains('card')) {
             leftButton.setAttribute('style', 'cursor: pointer')
@@ -1572,12 +1618,12 @@
             rightButton.setAttribute('style', 'cursor: not-allowed')
         }
 
-        //count
+        // count
+        // if card with matching ID is in the deck
         if (deckCards.querySelector(`#${card['id']}`)) {
-            focusedCount.innerHTML = deckCards.querySelector(`#${card['id']}`).getAttribute('count')
-        }
-        else {
-            focusedCount.innerHTML = 0
+            var cardCount = deckCards.querySelector(`#${card['id']}`).getAttribute('count')
+            focusedCount.innerHTML = cardCount
+            focusedCount.setAttribute('count', cardCount)
         }
 
         var dataContainer = card.getElementsByClassName('data')[0]
@@ -1587,23 +1633,34 @@
             rotation = 90
         }
 
-        focusedSet.title = JSON.parse(dataContainer.getAttribute('set'))['name']
-        focusedSet.innerHTML = ''
-        focusedSet.appendChild(createElement('img', null, {
-            'src': JSON.parse(dataContainer.getAttribute('set'))['images']['symbol'],
-            'style': 'height: 75%; width: 75%; object-fit: contain'
-        }))
-        if (document.getElementById(`set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}`).classList.contains('selectedButton')) {
-            focusedSet.classList.add('parameterButtonDivSelected')
+        if(dataContainer.getAttribute('set')) {
+            focusedSet.title = JSON.parse(dataContainer.getAttribute('set'))['name']
+            focusedSet.innerHTML = ''
+            focusedSet.appendChild(createElement('img', null, {
+                'src': JSON.parse(dataContainer.getAttribute('set'))['images']['symbol'],
+                'style': 'height: 75%; width: 75%; object-fit: contain'
+            }))
+            if (document.getElementById(`set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}`).classList.contains('selectedButton')) {
+                focusedSet.classList.add('parameterButtonDivSelected')
+            }
+            focusedSet.setAttribute('onclick', `clickParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true, []); if (this.classList.contains('parameterButtonDivSelected')) {this.classList.remove('parameterButtonDivSelected')} else {this.classList.add('parameterButtonDivSelected')}`)
         }
-        focusedSet.setAttribute('onclick', `clickParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true, []); if (this.classList.contains('parameterButtonDivSelected')) {this.classList.remove('parameterButtonDivSelected')} else {this.classList.add('parameterButtonDivSelected')}`)
 
         focusedCenter.prepend(cloneCard(card, {
                 'style': `transform: rotate(${rotation}deg);`,
                 'class': 'focusedCard orientable',
                 'image': JSON.parse(dataContainer.getAttribute('images'))['large']
         }))
+
         var newCard = focusedCenter.getElementsByClassName('focusedCard')[0]
+
+        //shine button
+        if (newCard.getElementsByClassName('holo')[0]) {
+            focusedShine.innerHTML = '✦'
+        }
+        else {
+            focusedShine.innerHTML = '✧'
+        }
 
         //remove individualCardCount, and cardHoverMenu
         var remove = ['individualCardCount', 'cardHoverMenu']
@@ -1622,7 +1679,15 @@
         }
 
         //download
-        focusedDownload.setAttribute('onclick', `downloadResource("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').replace(' ', '-').toLowerCase()}-${card.id}.png")`)
+        // console.log(card.getAttribute('custom-card'))
+        if (!dataContainer.getAttribute('custom-card') == true) {
+            focusedDownload.setAttribute('onclick', `downloadResource("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').replace(' ', '-').toLowerCase()}-${card.id}.png")`)
+            focusedDownload.setAttribute('style', 'cursor: pointer')
+        }
+        else {
+            focusedDownload.setAttribute('onclick', '')
+            focusedDownload.setAttribute('style', 'cursor: not-allowed')
+        }
 
         //add price data
         if (dataContainer.getAttribute('tcgplayer')) {
@@ -1924,41 +1989,43 @@
 
     function addDeckCard(card, count) {
         //if card exists in deck
-        if (deckCards.querySelector(`#${card['id']}`)) {
-            modifyDeckCardCount(deckCards.querySelector(`#${card['id']}`), count)
+        for (i=0; i<deckCards.children.length; i++) {
+            if (deckCards.children[i]['id'] == card['id']) {
+                modifyDeckCardCount(deckCards.children[i], count)
+                return
+            }
         }
+        
         //if card does not exist in deck
-        else {
-            newCard = cloneCard(card, {
-                    'class': 'card deckCard fadeIn',
-                    'onmouseenter': 'deckCardHover(this)',
-                    'ontouchstart': 'deckCardHover(this)',
-                    'draggable': 'true',
-                    'ondragstart': 'if(isDeckLocked == false) {this.setAttribute("style", "transform: scale(1); box-shadow: none")}',
-                    'ondragend': 'if(isDeckLocked == false) {drop(this, cardDropTarget); this.removeAttribute("style")}',
-                    'ondragover': 'if(isDeckLocked == false) {allowDrop(event); cardDropTarget = this}',
-                    'count': count
+        newCard = cloneCard(card, {
+                'class': 'card deckCard fadeIn',
+                'onmouseenter': 'deckCardHover(this)',
+                'ontouchstart': 'deckCardHover(this)',
+                'draggable': 'true',
+                'ondragstart': 'if(isDeckLocked == false) {this.setAttribute("style", "transform: scale(1); box-shadow: none")}',
+                'ondragend': 'if(isDeckLocked == false) {drop(this, cardDropTarget); this.removeAttribute("style")}',
+                'ondragover': 'if(isDeckLocked == false) {allowDrop(event); cardDropTarget = this}',
+                'count': count
 
-                })
-            if (newCard.getElementsByClassName('holo')[0]) {
-                newCard.getElementsByClassName('holo')[0].classList.remove('focusedHolo')
-                const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
-                const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
-                newCard.getElementsByClassName('holo')[0].setAttribute('style', `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`)
-            }
-            newCard.appendChild(createElement('input', null, {
-                'type': 'button',
-                'value': count,
-                'class': 'individualCardCount scaledbuttonObject'
-            }))
-            deckCards.appendChild(newCard)
-            modifyDeckCardCount(null, count)
+            })
+        if (newCard.getElementsByClassName('holo')[0]) {
+            newCard.getElementsByClassName('holo')[0].classList.remove('focusedHolo')
+            const holoSpeed = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoSpeed'))
+            const holoFPS = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoFPS'))
+            newCard.getElementsByClassName('holo')[0].setAttribute('style', `animation-delay: -${randomInteger(0, holoSpeed * holoFPS) / holoFPS}s`)
+        }
+        newCard.appendChild(createElement('input', null, {
+            'type': 'button',
+            'value': count,
+            'class': 'individualCardCount scaledbuttonObject'
+        }))
+        deckCards.appendChild(newCard)
+        modifyDeckCardCount(null, count)
 
-            // focused count
-            var focusedCard = document.getElementsByClassName('focusedCard')[0]
-            if (focusedCard && focusedCard['id'] == card['id']) {
-                document.getElementById('focusedCount').innerHTML = 1
-            }
+        // focused count
+        var focusedCard = document.getElementsByClassName('focusedCard')[0]
+        if (focusedCard && focusedCard['id'] == card['id']) {
+            document.getElementById('focusedCount').setAttribute('count', 1)
         }
     }
 
@@ -2017,7 +2084,7 @@
                 // focused count
                 var focusedCard = document.getElementsByClassName('focusedCard')[0]
                 if (focusedCard && focusedCard['id'] == card['id']) {
-                    document.getElementById('focusedCount').innerHTML = newValue
+                    document.getElementById('focusedCount').setAttribute('count', newValue)
                 }
 
                 // hovered card duplicates
@@ -2312,21 +2379,29 @@
             var count = cards[i].getElementsByClassName('individualCardCount')[0].value
             var name = dataContainer.getAttribute('name')
             var code
-            //if ptcgoCode
-            if (JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']) {
-                code = JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']
-                if (ptcgoCodeTranslations[code]) {
-                    code = ptcgoCodeTranslations[code]
+            if (dataContainer.getAttribute('set')) {
+                //if ptcgoCode
+                if (JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']) {
+                    code = JSON.parse(dataContainer.getAttribute('set'))['ptcgoCode']
+                    if (ptcgoCodeTranslations[code]) {
+                        code = ptcgoCodeTranslations[code]
+                    }
                 }
+                //else, use ID
+                else {
+                    code = JSON.parse(dataContainer.getAttribute('set'))['id'].toUpperCase()
+                }
+                var number = dataContainer.getAttribute('number')
+                text.push(
+                    `${count} ${name} ${code} ${number}`
+                )
             }
-            //else, use ID
             else {
-                code = JSON.parse(dataContainer.getAttribute('set'))['id'].toUpperCase()
+                text.push(
+                    `${count} ${name}`
+                )
             }
-            var number = dataContainer.getAttribute('number')
-            text.push(
-                `${count} ${name} ${code} ${number}`
-            )
+
         }
         text = text.join('\n')
 
