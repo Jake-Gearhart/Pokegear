@@ -8,7 +8,7 @@
         <div id='title'>
             <img id='titleIcon' src='images/favicon.png'>
             <h1 id='titleText'>Pokegear.app 1.2.0</h1>
-            <a id='titleLink' href='https://twitter.com/jakekgearhart'>twitter.com/jakekgearhart</a>
+            <a id='titleLink' href='https://twitter.com/jakekgearhart'>By Jake Gearhart</a>
         </div>
         <button id='help' class='buttonObject deckButton' title='Help' onclick='openHelpMenu()'>﹖</button>
         <button id='settings' class='buttonObject deckButton' title='Settings' onclick='openSettings()'>⚙</button>
@@ -176,6 +176,13 @@
         font-size: calc(var(--cardHeight) / 12);
         bottom: calc(-1 * var(--cardHeight) / 12);
         font-style: italic;
+        color: gray;
+        text-decoration: none;
+        transition: 0.15s;
+    }
+    #titleLink:hover {
+        color: purple;
+        text-decoration: underline;  
     }
     #titleIcon:hover {
         animation: iconBounce 1s ease-in-out infinite;
