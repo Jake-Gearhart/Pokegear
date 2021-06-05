@@ -941,7 +941,7 @@
     document.addEventListener("dragover", e => {
         e.preventDefault()
     });
-    document.getElementById('deck').addEventListener('drop', e => {
+    document.addEventListener('drop', e => {
         e.preventDefault()
         if (isDeckLocked == false) {
             var inputFiles = e['dataTransfer']['files']
