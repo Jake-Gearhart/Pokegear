@@ -8,7 +8,11 @@
         <div id='title'>
             <img id='titleIcon' src='images/favicon.png'>
             <h1 id='titleText'>Pokegear.app 1.2.3 (Dev)</h1>
-            <a id='titleLink' href='https://twitter.com/jakekgearhart'>By Jake Gearhart</a>
+            <div id='titleLinks'>
+                <a id='linktree' class='titleLink' href='https://linktr.ee/JakeGearhart'>By Jake Gearhart</a>
+                <span style='color: gray'>——</span>
+                <a id='patreon' class='titleLink' href='https://www.patreon.com/jakegearhart'>Request A Feature</a>
+            </div>
         </div>
         <button id='help' class='buttonObject deckButton' title='Help' onclick='openHelpMenu()'>﹖</button>
         <button id='settings' class='buttonObject deckButton' title='Settings' onclick='openSettings()'>⚙</button>
@@ -177,22 +181,23 @@
         color: var(--midBlue);
         font-size: calc(var(--cardHeight) / 6);
     }
-    #titleLink {
+    #titleLinks {
         position: absolute;
-        font-size: calc(var(--cardHeight) / 12);
         bottom: calc(-1 * var(--cardHeight) / 12);
+        font-size: calc(var(--cardHeight) / 10);
+    }
+    .titleLink {
+        display: inline-block;
         font-style: italic;
         color: gray;
         text-decoration: none;
         transition: 0.15s;
     }
-    #titleLink:hover {
+    .titleLink:hover {
         color: purple;
-        text-decoration: underline;  
+        text-decoration: underline;
     }
-    #titleIcon:hover {
-        animation: iconBounce 1s ease-in-out infinite;
-    }
+
     @keyframes iconBounce {
     0%, 100% {
             transform: translateY(0);
