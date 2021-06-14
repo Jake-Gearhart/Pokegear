@@ -7,7 +7,7 @@
     <body onresize='windowResize()'>
         <div id='title'>
             <img id='titleIcon' src='images/favicon.png'>
-            <h1 id='titleText'>Pokegear.app 1.2.2</h1>
+            <h1 id='titleText'>Pokegear.app 1.2.3</h1>
             <a id='titleLink' href='https://twitter.com/jakekgearhart'>By Jake Gearhart</a>
         </div>
         <button id='help' class='buttonObject deckButton' title='Help' onclick='openHelpMenu()'>﹖</button>
@@ -78,7 +78,9 @@
         --holoSpeed: 20;
         --holoFPS: 30;
         --focusedHoloFPS: 60;
-        --holoEnabled: 1;
+        --holoVisible: 1;
+
+        --cardCountVisible: 0;
     }
     @media only screen and (max-device-width: 600px) {
         :root {
@@ -139,7 +141,7 @@
     .buttonObject:active {
         transform: translateY(4%);
     }
-    .scaledbuttonObject {
+    .scaledButtonObject {
         width: calc(var(--scaledCardHeight) / 3);
         height: calc(var(--scaledCardHeight) / 3);
         font-size: calc(var(--scaledCardHeight) / 6);
@@ -152,10 +154,10 @@
         color: rgba(255, 255, 255, 0.8);
         transition: background-color 0.25s, transform 0.125s;
     }
-    .scaledbuttonObject:hover {
+    .scaledButtonObject:hover {
         background-color: var(--midBlue60);
     }
-    .scaledbuttonObject:active {
+    .scaledButtonObject:active {
         transform: translateY(4%);
     }
     #title {
@@ -329,6 +331,8 @@
         pointer-events: none;
     }
     .individualCardCount {
+        /* HERE */
+        z-index: var(--cardCountVisible);
         position: absolute;
         bottom: calc(var(--scaledCardHeight) / 32);
         left: 0;
@@ -612,8 +616,8 @@
     }
 
     .holo {
-        width: calc(100% * var(--holoEnabled));
-        height: calc(100% * var(--holoEnabled));
+        width: calc(100% * var(--holoVisible));
+        height: calc(100% * var(--holoVisible));
         border-radius: inherit;
         position: absolute;
         pointer-events: none;
@@ -784,10 +788,10 @@
 
     #toggleShineGlobal {
         position: absolute;
-        top: 10%;
-        height: calc(20vw);
-        width: 20%;
-        left: 20%;
+        top: 5%;
+        height: 40%;
+        width: 40vh;
+        left: 10%;
         cursor: pointer;
         object-fit: contain;
         text-align: center;
@@ -796,10 +800,22 @@
     }
     #exportConsole {
         position: absolute;
-        top: 10%;
-        height: calc(20vw);
-        width: 20%;
-        right: 20%;
+        top: 5%;
+        height: 40%;
+        width: 40vh;
+        right: 10%;
+        cursor: pointer;
+        object-fit: contain;
+        text-align: center;
+        font-size: calc(var(--cardHeight) * 5/12);
+        pointer-events: all;
+    }
+    #toggleIndividualCardNumbers {
+        position: absolute;
+        top: 50%;
+        height: 40%;
+        width: 40vh;
+        left: 10%;
         cursor: pointer;
         object-fit: contain;
         text-align: center;
@@ -1508,8 +1524,8 @@
             'onclick': 'toggleShineGlobal()'
         }))
         toggleShineGlobal.appendChild(createElement('p', 'TESTING', null))
-        const holoEnabled = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoEnabled'))
-        if (holoEnabled == 0) {
+        const holoVisible = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoVisible'))
+        if (holoVisible == 0) {
             toggleShineGlobal['value'] = '✧'
         }
         else {
@@ -1524,6 +1540,29 @@
             'value': '🗒 ↧',
             'onclick': 'exportConsole()'
         }))
+
+        var toggleIndividualCardNumbers = settingsMenu.appendChild(createElement('input', null, {
+            'id': 'toggleIndividualCardNumbers',
+            'class': 'fadeIn buttonObject',
+            'title': 'Hide/Show Individual Card Numbers',
+            'type': 'submit',
+            'value': '🔢',
+            'onclick': 'toggleIndividualCardNumbers()'
+        }))
+    }
+
+    function toggleShineGlobal() {
+        const holoVisible = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoVisible'))
+        if (holoVisible == 0) {
+            document.getElementById('toggleShineGlobal').value = '✦'
+            document.documentElement.style.setProperty('--holoVisible', 1);
+            LOG_normal('Enabled holo animations')
+        }
+        else {
+            document.getElementById('toggleShineGlobal').value = '✧'
+            document.documentElement.style.setProperty('--holoVisible', 0);
+            LOG_normal('Disabled holo animations')
+        }
     }
 
     function exportConsole() {
@@ -1540,17 +1579,15 @@
         LOG_normal('Exported console')
     }
 
-    function toggleShineGlobal() {
-        const holoEnabled = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoEnabled'))
-        if (holoEnabled == 0) {
-            document.getElementById('toggleShineGlobal').value = '✦'
-            document.documentElement.style.setProperty('--holoEnabled', 1);
-            LOG_normal('Enabled holo animations')
+    function toggleIndividualCardNumbers() {
+        const cardCountVisible = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--cardCountVisible'))
+        if (cardCountVisible == -1) {
+            document.documentElement.style.setProperty('--cardCountVisible', 0);
+            LOG_normal('Made card count visible')
         }
         else {
-            document.getElementById('toggleShineGlobal').value = '✧'
-            document.documentElement.style.setProperty('--holoEnabled', 0);
-            LOG_normal('Disabled holo animations')
+            document.documentElement.style.setProperty('--cardCountVisible', -1);
+            LOG_normal('Made card count invisible')
         }
     }
 
@@ -2128,7 +2165,7 @@
         newCard.appendChild(createElement('input', null, {
             'type': 'button',
             'value': count,
-            'class': 'individualCardCount scaledbuttonObject'
+            'class': 'individualCardCount scaledButtonObject'
         }))
         deckCards.appendChild(newCard)
         modifyDeckCardCount(null, count)
@@ -2146,13 +2183,13 @@
         if (hoverMenu) {
             hoverMenu.appendChild(createElement('input', null, {
                 'type': 'button',
-                'class': 'deckCardHoverButtonAdd scaledbuttonObject',
+                'class': 'deckCardHoverButtonAdd scaledButtonObject',
                 'value': '＋',
                 'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDeckCardCount(this.parentNode.parentNode, +1)}'
             }))
             hoverMenu.appendChild(createElement('input', null, {
                 'type': 'button',
-                'class': 'deckCardHoverButtonRemove scaledbuttonObject',
+                'class': 'deckCardHoverButtonRemove scaledButtonObject',
                 'value': '－',
                 'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDeckCardCount(this.parentNode.parentNode, -1)}'
             }))
