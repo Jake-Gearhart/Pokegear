@@ -7,7 +7,7 @@
     <body onresize='windowResize()'>
         <div id='title'>
             <img id='titleIcon' src='images/favicon.png'>
-            <h1 id='titleText'>Pokegear.app 1.2.1 (Developer)</h1>
+            <h1 id='titleText'>Pokegear.app 1.2.2 (Dev)</h1>
             <a id='titleLink' href='https://twitter.com/jakekgearhart'>By Jake Gearhart</a>
         </div>
         <button id='help' class='buttonObject deckButton' title='Help' onclick='openHelpMenu()'>﹖</button>
@@ -524,6 +524,10 @@
     .parameterButtonDivWide {
         width: calc(var(--cardHeight) / 1.5); 
     }
+    .parameterButtonDivLarge {
+        width: calc(var(--cardHeight) / 2); 
+        height: calc(var(--cardHeight) / 2);
+    }
     .parameterButtonDiv:hover {
         background-color: var(--lightBlue30);
     }
@@ -535,8 +539,8 @@
     }
     .parameterButtonSpacer {
         display: inline-block;
-        width: 100%; 
-        height: calc(var(--cardHeight) / 3);
+        width: 100%;
+        height: calc(var(--cardHeight) / 9);
     }
     .parameterButton {
         position: absolute;
@@ -548,6 +552,10 @@
     }
     .parameterButtonWide {
         width: calc(var(--cardHeight) / 1.8); 
+    }
+    .parameterButtonLarge {
+        width: calc(var(--cardHeight) / 2.5); 
+        height: calc(var(--cardHeight) / 2.5);
     }
     .card {
         position: relative;
@@ -1008,7 +1016,7 @@
                 combinationButtons[reverseSet['series']] = {
                     'setA_img': reverseSet['images']['symbol'],
                     'setB_img': reverseSet['images']['symbol'],
-                    'sets': ['set.id:' + reverseSet['id']]
+                    'sets': [reverseSet['id']]
                 }
             }
             else {
@@ -1017,14 +1025,14 @@
                     combinationButtons[reverseSet['series']]['setA_img'] = reverseSet['images']['symbol']
                 }
                 combinationButtons[reverseSet['series']]['setB_img'] = reverseSet['images']['symbol']
-                combinationButtons[reverseSet['series']]['sets'].push('set.id:' + reverseSet['id'])
+                combinationButtons[reverseSet['series']]['sets'].push(reverseSet['id'])
             }
             rightButtons.appendChild(
                 createElement('div', null, {
                     'id': 'set.id:' + set['id'],
                     'class': 'parameterButtonDiv',
                     'title': set['name'],
-                    'onclick': 'clickParameterButton(this, true, [])'
+                    'onclick': 'toggleParameterButton(this, true)'
                 })
             ).appendChild(
                 createElement('img', null, {
@@ -1058,7 +1066,7 @@
                     'id': 'types:%22' + types[i].toLocaleLowerCase() + '%22',
                     'class': 'parameterButtonDiv',
                     'title': types[i],
-                    'onclick': 'clickParameterButton(this, true, [])'
+                    'onclick': 'toggleParameterButton(this, true)'
                 })
             ).appendChild(
                 createElement('img', null, {
@@ -1083,7 +1091,7 @@
                     'id': 'subtypes:%22' + subtypes[i].toLocaleLowerCase() + '%22',
                     'class': 'parameterButtonDiv parameterButtonDivWide',
                     'title': subtypes[i],
-                    'onclick': 'clickParameterButton(this, true, [])'
+                    'onclick': 'toggleParameterButton(this, true)'
                 })
             ).appendChild(
                 createElement('img', null, {
@@ -1094,28 +1102,25 @@
         }
 
         leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
-        var legalities = [
-            'Standard',
-            'Expanded'
-        ]
-        for (i=0; i<legalities.length; i++) {
-            leftButtons.appendChild(
-                createElement('div', null, {
-                    'id': 'legalities.' + legalities[i].toLowerCase() + ':%22legal%22',
-                    'class': 'parameterButtonDiv',
-                    'title': legalities[i],
-                    'onclick': 'clickParameterButton(this, true, [])'
-                })
-            ).appendChild(
-                createElement('img', null, {
-                    'class': 'parameterButton fadeIn',
-                    'src': 'images/legalities/' + legalities[i].toLowerCase() + '.png'
-                })
-            )
-        }
-
-        leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
-
+        // var legalities = [
+        //     'Standard',
+        //     'Expanded'
+        // ]
+        // for (i=0; i<legalities.length; i++) {
+        //     leftButtons.appendChild(
+        //         createElement('div', null, {
+        //             'id': 'legalities.' + legalities[i].toLowerCase() + ':%22legal%22',
+        //             'class': 'parameterButtonDiv',
+        //             'title': legalities[i],
+        //             'onclick': 'toggleParameterButton(this, true)'
+        //         })
+        //     ).appendChild(
+        //         createElement('img', null, {
+        //             'class': 'parameterButton fadeIn',
+        //             'src': 'images/legalities/' + legalities[i].toLowerCase() + '.png'
+        //         })
+        //     )
+        // }
         for (key in combinationButtons) {
             var combinationButton = combinationButtons[key]
             if (combinationButton['sets'].length == 1) {
@@ -1126,7 +1131,7 @@
                     'id': key,
                     'class': 'parameterButtonDiv fadeIn',
                     'title': key,
-                    'onclick': `clickParameterButton(this, true, ['${combinationButton['sets'].join("','")}'])`
+                    'onclick': `toggleParameterButton(this, true, ['set.id:${combinationButton['sets'].join("','set.id:")}'], true)`
                 }))
             newButton.appendChild(
                 createElement('img', null, {
@@ -1140,6 +1145,47 @@
                     'class': 'parameterButton',
                     'src': combinationButton['setA_img'],
                     'style': 'transform: translateX(calc(-1 * var(--cardWidth)/12)) translateY(calc(var(--cardWidth)/12)) scale(0.85)'
+                })
+            )
+        }
+
+        leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
+        var yearLegalities = {
+            '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5'],
+            '2011 - 2021 (Expanded)': ['bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5'],
+            '2019 - 2020': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3'],
+            '2018 - 2019': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11'],
+            '2017 - 2018': ['xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7'],
+            '2016 - 2017': ['xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'sm1', 'sm2', 'sm3'],
+            '2015 - 2016': ['xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11'],
+            '2014 - 2015': ['bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6'],
+            '2013 - 2014': ['bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xy0', 'xy1', 'xy2'],
+            '2012 - 2013': ['bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9'],
+            '2011 - 2012': ['hgss1', 'hgss2', 'hgss3', 'hgss4', 'col1', 'bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5'],
+            '2010 - 2011': ['hgss1', 'hgss2', 'hgss3', 'hgss4', 'col1', 'bw1'],
+            '2009 - 2010': ['dp1', 'dp2', 'pop6', 'dp3', 'dp4', 'pop7', 'dp5', 'dp6', 'pop8', 'dp7', 'pl1', 'pop9', 'pl2', 'pl2', 'pl3', 'pl4', 'ru1', 'hgss1', 'hgss2'],
+            '2008 - 2009': ['dp1', 'dp2', 'pop6', 'dp3', 'dp4', 'pop7', 'dp5', 'dp6', 'pop8', 'dp7', 'pl1', 'pop9', 'pl2', 'pl2'],
+            '2007 - 2008': ['ex13', 'pop4', 'ex14', 'ex15', 'ex16', 'pop5', 'dp1', 'dp2', 'pop6', 'dp3', 'dp4', 'pop7', 'dp5'],
+            '2006 - 2007': ['ex8', 'ex9', 'pop2', 'ex10', 'ex11', 'ex12', 'pop3', 'ex13', 'pop4', 'ex14', 'ex15', 'ex16', 'pop5'],
+            '2005 - 2006': ['ex5', 'pop1', 'ex6', 'ex7', 'ex8', 'ex9', 'pop2', 'ex10', 'ex11', 'ex12', 'pop3', 'ex13'],
+            '2004 - 2005': ['ex1', 'ex2', 'ex3', 'ex4', 'ex5', 'pop1', 'ex6', 'ex7', 'ex8', 'ex9'],
+            '2003 - 2004': ['ecard1', 'ecard2', 'ecard3', 'ex1', 'ex2', 'ex3', 'ex4', 'ex5'],
+            '2002 - 2003': ['neo1', 'neo2', 'si1', 'neo3', 'neo4', 'base6', 'ecard1', 'ecard2', 'ecard3'],
+            '2001 - 2002': ['base5', 'gym1', 'gym2', 'neo1', 'neo2', 'si1', 'neo3', 'neo4', 'base6'],
+            '2000 - 2001': ['base1', 'base2', 'base3', 'base4', 'base5', 'gym1', 'gym2', 'neo1', 'neo2', 'si1'],
+        }
+        for (key in yearLegalities) {
+            leftButtons.appendChild(
+                createElement('div', null, {
+                    'id': key,
+                    'class': 'parameterButtonDiv parameterButtonDivLarge',
+                    'title': key,
+                    'onclick': `toggleParameterButton(this, true, ['set.id:${yearLegalities[key].join("','set.id:")}'], true)`
+                })
+            ).appendChild(
+                createElement('img', null, {
+                    'class': 'parameterButton parameterButtonLarge fadeIn',
+                    'src': 'images/legalities/' + key + '.png'
                 })
             )
         }
@@ -1685,7 +1731,7 @@
             if (document.getElementById(`set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}`).classList.contains('selectedButton')) {
                 focusedSet.classList.add('parameterButtonDivSelected')
             }
-            focusedSet.setAttribute('onclick', `clickParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true, []); if (this.classList.contains('parameterButtonDivSelected')) {this.classList.remove('parameterButtonDivSelected')} else {this.classList.add('parameterButtonDivSelected')}`)
+            focusedSet.setAttribute('onclick', `toggleParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true); if (this.classList.contains('parameterButtonDivSelected')) {this.classList.remove('parameterButtonDivSelected')} else {this.classList.add('parameterButtonDivSelected')}`)
         }
         else {
             focusedSet.innerHTML = '?'
@@ -1815,33 +1861,53 @@
         }
     }
 
-    function clickParameterButton (elem, initiateSearch, group) {
-        var activating
+    function toggleParameterButton (elem, initiateSearch, group, conform) {
         if (!elem.classList.contains('parameterButtonDivSelected')) {
-            elem.classList.add('parameterButtonDivSelected')
-            activating = true
+            enableParameterButton(elem, initiateSearch, group, conform)
         }
         else {
-            elem.classList.remove('parameterButtonDivSelected')
-            activating = false
+            disableParameterButton(elem, initiateSearch, group, conform)
         }
+    }
 
-        if (group.length < 1) {
-            if (activating == true) {
-                elem.classList.add('selectedButton')
-            }
-            else {
-                elem.classList.remove('selectedButton')
-            }
+    function enableParameterButton (elem, initiateSearch, group, conform) {
+        elem.classList.add('parameterButtonDivSelected')
+        if (!group || group.length < 1) {
+            elem.classList.add('selectedButton')
         }
         else {
             for (i=0; i<group.length; i++) {
-                clickParameterButton(document.getElementById(group[i]), false, []);
+                if (conform == true) {
+                    enableParameterButton(document.getElementById(group[i]), false);
+                }
+                else {
+                    toggleParameterButton(document.getElementById(group[i]), false);
+                }
             }
         }
         if (initiateSearch == true) {
             constructSearchUrl()
         }
+    }
+
+    function disableParameterButton (elem, initiateSearch, group, conform) {
+        elem.classList.remove('parameterButtonDivSelected')
+        if (!group || group.length < 1) {
+            elem.classList.remove('selectedButton')
+        }
+        else {
+            for (i=0; i<group.length; i++) {
+                if (conform == true) {
+                    disableParameterButton(document.getElementById(group[i]), false);
+                }
+                else {
+                    toggleParameterButton(document.getElementById(group[i]), false);
+                }
+            }
+        }
+        if (initiateSearch == true) {
+            constructSearchUrl()
+        }  
     }
 
     function constructSearchUrl () {
