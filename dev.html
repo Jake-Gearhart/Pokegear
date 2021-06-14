@@ -1724,7 +1724,6 @@
         }
 
         //download
-        // console.log(card.getAttribute('custom-card'))
         if (!dataContainer.getAttribute('custom-card') == true) {
             focusedDownload.setAttribute('onclick', `downloadResource("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').replace(' ', '-').toLowerCase()}-${card.id}.png")`)
             focusedDownload.setAttribute('style', 'cursor: pointer')
@@ -2034,9 +2033,10 @@
 
     function addDeckCard(card, count) {
         //if card exists in deck
-        for (i=0; i<deckCards.children.length; i++) {
-            if (deckCards.children[i]['id'] == card['id']) {
-                modifyDeckCardCount(deckCards.children[i], count)
+        // FIX: j instead of i because importDeck was being changed
+        for (j=0; j<deckCards.children.length; j++) {
+            if (deckCards.children[j]['id'] == card['id']) {
+                modifyDeckCardCount(deckCards.children[j], count)
                 return
             }
         }
