@@ -7,11 +7,11 @@
     <body onresize='windowResize()'>
         <div id='title'>
             <img id='titleIcon' src='images/favicon.png'>
-            <h1 id='titleText'>Pokegear.app 1.2.3 (Dev)</h1>
+            <h1 id='titleText'>Pokegear<wbr>.app 1.2.3 (Dev)</h1>
             <div id='titleLinks'>
                 <a id='linktree' class='titleLink' href='https://linktr.ee/JakeGearhart'>By Jake Gearhart</a>
-                <span style='color: gray'>——</span>
-                <a id='patreon' class='titleLink' href='https://www.patreon.com/jakegearhart'>Request A Feature</a>
+                <br>
+                <a id='patreon' class='titleLink' href='https://www.patreon.com/jakegearhart'>Support the Project / Request A Feature</a>
             </div>
         </div>
         <button id='help' class='buttonObject deckButton' title='Help' onclick='openHelpMenu()'>﹖</button>
@@ -167,27 +167,32 @@
     #title {
         z-index: 500;
         position: absolute;
+        top: calc(var(--cardHeight) * 1/12);
         height: calc(var(--cardHeight) / 3);
         left: calc(var(--cardHeight) * 11/12);
+        width: calc(50% - var(--cardHeight) * 5/4);
+        margin: 0;
+        padding: 0;
     }
     #titleIcon {
         position: absolute;
         height: calc(var(--cardHeight) / 3);
-        bottom: calc(-1 * var(--cardHeight) / 12);
         left: calc(var(--cardHeight) * -5/12);
     }
     #titleText {
         font-family: 'Courier New', Courier, monospace;
         color: var(--midBlue);
         font-size: calc(var(--cardHeight) / 6);
+        position: relative;
+        margin: 0;
+        padding: 0;
     }
     #titleLinks {
-        position: absolute;
-        bottom: calc(-1 * var(--cardHeight) / 12);
+        margin: 0;
+        padding: 0;
         font-size: calc(var(--cardHeight) / 10);
     }
     .titleLink {
-        display: inline-block;
         font-style: italic;
         color: gray;
         text-decoration: none;
