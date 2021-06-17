@@ -9,7 +9,7 @@
             <img id='titleIcon' src='images/favicon.png'>
             <h1 id='titleText'>Pokegear<wbr>.app 1.2.3</h1>
             <div id='titleLinks'>
-                <a id='linktree' class='titleLink' href='https://linktr.ee/JakeGearhart'>By Jake Gearhart</a>
+                <a id='linktree' class='titleLink' href='https://linktr.ee/JakeGearhart'>Created By Jake Gearhart</a>
                 <br>
                 <a id='patreon' class='titleLink' href='https://www.patreon.com/jakegearhart'>Support the Project / Request A Feature</a>
             </div>
@@ -70,14 +70,12 @@
         --focusedWidth: calc(min(100vw, 100vh) * var(--cardDimensionRatio));
 
         --lightBlue: rgb(207, 239, 255);
-        --lightBlue30: rgba(207, 239, 255, 0.3);
-        --lightBlue60: rgba(207, 239, 255, 0.6);
+        --lightBlue3÷10: rgba(207, 239, 255, calc(3/10));
+        --lightBlue6÷10: rgba(207, 239, 255, calc(6/10));
         --darkBlue: rgb(15, 15, 71);
-        --darkBlue30: rgba(15, 15, 71, 0.3);
-        --darkBlue60: rgba(15, 15, 71, 0.6);
-        --midBlue: rgb(46, 51, 101);
-        --midBlue30: rgba(46, 51, 101, 0.3);
-        --midBlue60: rgba(46, 51, 101, 0.6);
+        --darkBlue3÷10: rgba(15, 15, 71, calc(3/10));
+        --darkBlue6÷10: rgba(15, 15, 71, calc(6/10));
+        --darkBlue5÷6: rgba(15, 15, 71, calc(5/6));
 
         --holoSpeed: 20;
         --holoFPS: 30;
@@ -131,16 +129,16 @@
         height: calc(var(--cardHeight) / 3);
         font-size: calc(var(--cardHeight) / 6);
         margin: 0;
-        border: calc(var(--cardHeight) / 48) solid var(--lightBlue60);
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue6÷10);
         border-radius: calc(var(--cardHeight) / 9) !important;
         -webkit-border-radius: calc(var(--cardHeight) / 9) !important;
         text-shadow: 0px 0px 8px var(--darkBlue);
-        background-color: var(--darkBlue60);
+        background-color: var(--darkBlue6÷10);
         color: rgba(255, 255, 255, 0.8);
         transition: background-color 0.25s, transform 0.125s;
     }
     .buttonObject:hover {
-        background-color: var(--midBlue60);
+        background-color: var(--darkBlue6÷10);
     }
     .buttonObject:active {
         transform: translateY(4%);
@@ -150,16 +148,16 @@
         height: calc(var(--scaledCardHeight) / 3);
         font-size: calc(var(--scaledCardHeight) / 6);
         margin: 0;
-        border: calc(var(--scaledCardHeight) / 48) solid var(--lightBlue60);
+        border: calc(var(--scaledCardHeight) / 48) solid var(--lightBlue6÷10);
         border-radius: calc(var(--scaledCardHeight) / 9) !important;
         -webkit-border-radius: calc(var(--scaledCardHeight) / 9) !important;
         text-shadow: 0px 0px calc(8px * var(--cardScale)) var(--darkBlue);
-        background-color: var(--darkBlue60);
+        background-color: var(--darkBlue6÷10);
         color: rgba(255, 255, 255, 0.8);
         transition: background-color 0.25s, transform 0.125s;
     }
     .scaledButtonObject:hover {
-        background-color: var(--midBlue60);
+        background-color: var(--darkBlue6÷10);
     }
     .scaledButtonObject:active {
         transform: translateY(4%);
@@ -181,7 +179,7 @@
     }
     #titleText {
         font-family: 'Courier New', Courier, monospace;
-        color: var(--midBlue);
+        color: var(--darkBlue5÷6);
         font-size: calc(var(--cardHeight) / 6);
         position: relative;
         margin: 0;
@@ -215,7 +213,7 @@
         z-index: 1000;
         position: absolute;
         right: calc(var(--cardHeight) / 12);
-        background-color: var(--midBlue);
+        background-color: var(--darkBlue5÷6);
         font-weight: bold;
         cursor: pointer;
     }
@@ -298,8 +296,8 @@
         margin-left: calc(var(--cardHeight) / 12);
         margin-bottom: calc(-1 * var(--cardHeight) / 6);
         -webkit-appearance: none;
-        background-color: var(--midBlue);
-        border: calc(var(--cardHeight) / 48) solid var(--lightBlue60);
+        background-color: var(--darkBlue5÷6);
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue6÷10);
         border-radius: calc(var(--cardHeight) / 9);
     }
     #scaleSlider::-webkit-slider-thumb {
@@ -336,8 +334,8 @@
         width: calc(var(--cardHeight) / 2);
         left: calc(50% - var(--cardHeight) / 4);
         top: calc(var(--cardHeight) / 12);
-        background-color: var(--midBlue);
-        border: calc(var(--cardHeight) / 48) solid var(--lightBlue60);
+        background-color: var(--darkBlue5÷6);
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue6÷10);
         pointer-events: none;
     }
     .individualCardCount {
@@ -348,8 +346,8 @@
         left: 0;
         right: 0;
         margin: auto;
-        background-color: var(--lightBlue60);
-        border: calc(var(--scaledCardHeight) / 48) solid var(--darkBlue30);
+        background-color: var(--lightBlue6÷10);
+        border: calc(var(--scaledCardHeight) / 48) solid var(--darkBlue3÷10);
         pointer-events: none;
     }
     #deck {
@@ -379,7 +377,7 @@
         width: calc(var(--scaledCardHeight) / 4);
         font-size: calc(var(--scaledCardHeight) / (20/3));
         font-weight: bold;
-        border: calc(var(--scaledCardHeight) / 64) solid var(--lightBlue30);
+        border: calc(var(--scaledCardHeight) / 64) solid var(--lightBlue3÷10);
         margin: calc(-1 * var(--scaledCardHeight) / 64);
         border-radius: calc(var(--scaledCardHeight) / 12) !important;
         -webkit-border-radius: calc(var(--scaledCardHeight) / 12) !important;
@@ -395,7 +393,7 @@
         width: calc(var(--scaledCardHeight) / 4);
         font-size: calc(var(--scaledCardHeight) / (20/3));
         font-weight: bold;
-        border: calc(var(--scaledCardHeight) / 64) solid var(--lightBlue30);
+        border: calc(var(--scaledCardHeight) / 64) solid var(--lightBlue3÷10);
         margin: calc(-1 * var(--scaledCardHeight) / 64);
         border-radius: calc(var(--scaledCardHeight) / 12) !important;
         -webkit-border-radius: calc(var(--scaledCardHeight) / 12) !important;
@@ -419,7 +417,7 @@
         width: calc(40% + var(--cardHeight) * 5/12);
         height: 100%;
         margin-left: -40%;
-        background-color: var(--darkBlue60);
+        background-color: var(--darkBlue6÷10);
         transition: 0.5s;
         transition-delay: 0.15s;
     }
@@ -433,7 +431,7 @@
         left: calc(50% - var(--cardHeight) / 6);
         margin: 0 auto;
         font-weight: bold;
-        border: calc(var(--cardHeight) / 48) solid var(--lightBlue30);
+        border: calc(var(--cardHeight) / 48) solid var(--lightBlue3÷10);
         cursor: pointer;
         pointer-events: all;
     }
@@ -442,7 +440,7 @@
         width: calc(var(--cardHeight) * 5/12);
         height: 100%;
         margin-left: calc(100% - var(--cardHeight) * 5/12);
-        background-color: var(--darkBlue60);
+        background-color: var(--darkBlue6÷10);
         color: white;
         font-size: calc(var(--cardHeight) * 5/12);
         cursor: pointer;
@@ -513,7 +511,7 @@
         width: calc(100% - var(--cardHeight) * 5/12);
         height: 50%;
         bottom: calc(-50% + calc(var(--cardHeight) / 3));
-        background-color: var(--darkBlue60);
+        background-color: var(--darkBlue6÷10);
         transition: 0.5s;
         transition-delay: 0.15s;
     }
@@ -543,7 +541,7 @@
         height: calc(var(--cardHeight) / 2);
     }
     .parameterButtonDiv:hover {
-        background-color: var(--lightBlue30);
+        background-color: var(--lightBlue3÷10);
     }
     .parameterButtonDivSelected {
         background-color: rgba(0, 255, 0, 0.6)
@@ -1514,10 +1512,13 @@
         helpMenu.appendChild(createElement('p', 'You can search for cards to add to your deck using the sidebar found to the left of the screen. Hover over the blue tab with the arrow to open it. Expand it to full screen by clicking on the arrow. Search for cards by using the buttons at the bottom or type in the search bar at the top. Clicking the + button will add a new search field so you can search using multiple criteria. Click any card to view it in fullscreen. Once a card is in the deck, you can move it around by dragging it.', {
             'id': 'helpMenuText'
         }))
+        helpMenu.appendChild(createElement('p', 'To add proxies into the program, simply drag and drop an image of a card into the deck. You can customize if the card is holo or not by clicking on the card and clicking the top left button in the fullscreen menu.', {
+            'id': 'helpMenuText'
+        }))
         helpMenu.appendChild(createElement('p', 'You can import or export decks from your clipboard or browser\'s local storage using the ↥/↧ buttons to the right of the screen. The 🔓 button allows you to prevent changes to the deck as well as hides the +/- buttons when hovering over cards (best for recording a video on your decks). You can automatically sort the deck with the ⟳ button, or drag cards in the deck to sort it yourself. The slider allows you to enlarge or shrink the visual size of cards in the deck. Remove all cards in the deck or delete a saved deck by using the 🗑 button.', {
             'id': 'helpMenuText'
         }))
-        helpMenu.appendChild(createElement('p', 'Clicking the ✦ in the ⚙ (settings) menu will disable the holo effect on cards. Clicking 🗒 ↧ will export the log of actions for this session.', {
+        helpMenu.appendChild(createElement('p', 'Clicking the ✦ in the ⚙ (settings) menu will disable the holo effect on cards. Clicking 🔢 will hide/show the numbers on individual cards. Clicking 🗒 ↧ will export the log of actions for this session.', {
             'id': 'helpMenuText'
         }))
     }
