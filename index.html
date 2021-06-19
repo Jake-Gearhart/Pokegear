@@ -1175,7 +1175,7 @@
 
         leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
         var yearLegalities = {
-            '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5'],
+            '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6'],
             '2011 - 2021 (Expanded)': ['bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5'],
             '2019 - 2020': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3'],
             '2018 - 2019': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11'],
@@ -2336,15 +2336,6 @@
             LOG_alertNormal('Please wait for a few seconds for sets to load.')
             return
         }
-        var overwriteDeck = true
-        if (deckCards.firstChild && !confirm('Would you like to overwrite the existing deck?')) {
-            if (confirm('Are you sure you want to import new cards? (This will add cards on top of the existing deck)')) {
-                overwriteDeck = false
-            }
-            else {
-                return
-            }
-        }
 
         text = text.split('\n')
         var cardsToSearch = []
@@ -2469,8 +2460,17 @@
         }
 
         var importedCorrectly = true
+        var overwriteDeck = true
         if (cardsToSearch.length == 0) {
             LOG_alertError('No cards were found on the clipboard:\n\n' + text)
+        }
+        else if (deckCards.firstChild && !confirm('Would you like to overwrite the existing deck?')) {
+            if (confirm('Are you sure you want to import new cards? (This will add cards on top of the existing deck)')) {
+                overwriteDeck = false
+            }
+            else {
+                return
+            }
         }
         //begin import
         else {
@@ -2488,7 +2488,7 @@
             var cardData
             //if response did not contain card data
             if (!response['cards']) {
-                LOG_alertNormal('The deck you tried to import was malformed.')
+                LOG_alertNormal('The deck you tried to import was malformed:\n\n' + text)
             }
             else {
                 cardData = response['cards']
