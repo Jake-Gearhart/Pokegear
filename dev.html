@@ -7,7 +7,7 @@
     <body onresize='windowResize()'>
         <div id='title'>
             <img id='titleIcon' src='images/favicon.png'>
-            <h1 id='titleText'>Pokegear<wbr>.app 1.2.3 (Dev)</h1>
+            <h1 id='titleText'>Pokegear<wbr>.app 1.3.0 (Dev)</h1>
             <div id='titleLinks'>
                 <a id='linktree' class='titleLink' href='https://linktr.ee/JakeGearhart'>Created By Jake Gearhart</a>
                 <br>
@@ -45,6 +45,7 @@
             </div>
             <input class='addParameterButton buttonObject' title='Add Parameter' type='button' value='＋' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
         </div>
+        <canvas id='exportCanvas' width=1280px height=720px style='position: absolute; background-color: rgba(255, 0, 0, 0.5); pointer-events: none; transform: translateX(-200px) scale(0.5);'></canvas>
     </body>
 </html>
 <template>
@@ -256,7 +257,6 @@
     .deckSubButton {
         background-color: rgba(0,0,0,0);
         border: none;
-        width: 50%;
         height: 100%;
         font-size: calc(var(--cardHeight) / 6);
         text-shadow: 0px 0px 8px var(--darkBlue);
@@ -272,7 +272,7 @@
         cursor: default;
     }
     #exportDeck:hover {
-        width: calc(var(--cardHeight) * 3/4);
+        width: calc(var(--cardHeight) * 7/6);
     }
     #sortDeck {
         top: calc(var(--cardHeight) * 21/12);
@@ -427,7 +427,6 @@
     .sidebarCardHoverButton {
         position: relative;
         top: 15%;
-        left: calc(50% - var(--cardHeight) / 6);
         margin: 0 auto;
         font-weight: bold;
         border: calc(var(--cardHeight) / 48) solid var(--lightBlue6÷10);
@@ -1477,7 +1476,16 @@
         elem.remove()
     }
 
-    function downloadResource(url, filename) {
+    function downloadTempButton (filename, data) {
+        var temp = document.createElement('a');
+        temp.download = filename;
+        temp.href = data;
+        document.body.appendChild(temp);
+        temp.click();
+        temp.remove();
+    }
+
+    function downloadImageLink(url, filename) {
         fetch(url, {
             headers: new Headers({
             'Origin': location.origin
@@ -1486,13 +1494,8 @@
         })
         .then(response => response.blob())
         .then(blob => {
-            let blobUrl = window.URL.createObjectURL(blob);
-            var temp = document.createElement('a');
-            temp.download = filename;
-            temp.href = blobUrl;
-            document.body.appendChild(temp);
-            temp.click();
-            temp.remove();
+            var blobUrl = window.URL.createObjectURL(blob);
+            downloadTempButton(filename, blobUrl)
         })
         .catch(error => console.error(error));
     }
@@ -1819,7 +1822,7 @@
 
         //download
         if (!dataContainer.getAttribute('custom-card') == true) {
-            focusedDownload.setAttribute('onclick', `downloadResource("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').replace(' ', '-').toLowerCase()}-${card.id}.png")`)
+            focusedDownload.setAttribute('onclick', `downloadImageLink("${JSON.parse(dataContainer.getAttribute('images'))['large']}", "${dataContainer.getAttribute('name').replace(' ', '-').toLowerCase()}-${card.id}.png")`)
             focusedDownload.setAttribute('style', 'cursor: pointer')
         }
         else {
@@ -2295,12 +2298,14 @@
         button.appendChild(createElement('button', '📂', {
             'title': 'Import Saved Deck',
             'class': 'deckSubButton',
-            'onclick': 'importDeckLocalStorage()'
+            'onclick': 'importDeckLocalStorage()',
+            'style': 'width: calc(100%/2)'
         }))
         button.appendChild(createElement('button', '📋', {
             'title': 'Import Deck From Clipboard',
             'class': 'deckSubButton',
-            'onclick': 'importDeckClipboard()'
+            'onclick': 'importDeckClipboard()',
+            'style': 'width: calc(100%/2)'
         }))
     }
 
@@ -2524,16 +2529,24 @@
         button.appendChild(createElement('button', '💾', {
             'title': 'Save Deck',
             'class': 'deckSubButton',
-            'onclick': 'exportDeck("localStorage")'
+            'onclick': 'exportDeckText("localStorage")',
+            'style': 'width: calc(100%/3)'
+        }))
+        button.appendChild(createElement('button', '📷', {
+            'title': 'Export Deck As Image Or Gif',
+            'class': 'deckSubButton',
+            'onclick': 'exportDeckImage()',
+            'style': 'width: calc(100%/3)'
         }))
         button.appendChild(createElement('button', '📋', {
             'title': 'Copy Deck To Clipboard',
             'class': 'deckSubButton',
-            'onclick': 'exportDeck("clipboard")'
+            'onclick': 'exportDeckText("clipboard")',
+            'style': 'width: calc(100%/3)'
         }))
     }
 
-    function exportDeck (mode) {
+    function exportDeckText (mode) {
         var cards = deckCards.childNodes
         if (cards.length == 0) {
             LOG_alertNormal('Use this button to export the deck to your clipboard.')
@@ -2589,6 +2602,24 @@
                 localStorage.setItem(key, text)
             }
         }
+    }
+
+    function exportDeckImage () {
+        console.log('EXPORTING DECK IMAGE')
+
+        var canvas = document.getElementById('exportCanvas')
+        var context = canvas.getContext('2d')
+
+        var cards = document.getElementById('deckCards').children
+        for (i=0; i<cards.length; i++) {
+            var cardImageContainer = cards[i].getElementsByClassName('cardImageContainer')
+            var cardImage = cardImageContainer[cardImageContainer.length -1].firstChild
+            context.drawImage(cardImage, (canvas.width/cards.length)*i, 0, canvas.width/cards.length, canvas.height);
+        }
+        downloadTempButton('my-deck.png', canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+
+
+        // HEREHEREHERE
     }
 
     function sortDeck () {
@@ -2762,12 +2793,14 @@
         button.appendChild(createElement('button', '📂', {
             'title': 'Delete Saved Deck',
             'class': 'deckSubButton',
-            'onclick': 'deleteSavedDeck()'
+            'onclick': 'deleteSavedDeck()',
+            'style': 'width: calc(100%/2)'
         }))
         button.appendChild(createElement('button', '🗑', {
             'title': 'Delete Deck',
             'class': 'deckSubButton',
-            'onclick': 'deleteDeck()'
+            'onclick': 'deleteDeck()',
+            'style': 'width: calc(100%/2)'
         }))
     }
 
