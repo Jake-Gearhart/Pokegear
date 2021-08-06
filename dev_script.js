@@ -35,8 +35,6 @@ const urlTranslations = {
     'delta': '%CE%B4'
 }
 
-const header = {headers: {'X-Api-Key': 'c937592b-dbe9-47de-a29f-194bce94c11b'}}
-
 //sidebar
 const sidebarDiv = document.getElementById('sidebar')
 const sidebarCards = document.getElementById('sidebarCards');
@@ -170,7 +168,7 @@ async function populateSets () {
     var response
     var json
     try {
-        response = await fetch(url, header)
+        response = await fetch(url)
         json = await response.json()
         loadingAlertEnd(url, true)
     }
@@ -495,7 +493,8 @@ async function fetchCards (url) {
     const id = currentFetchID
     
     try {
-        const response = await fetch(url, header)
+        // HERE
+        const response = await fetch(url)
         const json = await response.json()
 
         loadingAlertEnd(url, true)
@@ -677,6 +676,9 @@ function openHelpMenu () {
         'id': 'helpMenuText'
     }))
     helpMenu.appendChild(createElement('p', 'Clicking the ✦ in the ⚙ (settings) menu will disable the holo effect on cards. Clicking 🔢 will hide/show the numbers on individual cards. Clicking 🗒 ↧ will export the log of actions for this session.', {
+        'id': 'helpMenuText'
+    }))
+    helpMenu.appendChild(createElement('p', 'Pokegear logo designed by <a href="https://zachroy.com">Zach Roy</a>', {
         'id': 'helpMenuText'
     }))
 }
@@ -1212,7 +1214,7 @@ async function fetchNewSidebarCards(url) {
     loadingMoreCards = true
 
     //fetch URL
-    const response = await fetchCards(url, header)
+    const response = await fetchCards(url)
 
     //return if not the most recent request
     if (response['id'] != currentFetchID) {
@@ -1643,7 +1645,7 @@ async function importDeck (text) {
         }
         var url = `https://api.pokemontcg.io/v2/cards?q=id:${cardIDs.join('+OR+id:')}+`
 
-        const response = await fetchCards(url, header)
+        const response = await fetchCards(url)
 
         var cardData
         //if response did not contain card data
@@ -1759,6 +1761,21 @@ function exportDeckText (mode) {
     }
 }
 
+// function exportDeckImage () {
+//     console.log('EXPORTING DECK IMAGE')
+
+//     var canvas = document.getElementById('exportCanvas')
+//     var context = canvas.getContext('2d')
+
+//     var cards = document.getElementById('deckCards').children
+//     for (i=0; i<cards.length; i++) {
+//         var cardImageContainer = cards[i].getElementsByClassName('cardImageContainer')
+//         var cardImage = cardImageContainer[cardImageContainer.length -1].firstChild
+//         context.drawImage(cardImage, (canvas.width/cards.length)*i, 0, canvas.width/cards.length, canvas.height);
+//     }
+//     downloadTempButton('my-deck.png', canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+// }
+
 function exportDeckImage () {
     console.log('EXPORTING DECK IMAGE')
 
@@ -1769,7 +1786,12 @@ function exportDeckImage () {
     for (i=0; i<cards.length; i++) {
         var cardImageContainer = cards[i].getElementsByClassName('cardImageContainer')
         var cardImage = cardImageContainer[cardImageContainer.length -1].firstChild
-        context.drawImage(cardImage, (canvas.width/cards.length)*i, 0, canvas.width/cards.length, canvas.height);
+        fetch(cardImage)
+        .then(result => result.blob())
+        .then(blob => {
+            myImageElement.src = URL.createObjectURL(blob);
+            myImageElement.onload = context.drawImage(cardImage, (canvas.width/cards.length)*i, 0, canvas.width/cards.length, canvas.height);;
+        })
     }
     downloadTempButton('my-deck.png', canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
 }
