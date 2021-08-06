@@ -1,5 +1,5 @@
 <head>
-    <link rel="shortcut icon" type="image/png" href='images/favicon_new.png'>
+    <link rel="shortcut icon" type="image/png" href='images/favicon.png'>
     <title>Pokégear</title>
     <meta charset="utf-8">
 </head>
@@ -45,7 +45,7 @@
             </div>
             <input class='addParameterButton buttonObject' title='Add Parameter' type='button' value='＋' onclick='document.getElementById("sidebar").insertBefore(document.getElementsByTagName("template")[0].content.cloneNode(true), this)'>
         </div>
-        <!-- <canvas id='exportCanvas' width=1280px height=720px style='position: absolute; background-color: rgba(255, 0, 0, 0.5); pointer-events: none; transform: translateX(-200px) scale(0.5);'></canvas> -->
+        <canvas id='exportCanvas' width=1280px height=720px style='position: absolute; background-color: rgba(255, 0, 0, 0.5); pointer-events: none; transform: translateX(-200px) scale(0.5);'></canvas>
     </body>
 </html>
 <template>
@@ -69,13 +69,6 @@
 
         --focusedHeight: min(100vw, 100vh);
         --focusedWidth: calc(min(100vw, 100vh) * var(--cardDimensionRatio));
-
-        /* --lightColor: rgb(207, 239, 255); */
-        /* --lightColor6÷10: rgba(207, 239, 255, calc(6/10)); */
-        /* --darkColor: rgb(15, 15, 71); */
-        /* --darkColor3÷10: rgba(15, 15, 71, calc(3/10)); */
-        /* --darkColor6÷10: rgba(15, 15, 71, calc(6/10)); */
-        /* --darkColor5÷6: rgba(15, 15, 71, calc(5/6)); */
 
         --lightColor: rgb(208, 237, 252);
         --lightColor6÷10: rgba(208, 237, 252, calc(2/3));
@@ -849,5 +842,5 @@
     @keyframes fadeOut {from {opacity: 1} to {opacity: 0}}
 
 </style>
-<script src='dev_script.js'></script>
+<script src='script.js'></script>
 <!-- <script src='html2canvas.js'></script> -->
