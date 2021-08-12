@@ -1844,7 +1844,7 @@ function exportDeckImage () {
 
             imgCtx.drawImage(this, 0, 0)
 
-            if (this.shine == true) {
+            if (this.shine == true && 1 == 2) {
                 var shineImg = new Image()
                 shineImg.ctx = imgCtx
                 img.onload = function () {
