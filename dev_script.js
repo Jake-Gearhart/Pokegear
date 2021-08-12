@@ -1761,45 +1761,160 @@ function exportDeckText (mode) {
     }
 }
 
+// HERE
 // function exportDeckImage () {
 //     console.log('EXPORTING DECK IMAGE')
 
 //     var canvas = document.getElementById('exportCanvas')
 //     var context = canvas.getContext('2d')
+//     context.imageSmoothingEnabled = false;
 
 //     var cards = document.getElementById('deckCards').children
 //     for (i=0; i<cards.length; i++) {
-//         var cardImageContainer = cards[i].getElementsByClassName('cardImageContainer')
-//         var cardImage = cardImageContainer[cardImageContainer.length -1].firstChild
-//         context.drawImage(cardImage, (canvas.width/cards.length)*i, 0, canvas.width/cards.length, canvas.height);
+//         var completed = 0
+//         var img = new Image()
+//         img.i = i
+//         img.onload = function () {
+//             context.drawImage(this, (canvas.width/cards.length)*this.i, 0, canvas.width/cards.length, canvas.height)
+//             completed++
+//             if (completed == cards.length) {
+//                 // downloadTempButton('my-deck.png', canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+//             }
+//         }
+//         img.crossOrigin = 'Anonymous'
+//         img.src = JSON.parse(cards[i].getElementsByClassName('data')[0].getAttribute('images'))['large']
 //     }
-//     downloadTempButton('my-deck.png', canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
 // }
 
 function exportDeckImage () {
     console.log('EXPORTING DECK IMAGE')
+    if (document.getElementById('exportCanvas')) {
+        document.getElementById('exportCanvas').remove()
+    }
 
-    var canvas = document.getElementById('exportCanvas')
-    var context = canvas.getContext('2d')
-
+    var exportCanvas = document.createElement('canvas')
+    exportCanvas.id = 'exportCanvas'
+    document.body.appendChild(exportCanvas)
+    exportCanvas.height = 1440
+    exportCanvas.width = 2560
+    exportCanvas.setAttribute('style', 'position: absolute; background-color: rgba(255, 0, 0, 0.5); pointer-events: none; transform: scale(0.25);')
+    var ctx = exportCanvas.getContext('2d')
+    ctx.imageSmoothingEnabled = false
+    
     var cards = document.getElementById('deckCards').children
     for (i=0; i<cards.length; i++) {
-        var cardImageContainer = cards[i].getElementsByClassName('cardImageContainer')
-        var cardImage = cardImageContainer[cardImageContainer.length -1].firstChild
-        fetch(cardImage)
-        .then(result => result.blob())
-        .then(blob => {
-            myImageElement.src = URL.createObjectURL(blob);
-            myImageElement.onload = context.drawImage(cardImage, (canvas.width/cards.length)*i, 0, canvas.width/cards.length, canvas.height);;
-        })
+        var completed = 0
+
+        var tempCanvas = document.createElement('canvas')
+        document.body.appendChild(tempCanvas)
+        tempCanvas.setAttribute('style', 'position: absolute; transform: translateY(100px) scale(0.5)')
+        var tempCtx = tempCanvas.getContext('2d')
+        tempCtx.imageSmoothingEnabled = false
+
+        var img = new Image()
+        img.i = i
+        img.canvas = tempCanvas
+        if (cards[i].getElementsByClassName('holo')[0]) {
+            img.shine = true
+        }
+        else {
+            img.shine = false
+        }
+        img.onload = function () {
+            var width = this.width
+            var height = this.height
+            var imgCanvas = this.canvas
+            var imgCtx = imgCanvas.getContext('2d')
+            imgCanvas.width = width
+            imgCanvas.height = height
+
+            var radius = height/26
+
+            imgCtx.moveTo(radius, 0)
+            imgCtx.lineTo(width - radius, 0)
+            imgCtx.quadraticCurveTo(width, 0, width, radius)
+            imgCtx.lineTo(width, height - radius)
+            imgCtx.quadraticCurveTo(width, height, width - radius, height)
+            imgCtx.lineTo(radius, height)
+            imgCtx.quadraticCurveTo(0, height, 0, height - radius)
+            imgCtx.lineTo(0, radius)
+            imgCtx.quadraticCurveTo(0, 0, radius, 0)
+            imgCtx.closePath()
+            imgCtx.clip()
+
+            imgCtx.drawImage(this, 0, 0)
+
+            if (this.shine == true) {
+                var shineImg = new Image()
+                shineImg.ctx = imgCtx
+                img.onload = function () {
+                    shineImg.ctx.drawImage(this, 0, 0)
+
+                    // add finished card to main export canvas
+                    ctx.drawImage(imgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
+                    imgCanvas.remove()
+                    completed++
+                    if (completed == cards.length) {
+                        downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+                    }
+                }
+
+                // imgCtx.fillStyle = 'rgba(0, 255, 0, 0.5)'
+                // imgCtx.fillRect(0, 0, imgCanvas.width, imgCanvas.height)
+
+                img.src = 'images/holo_overlay.png'
+                // HERE HERE HERE
+            }
+            else {
+                // add finished card to main export canvas
+                ctx.drawImage(imgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
+                imgCanvas.remove()
+                completed++
+                if (completed == cards.length) {
+                    downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+                }
+            }
+        }
+        img.crossOrigin = 'Anonymous'
+        img.src = JSON.parse(cards[i].getElementsByClassName('data')[0].getAttribute('images'))['large']
     }
-    downloadTempButton('my-deck.png', canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
 }
 
-// function exportDeckImage () {
-//     html2canvas(document.getElementById('deckCards'), { allowTaint: true }).then(canvas => {
-//         document.body.appendChild(canvas)
-//     });
+// function createCardCanvas (imageUrl, shine) {
+//     var tempCanvas = document.createElement('canvas')
+//     tempCanvas.id = 'TEST-CANVAS'
+//     document.body.appendChild(tempCanvas)
+//     tempCanvas.setAttribute('style', 'position: absolute; opacity: 50%; transform: translateY(100px) scale(1)')
+//     var tempCtx = tempCanvas.getContext('2d')
+//     tempCtx.imageSmoothingEnabled = false
+//     var img = new Image()
+//     img.onload = function () {
+//         var width = img.width
+//         var height = img.height
+//         tempCanvas.width = width
+//         tempCanvas.height = height
+//         var radius = height/26
+//         tempCtx.beginPath()
+//         tempCtx.moveTo(radius, 0)
+//         tempCtx.lineTo(width - radius, 0)
+//         tempCtx.quadraticCurveTo(width, 0, width, radius)
+//         tempCtx.lineTo(width, height - radius)
+//         tempCtx.quadraticCurveTo(width, height, width - radius, height)
+//         tempCtx.lineTo(radius, height)
+//         tempCtx.quadraticCurveTo(0, height, 0, height - radius)
+//         tempCtx.lineTo(0, radius)
+//         tempCtx.quadraticCurveTo(0, 0, radius, 0)
+//         tempCtx.closePath()
+//         tempCtx.clip()
+//         tempCtx.drawImage(this, 0, 0)
+//         if (shine == true) {
+//             tempCtx.fillStyle = 'rgba(0, 255, 0, 0.5)'
+//             tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
+//         }
+//     }
+//     img.crossOrigin = 'Anonymous'
+//     img.src = imageUrl
+//     return canvas
 // }
 
 function sortDeck () {
