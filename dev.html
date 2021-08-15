@@ -1,13 +1,13 @@
 <head>
     <link rel="shortcut icon" type="image/png" href='images/pokegear.png'>
-    <title>Pokégear 1.3.0 (Dev)</title>
+    <title>Pokégear</title>
     <meta charset="utf-8">
 </head>
 <html>
     <body onresize='windowResize()'>
         <div id='title'>
             <img id='titleIcon' src='images/pokegear.png'>
-            <h1 id='titleText'>Pokegear<wbr>.app 1.3.0 (Dev)</h1>
+            <h1 id='titleText'>Pokegear<wbr>.app Dev1</h1>
             <div id='titleLinks'>
                 <a id='linktree' class='titleLink' href='https://linktr.ee/JakeGearhart'>Created By Jake Gearhart</a>
                 <br>
@@ -24,8 +24,8 @@
             <input id='scaleSlider' class='' title='Zoom Deck' type='range' oninput='changeCardScale(this.value)' min='-1' value='0' max='1' step='0.000000000000000001'></input>
         </div>
         <button id='deleteDeck' class='buttonObject deckButton' onmouseenter='deleteButtonHover(this)' onmouseleave='this.innerHTML = "🗑"'>🗑</button>
+        <input id='deckCardCount' class='buttonObject' type='button' value='0'>
         <div id='deck' ontouchstart='fullScreenSidebar(false)'>
-            <input id='deckCardCount' class='buttonObject' type='button' value='0'>
             <div id='deckCards'></div>
         </div>
         <div id='sidebar' ontouchstart='fullScreenSidebar(true)'>
@@ -126,11 +126,12 @@
     .buttonObject {
         width: calc(var(--cardHeight) / 3);
         height: calc(var(--cardHeight) / 3);
-        font-size: calc(var(--cardHeight) / 6);
+        font-size: calc(var(--cardWidth) / 4);
         margin: 0;
-        border: calc(var(--cardHeight) / 48) solid var(--lightColor6÷10);
-        border-radius: calc(var(--cardHeight) / 9) !important;
-        -webkit-border-radius: calc(var(--cardHeight) / 9) !important;
+        border: calc(var(--cardHeight) / 52) solid var(--lightColor6÷10);
+        /* 28/3 = Card border radius / 3 */
+        border-radius: calc(var(--cardHeight) / (28/3)) !important;
+        -webkit-border-radius: calc(var(--cardHeight) / (28/3)) !important;
         text-shadow: 0px 0px 8px var(--darkColor);
         background-color: var(--darkColor6÷10);
         color: rgba(255, 255, 255, 0.8);
@@ -143,13 +144,13 @@
         transform: translateY(4%);
     }
     .scaledButtonObject {
-        width: calc(var(--scaledCardHeight) / 3);
-        height: calc(var(--scaledCardHeight) / 3);
-        font-size: calc(var(--scaledCardHeight) / 6);
+        width: calc(var(--scaledCardWidth) / 2);
+        height: calc(var(--scaledCardWidth) / 2);
+        font-size: calc(var(--scaledCardWidth) / 4);
         margin: 0;
-        border: calc(var(--scaledCardHeight) / 48) solid var(--lightColor6÷10);
-        border-radius: calc(var(--scaledCardHeight) / 9) !important;
-        -webkit-border-radius: calc(var(--scaledCardHeight) / 9) !important;
+        border: calc(var(--scaledCardHeight) / 52) solid var(--lightColor6÷10);
+        border-radius: calc(var(--scaledCardHeight) / (28/3)) !important;
+        -webkit-border-radius: calc(var(--scaledCardHeight) / (28/3)) !important;
         text-shadow: 0px 0px calc(8px * var(--cardScale)) var(--darkColor);
         background-color: var(--darkColor6÷10);
         color: rgba(255, 255, 255, 0.8);
@@ -295,8 +296,8 @@
         margin-bottom: calc(-1 * var(--cardHeight) / 6);
         -webkit-appearance: none;
         background-color: var(--darkColor5÷6);
-        border: calc(var(--cardHeight) / 48) solid var(--lightColor6÷10);
-        border-radius: calc(var(--cardHeight) / 9);
+        border: calc(var(--cardHeight) / 52) solid var(--lightColor6÷10);
+        border-radius: calc(var(--cardHeight) / (28/3));
     }
     #scaleSlider::-webkit-slider-thumb {
         -webkit-appearance: none;
@@ -304,7 +305,7 @@
         width: calc(var(--cardHeight) / 5);
         height: calc(var(--cardHeight) / 9);
         background: white;
-        border-radius: calc(var(--cardHeight) / 9);
+        border-radius: calc(var(--cardHeight) / (28/3));
         cursor: pointer;
     }
     #scaleSlider::-moz-range-thumb {
@@ -313,7 +314,7 @@
         width: calc(var(--cardHeight) / 8);
         height: calc(var(--cardHeight) / 8);
         background: white;
-        border-radius: calc(var(--cardHeight) / 9);
+        border-radius: calc(var(--cardHeight) / (28/3));
         cursor: pointer;
     }
     #deleteDeck {
@@ -333,19 +334,19 @@
         left: calc(50% - var(--cardHeight) / 4);
         top: calc(var(--cardHeight) / 12);
         background-color: var(--darkColor5÷6);
-        border: calc(var(--cardHeight) / 48) solid var(--lightColor6÷10);
+        border: calc(var(--cardHeight) / 52) solid var(--lightColor6÷10);
         pointer-events: none;
     }
     .individualCardCount {
         /* HERE */
         z-index: var(--cardCountVisible);
         position: absolute;
-        bottom: calc(var(--scaledCardHeight) / 32);
+        bottom: calc(var(--scaledCardWidth) / 26);
         left: 0;
         right: 0;
         margin: auto;
         background-color: var(--lightColor6÷10);
-        border: calc(var(--scaledCardHeight) / 48) solid var(--darkColor3÷10);
+        border: calc(var(--scaledCardHeight) / 52) solid var(--darkColor3÷10);
         pointer-events: none;
     }
     #deck {
@@ -371,32 +372,30 @@
     }
     .deckCardHoverButtonAdd {
         position: absolute;
-        height: calc(var(--scaledCardHeight) / 4);
-        width: calc(var(--scaledCardHeight) / 4);
-        font-size: calc(var(--scaledCardHeight) / (20/3));
+        height: calc(var(--scaledCardWidth) / 2.5);
+        width: calc(var(--scaledCardWidth) / 2.5);
+        font-size: calc(var(--scaledCardWidth) / 5);
         font-weight: bold;
-        border: calc(var(--scaledCardHeight) / 64) solid var(--lightColor6÷10);
-        margin: calc(-1 * var(--scaledCardHeight) / 64);
-        border-radius: calc(var(--scaledCardHeight) / 12) !important;
-        -webkit-border-radius: calc(var(--scaledCardHeight) / 12) !important;
-        bottom: calc(7 * var(--scaledCardHeight) / 96);
-        left: calc(var(--scaledCardHeight) / 32);
+        border: calc(var(--scaledCardHeight) / 52) solid var(--lightColor6÷10);
+        border-radius: calc(var(--scaledCardHeight) / (28/3)) !important;
+        -webkit-border-radius: calc(var(--scaledCardHeight) / (28/3)) !important;
+        bottom: calc(var(--scaledCardHeight) / 36 + var(--scaledCardWidth) / 20);
+        left: calc(var(--scaledCardHeight) / 36);
         margin: auto;
         cursor: pointer;
         pointer-events: all;
     }
     .deckCardHoverButtonRemove {
         position: absolute;
-        height: calc(var(--scaledCardHeight) / 4);
-        width: calc(var(--scaledCardHeight) / 4);
-        font-size: calc(var(--scaledCardHeight) / (20/3));
+        height: calc(var(--scaledCardWidth) / 2.5);
+        width: calc(var(--scaledCardWidth) / 2.5);
+        font-size: calc(var(--scaledCardWidth) / 5);
         font-weight: bold;
-        border: calc(var(--scaledCardHeight) / 64) solid var(--lightColor6÷10);
-        margin: calc(-1 * var(--scaledCardHeight) / 64);
-        border-radius: calc(var(--scaledCardHeight) / 12) !important;
-        -webkit-border-radius: calc(var(--scaledCardHeight) / 12) !important;
-        bottom: calc(7 * var(--scaledCardHeight) / 96);
-        right: calc(var(--scaledCardHeight) / 32);
+        border: calc(var(--scaledCardHeight) / 52) solid var(--lightColor6÷10);
+        border-radius: calc(var(--scaledCardHeight) / (28/3)) !important;
+        -webkit-border-radius: calc(var(--scaledCardHeight) / (28/3)) !important;
+        bottom: calc(var(--scaledCardHeight) / 36 + var(--scaledCardWidth) / 20);
+        right: calc(var(--scaledCardHeight) / 36);
         margin: auto;
         cursor: pointer;
         pointer-events: all;
@@ -428,7 +427,7 @@
         top: 15%;
         margin: 0 auto;
         font-weight: bold;
-        border: calc(var(--cardHeight) / 48) solid var(--lightColor6÷10);
+        border: calc(var(--cardHeight) / 52) solid var(--lightColor6÷10);
         cursor: pointer;
         pointer-events: all;
     }
@@ -527,7 +526,7 @@
         display: inline-block;
         width: calc(var(--cardHeight) / 3); 
         height: calc(var(--cardHeight) / 3);
-        border-radius: calc(var(--cardHeight) / 9);
+        border-radius: calc(var(--cardHeight) / (28/3));
         cursor: pointer;
         transition: 0.125s;
     }
