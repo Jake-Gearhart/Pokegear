@@ -1834,7 +1834,7 @@ function exportDeckImage () {
                     shineImgCanvas.remove()
                     completed--
                     if (completed == 0) {
-                        // downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+                        downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
                     }
                 }
                 shineImg.crossOrigin = 'Anonymous'
@@ -1847,7 +1847,7 @@ function exportDeckImage () {
                 imgCanvas.remove()
                 completed--
                 if (completed == 0) {
-                    // downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+                    downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
                 }
             }
         }
