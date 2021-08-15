@@ -1770,8 +1770,8 @@ function exportDeckImage () {
     var exportCanvas = document.createElement('canvas')
     exportCanvas.id = 'exportCanvas'
     document.body.appendChild(exportCanvas)
-    exportCanvas.height = 1440
-    exportCanvas.width = 2560
+    exportCanvas.height = 2640/2
+    exportCanvas.width = 5040/2
     exportCanvas.setAttribute('style', 'position: absolute; background-color: rgba(255, 0, 0, 0.5); pointer-events: none; transform: scale(0.25);')
     var ctx = exportCanvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
@@ -1831,7 +1831,7 @@ function exportDeckImage () {
                     shineImgCtx.drawImage(this, 0, 0, shineImgCanvas.height * this.width / this.height, shineImgCanvas.height)
                     // add finished card to main export canvas
                     ctx.drawImage(shineImgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
-                    shineImgCanvas.remove()
+                    // shineImgCanvas.remove()
                     completed--
                     if (completed == 0) {
                         downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
