@@ -1761,31 +1761,6 @@ function exportDeckText (mode) {
     }
 }
 
-// HERE
-// function exportDeckImage () {
-//     console.log('EXPORTING DECK IMAGE')
-
-//     var canvas = document.getElementById('exportCanvas')
-//     var context = canvas.getContext('2d')
-//     context.imageSmoothingEnabled = false;
-
-//     var cards = document.getElementById('deckCards').children
-//     for (i=0; i<cards.length; i++) {
-//         var completed = 0
-//         var img = new Image()
-//         img.i = i
-//         img.onload = function () {
-//             context.drawImage(this, (canvas.width/cards.length)*this.i, 0, canvas.width/cards.length, canvas.height)
-//             completed++
-//             if (completed == cards.length) {
-//                 // downloadTempButton('my-deck.png', canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
-//             }
-//         }
-//         img.crossOrigin = 'Anonymous'
-//         img.src = JSON.parse(cards[i].getElementsByClassName('data')[0].getAttribute('images'))['large']
-//     }
-// }
-
 function exportDeckImage () {
     console.log('EXPORTING DECK IMAGE')
     if (document.getElementById('exportCanvas')) {
@@ -1802,8 +1777,8 @@ function exportDeckImage () {
     ctx.imageSmoothingEnabled = false
     
     var cards = document.getElementById('deckCards').children
+    var completed = cards.length
     for (i=0; i<cards.length; i++) {
-        var completed = 0
 
         var tempCanvas = document.createElement('canvas')
         document.body.appendChild(tempCanvas)
@@ -1844,34 +1819,35 @@ function exportDeckImage () {
 
             imgCtx.drawImage(this, 0, 0)
 
-            if (this.shine == true && 1 == 2) {
+            if (this.shine == true) {
+                console.log('REACHED 1')
                 var shineImg = new Image()
-                shineImg.ctx = imgCtx
-                img.onload = function () {
-                    shineImg.ctx.drawImage(this, 0, 0)
-
+                shineImg.i = this.i
+                shineImg.canvas = imgCanvas
+                shineImg.onload = function () {
+                    var shineImgCanvas = this.canvas
+                    var shineImgCtx = shineImgCanvas.getContext('2d')
+                    shineImgCtx.globalAlpha = 0.4;
+                    shineImgCtx.drawImage(this, 0, 0, shineImgCanvas.height * this.width / this.height, shineImgCanvas.height)
                     // add finished card to main export canvas
-                    ctx.drawImage(imgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
-                    imgCanvas.remove()
-                    completed++
-                    if (completed == cards.length) {
-                        downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+                    ctx.drawImage(shineImgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
+                    shineImgCanvas.remove()
+                    completed--
+                    if (completed == 0) {
+                        // downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
                     }
                 }
-
-                // imgCtx.fillStyle = 'rgba(0, 255, 0, 0.5)'
-                // imgCtx.fillRect(0, 0, imgCanvas.width, imgCanvas.height)
-
-                img.src = 'images/holo_overlay.png'
-                // HERE HERE HERE
+                shineImg.crossOrigin = 'Anonymous'
+                // shineImg.src = 'https://images.pokemontcg.io/dp1/130_hires.png'
+                shineImg.src = 'images/holo_overlay.png'
             }
             else {
                 // add finished card to main export canvas
                 ctx.drawImage(imgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
                 imgCanvas.remove()
-                completed++
-                if (completed == cards.length) {
-                    downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+                completed--
+                if (completed == 0) {
+                    // downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
                 }
             }
         }
@@ -1880,42 +1856,16 @@ function exportDeckImage () {
     }
 }
 
-// function createCardCanvas (imageUrl, shine) {
-//     var tempCanvas = document.createElement('canvas')
-//     tempCanvas.id = 'TEST-CANVAS'
-//     document.body.appendChild(tempCanvas)
-//     tempCanvas.setAttribute('style', 'position: absolute; opacity: 50%; transform: translateY(100px) scale(1)')
-//     var tempCtx = tempCanvas.getContext('2d')
-//     tempCtx.imageSmoothingEnabled = false
-//     var img = new Image()
-//     img.onload = function () {
-//         var width = img.width
-//         var height = img.height
-//         tempCanvas.width = width
-//         tempCanvas.height = height
-//         var radius = height/26
-//         tempCtx.beginPath()
-//         tempCtx.moveTo(radius, 0)
-//         tempCtx.lineTo(width - radius, 0)
-//         tempCtx.quadraticCurveTo(width, 0, width, radius)
-//         tempCtx.lineTo(width, height - radius)
-//         tempCtx.quadraticCurveTo(width, height, width - radius, height)
-//         tempCtx.lineTo(radius, height)
-//         tempCtx.quadraticCurveTo(0, height, 0, height - radius)
-//         tempCtx.lineTo(0, radius)
-//         tempCtx.quadraticCurveTo(0, 0, radius, 0)
-//         tempCtx.closePath()
-//         tempCtx.clip()
-//         tempCtx.drawImage(this, 0, 0)
-//         if (shine == true) {
-//             tempCtx.fillStyle = 'rgba(0, 255, 0, 0.5)'
-//             tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
-//         }
-//     }
-//     img.crossOrigin = 'Anonymous'
-//     img.src = imageUrl
-//     return canvas
-// }
+function tempImgHandler () {
+    // add finished card to main export canvas
+    ctx.drawImage(imgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
+    imgCanvas.remove()
+    completed++
+    if (completed == cards.length) {
+        // EXPORT IMAGE
+        downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+    }
+}
 
 function sortDeck () {
     if (isDeckLocked == true) {
