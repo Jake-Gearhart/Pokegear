@@ -7,7 +7,7 @@
     <body onresize='windowResize()'>
         <div id='title'>
             <img id='titleIcon' src='images/pokegear.png'>
-            <h1 id='titleText'>Pokegear<wbr>.app Dev1</h1>
+            <h1 id='titleText'>Pokegear<wbr>.app 1.3.0 (Dev)</h1>
             <div id='titleLinks'>
                 <a id='linktree' class='titleLink' href='https://linktr.ee/JakeGearhart'>Created By Jake Gearhart</a>
                 <br>
@@ -59,12 +59,12 @@
         --cardHeight: 4.4cm;
         --cardDimensionRatio: 367/512;
         --cardWidth: calc(var(--cardHeight) * var(--cardDimensionRatio));
-        --cardSpacing: calc(var(--cardWidth) * 30/734);
+        --cardSpacing: calc(var(--cardHeight) * 30/1024);
 
         --cardScale: 1;
         --scaledCardHeight: calc(var(--cardHeight) * var(--cardScale));
         --scaledCardWidth: calc(var(--cardWidth) * var(--cardScale));
-        --scaledCardSpacing: calc(var(--scaledCardWidth) * 30/734);
+        --scaledCardSpacing: calc(var(--scaledCardHeight) * 30/1024);
 
         --focusedHeight: min(100vw, 100vh);
         --focusedWidth: calc(min(100vw, 100vh) * var(--cardDimensionRatio));
@@ -685,14 +685,14 @@
         font-size: calc(var(--cardHeight) * 1/3);
         cursor: pointer;
     }
-    #focusedShine {
+    #focusedHolo {
         left: 2.5%;
     }
-    #focusedShine.landscape {
+    #focusedHolo.landscape {
         height: calc(50% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
         width: calc(45% - min(60vw, 90vh) * var(--cardDimensionRatio) / 2);
     }
-    #focusedShine.portrait {
+    #focusedHolo.portrait {
         height: calc(50% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
         width: calc(45% - min(100vw, 60vh) * var(--cardDimensionRatio) / 2);
     }
@@ -791,7 +791,7 @@
         bottom: 2.5vh;
     }
 
-    #toggleShineGlobal {
+    #toggleHoloGlobal {
         position: absolute;
         top: 5%;
         height: 40%;
