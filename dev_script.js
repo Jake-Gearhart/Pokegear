@@ -1859,7 +1859,7 @@ function exportDeckImage () {
     
     var cards = document.getElementById('deckCards').children
     var cardSpacing = 8.8 * 30/1024
-    var efficientPlacement = optimizeCardPlacement(cards.length, 6.3, 8.8, cardSpacing, width - borderSize * 2, height - borderSize * 2)
+    var efficientPlacement = optimizeCardPlacement(cards.length, 6.3, 8.8, cardSpacing, width - borderSize * 8/3, height - borderSize * 8/3)
     var scale = efficientPlacement['scale']
     var efficientCardWidth = 6.3 * scale
     var efficientCardHeight = 8.8 * scale
@@ -1870,8 +1870,8 @@ function exportDeckImage () {
     var cardRemainder = (cardsPerRow * efficientPlacement['cards_per_column']) - cards.length
     var finalRow = cards.length - cardsPerRow + cardRemainder
 
-    var verticalOffset = efficientPlacement['vertical_offset'] + borderSize
-    var horizontalOffset = efficientPlacement['horizontal_offset'] + borderSize
+    var verticalOffset = efficientPlacement['vertical_offset'] + borderSize * 4/3
+    var horizontalOffset = efficientPlacement['horizontal_offset'] + borderSize * 4/3
     var completed = cards.length
     for (i=0; i<cards.length; i++) {
         var tempCanvas = document.createElement('canvas')
