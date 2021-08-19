@@ -278,25 +278,6 @@ async function populateSets () {
     }
 
     leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
-    // var legalities = [
-    //     'Standard',
-    //     'Expanded'
-    // ]
-    // for (i=0; i<legalities.length; i++) {
-    //     leftButtons.appendChild(
-    //         createElement('div', null, {
-    //             'id': 'legalities.' + legalities[i].toLowerCase() + ':%22legal%22',
-    //             'class': 'parameterButtonDiv',
-    //             'title': legalities[i],
-    //             'onclick': 'toggleParameterButton(this, true)'
-    //         })
-    //     ).appendChild(
-    //         createElement('img', null, {
-    //             'class': 'parameterButton fadeIn',
-    //             'src': 'images/legalities/' + legalities[i].toLowerCase() + '.png'
-    //         })
-    //     )
-    // }
     for (key in combinationButtons) {
         var combinationButton = combinationButtons[key]
         if (combinationButton['sets'].length == 1) {
@@ -327,8 +308,8 @@ async function populateSets () {
 
     leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
     var yearLegalities = {
-        '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6'],
-        '2011 - 2021 (Expanded)': ['bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5'],
+        '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6'],
+        '2011 - 2021 (Expanded)': ['bwp', 'bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xyp', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'smp', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sma', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6'],
         '2019 - 2020': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3'],
         '2018 - 2019': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11'],
         '2017 - 2018': ['xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7'],
@@ -493,7 +474,6 @@ async function fetchCards (url) {
     const id = currentFetchID
     
     try {
-        // HERE
         const response = await fetch(url)
         const json = await response.json()
 
@@ -687,20 +667,20 @@ function openHelpMenu () {
 function openSettings () {
     LOG_normal('Opened settings')
     var settingsMenu = darkenScreen()
-    var toggleShineGlobal = settingsMenu.appendChild(createElement('input', null, {
-        'id': 'toggleShineGlobal',
+    var toggleHoloGlobal = settingsMenu.appendChild(createElement('input', null, {
+        'id': 'toggleHoloGlobal',
         'class': 'fadeIn buttonObject',
-        'title': 'Toggle Card Shine Effect',
+        'title': 'Toggle Card Holo Effect',
         'type': 'submit',
-        'onclick': 'toggleShineGlobal()'
+        'onclick': 'toggleHoloGlobal()'
     }))
-    toggleShineGlobal.appendChild(createElement('p', 'TESTING', null))
+    toggleHoloGlobal.appendChild(createElement('p', 'TESTING', null))
     const holoVisible = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoVisible'))
     if (holoVisible == 0) {
-        toggleShineGlobal['value'] = '✧'
+        toggleHoloGlobal['value'] = '✧'
     }
     else {
-        toggleShineGlobal['value'] = '✦'
+        toggleHoloGlobal['value'] = '✦'
     }
 
     var exportConsole = settingsMenu.appendChild(createElement('input', null, {
@@ -722,15 +702,15 @@ function openSettings () {
     }))
 }
 
-function toggleShineGlobal() {
+function toggleHoloGlobal() {
     const holoVisible = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoVisible'))
     if (holoVisible == 0) {
-        document.getElementById('toggleShineGlobal').value = '✦'
+        document.getElementById('toggleHoloGlobal').value = '✦'
         document.documentElement.style.setProperty('--holoVisible', 1);
         LOG_normal('Enabled holo animations')
     }
     else {
-        document.getElementById('toggleShineGlobal').value = '✧'
+        document.getElementById('toggleHoloGlobal').value = '✧'
         document.documentElement.style.setProperty('--holoVisible', 0);
         LOG_normal('Disabled holo animations')
     }
@@ -763,19 +743,19 @@ function toggleIndividualCardNumbers() {
 }
 
 //CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS –––––––– CARD MECHANICS
-function toggleShine(cardsToToggle) {
+function toggleHolo(cardsToToggle) {
     for (i=0; i<cardsToToggle.length; i++) {
         var cardToToggle = cardsToToggle[i]
         if (cardToToggle.getElementsByClassName('holo')[0]) {
             cardToToggle.getElementsByClassName('holo')[0].remove()
             if (cardToToggle.classList.contains('focusedCard')) {
-                document.getElementById('focusedShine').innerHTML = '✧'
+                document.getElementById('focusedHolo').innerHTML = '✧'
             }
         }
         else {
             cardToToggle.getElementsByClassName('cardImageContainer')[0].appendChild(createHoloAnimation())
             if (cardToToggle.classList.contains('focusedCard')) {
-                document.getElementById('focusedShine').innerHTML = '✦'
+                document.getElementById('focusedHolo').innerHTML = '✦'
             }
         }
     }
@@ -836,7 +816,7 @@ function focusCard (card) {
 
         // focusedAlts = document.getElementById('focusedAlts')
 
-        focusedShine = document.getElementById('focusedShine')
+        focusedHolo = document.getElementById('focusedHolo')
         focusedCount = document.getElementById('focusedCount')
         focusedDownload = document.getElementById('focusedDownload')
         focusedSet = document.getElementById('focusedSet')
@@ -850,11 +830,11 @@ function focusCard (card) {
             'id': 'focusedCenter',
             'class': 'orientable'
         }))
-        focusedShine = focusedCenter.appendChild(createElement('button', '', {
-            'id': 'focusedShine',
+        focusedHolo = focusedCenter.appendChild(createElement('button', '', {
+            'id': 'focusedHolo',
             'class': 'fadeIn buttonObject focusedButton orientable',
-            'title': 'Toggle Shine Effect',
-            'onclick': 'toggleShine([document.getElementsByClassName("focusedCard")[0], document.getElementsByClassName("focusedOrigin")[0]])'
+            'title': 'Toggle Holo Effect',
+            'onclick': 'toggleHolo([document.getElementsByClassName("focusedCard")[0], document.getElementsByClassName("focusedOrigin")[0]])'
         }))
         focusedCount = focusedCenter.appendChild(createElement('button', 0, {
             'id': 'focusedCount',
@@ -953,12 +933,12 @@ function focusCard (card) {
 
     var newCard = focusedCenter.getElementsByClassName('focusedCard')[0]
 
-    //shine button
+    //holo button
     if (newCard.getElementsByClassName('holo')[0]) {
-        focusedShine.innerHTML = '✦'
+        focusedHolo.innerHTML = '✦'
     }
     else {
-        focusedShine.innerHTML = '✧'
+        focusedHolo.innerHTML = '✧'
     }
 
     //remove individualCardCount, and cardHoverMenu
@@ -1761,7 +1741,39 @@ function exportDeckText (mode) {
     }
 }
 
+function optimizeCardPlacement (n, a, b, spacing, A, B) {
+    a = a + spacing
+    b = b + spacing
+
+    var best_scale = 0
+    var best_cardsPerRow
+    var best_cardsPerColumn
+
+    var cardsPerRow = 0
+    var cardsPerColumn = 0
+
+    while (cardsPerRow < n) {
+        cardsPerRow++
+        cardsPerColumn = Math.floor((n + cardsPerRow - 1) / cardsPerRow)
+        var scale = Math.min(A / (a * cardsPerRow), B / (b * cardsPerColumn))
+        if (scale > best_scale) {
+            best_scale = scale
+            best_cardsPerRow = cardsPerRow
+            best_cardsPerColumn = cardsPerColumn
+        }
+    }
+
+    return {
+        'scale': best_scale,
+        'cards_per_row': best_cardsPerRow,
+        'cards_per_column': best_cardsPerColumn,
+        'horizontal_offset': (A - best_cardsPerRow * best_scale * a) / 2,
+        'vertical_offset': (B - best_cardsPerColumn * best_scale * b) / 2
+    }
+}
+
 function exportDeckImage () {
+    // HERE
     console.log('EXPORTING DECK IMAGE')
     if (document.getElementById('exportCanvas')) {
         document.getElementById('exportCanvas').remove()
@@ -1770,84 +1782,187 @@ function exportDeckImage () {
     var exportCanvas = document.createElement('canvas')
     exportCanvas.id = 'exportCanvas'
     document.body.appendChild(exportCanvas)
-    exportCanvas.height = 2640/2
-    exportCanvas.width = 5040/2
-    exportCanvas.setAttribute('style', 'position: absolute; background-color: rgba(255, 0, 0, 0.5); pointer-events: none; transform: scale(0.25);')
+    exportCanvas.setAttribute('style', 'position: absolute; pointer-events: none; transform: scale(0.25);')
+    // exportCanvas.setAttribute('style', 'position: absolute; visibility: hidden')
     var ctx = exportCanvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
+
+    var height = 1080
+    var width = 1920
+    exportCanvas.height = height
+    exportCanvas.width = width
+    var borderSize = height/20
+    exportCanvas.borderSize = borderSize
+
+    // Draw Pokégear
+
+        // background
+    ctx.beginPath()
+    ctx.fillStyle = '#26225d'
+    ctx.rect(0, 0, width, height)
+    ctx.fill()
+    ctx.closePath()
+
+        // top large circle
+    ctx.beginPath()
+    ctx.fillStyle = '#8690b0'
+    ctx.arc(width/2, 0, width/5, 0, 2 * Math.PI, false);
+    ctx.fill()
+    ctx.closePath()
+
+        // bottom large circle
+    ctx.beginPath()
+    ctx.fillStyle = '#8690b0'
+    ctx.arc(width/2, height, width/5, 0, 2 * Math.PI, false);
+    ctx.fill()
+    ctx.closePath()
+
+        // cyan
+    var radius = height/20
+    var innerHeight = height - borderSize*2
+    var innerWidth = width - borderSize*2
+    ctx.beginPath()
+    ctx.fillStyle = '#6dcacd'
+    ctx.moveTo(borderSize + radius, borderSize);
+    ctx.lineTo(borderSize + innerWidth - radius, borderSize);
+    ctx.quadraticCurveTo(borderSize + innerWidth, borderSize, borderSize + innerWidth, borderSize + radius);
+    ctx.lineTo(borderSize + innerWidth, borderSize + innerHeight - radius);
+    ctx.quadraticCurveTo(borderSize + innerWidth, borderSize + innerHeight, borderSize + innerWidth - radius, borderSize + innerHeight);
+    ctx.lineTo(borderSize + radius, borderSize + innerHeight);
+    ctx.quadraticCurveTo(borderSize, borderSize + innerHeight, borderSize, borderSize + innerHeight - radius);
+    ctx.lineTo(borderSize, borderSize + radius);
+    ctx.quadraticCurveTo(borderSize, borderSize, borderSize + radius, borderSize);
+    ctx.fill()
+    ctx.closePath()
+
+        // light blue stripe 1
+    ctx.beginPath()
+    ctx.fillStyle = '#afe0eb'
+    ctx.moveTo(borderSize + innerWidth * 3/32, borderSize + innerHeight)
+    ctx.lineTo(borderSize + innerWidth * 3/32 + innerHeight * 5/6, borderSize)
+    ctx.lineTo(borderSize + innerWidth * 3/32 + innerHeight * 5/6 + innerWidth/4, borderSize)
+    ctx.lineTo(borderSize + innerWidth * 3/32 + innerWidth/4, borderSize + innerHeight)
+    ctx.lineTo(borderSize + innerWidth * 3/32, borderSize + innerHeight)
+    ctx.fill()
+    ctx.closePath()
+
+        // light blue stripe 2
+    ctx.beginPath()
+    ctx.fillStyle = '#afe0eb'
+    ctx.moveTo(borderSize + innerWidth * 12/32, borderSize + innerHeight)
+    ctx.lineTo(borderSize + innerWidth * 12/32 + innerHeight * 5/6, borderSize)
+    ctx.lineTo(borderSize + innerWidth * 12/32 + innerHeight * 5/6 + innerWidth/16, borderSize)
+    ctx.lineTo(borderSize + innerWidth * 12/32 + innerWidth/16, borderSize + innerHeight)
+    ctx.lineTo(borderSize + innerWidth * 12/32, borderSize + innerHeight)
+    ctx.fill()
+    ctx.closePath()
     
     var cards = document.getElementById('deckCards').children
+    var cardSpacing = 8.8 * 30/1024
+    var efficientPlacement = optimizeCardPlacement(cards.length, 6.3, 8.8, cardSpacing, width - borderSize * 2, height - borderSize * 2)
+    var scale = efficientPlacement['scale']
+    var efficientCardWidth = 6.3 * scale
+    var efficientCardHeight = 8.8 * scale
+    var efficientCardSpacing = cardSpacing * scale
+    var cardsPerRow = efficientPlacement['cards_per_row']
+
+    // remainders
+    var cardRemainder = (cardsPerRow * efficientPlacement['cards_per_column']) - cards.length
+    var finalRow = cards.length - cardsPerRow + cardRemainder
+
+    var verticalOffset = efficientPlacement['vertical_offset'] + borderSize
+    var horizontalOffset = efficientPlacement['horizontal_offset'] + borderSize
     var completed = cards.length
     for (i=0; i<cards.length; i++) {
-
         var tempCanvas = document.createElement('canvas')
         document.body.appendChild(tempCanvas)
-        tempCanvas.setAttribute('style', 'position: absolute; transform: translateY(100px) scale(0.5)')
+// switch for upload
+        // tempCanvas.setAttribute('style', 'position: absolute; transform: translateY(100px) scale(0.5)')
+        tempCanvas.setAttribute('style', 'position: absolute; visibility: hidden')
         var tempCtx = tempCanvas.getContext('2d')
         tempCtx.imageSmoothingEnabled = false
 
         var img = new Image()
         img.i = i
         img.canvas = tempCanvas
+        img.exportCanvas = exportCanvas
+        img.borderSize = borderSize
         if (cards[i].getElementsByClassName('holo')[0]) {
-            img.shine = true
+            img.holo = true
         }
         else {
-            img.shine = false
+            img.holo = false
         }
         img.onload = function () {
-            var width = this.width
-            var height = this.height
+            var imgWidth = this.width
+            var imgHeight = this.height
             var imgCanvas = this.canvas
             var imgCtx = imgCanvas.getContext('2d')
-            imgCanvas.width = width
-            imgCanvas.height = height
+            var exportCanvas = this.exportCanvas
+            imgCanvas.width = imgWidth
+            imgCanvas.height = imgHeight
 
-            var radius = height/26
+            var imgRadius = imgHeight/26
 
-            imgCtx.moveTo(radius, 0)
-            imgCtx.lineTo(width - radius, 0)
-            imgCtx.quadraticCurveTo(width, 0, width, radius)
-            imgCtx.lineTo(width, height - radius)
-            imgCtx.quadraticCurveTo(width, height, width - radius, height)
-            imgCtx.lineTo(radius, height)
-            imgCtx.quadraticCurveTo(0, height, 0, height - radius)
-            imgCtx.lineTo(0, radius)
-            imgCtx.quadraticCurveTo(0, 0, radius, 0)
+            imgCtx.moveTo(imgRadius, 0)
+            imgCtx.lineTo(imgWidth - imgRadius, 0)
+            imgCtx.quadraticCurveTo(imgWidth, 0, imgWidth, imgRadius)
+            imgCtx.lineTo(imgWidth, imgHeight - imgRadius)
+            imgCtx.quadraticCurveTo(imgWidth, imgHeight, imgWidth - imgRadius, imgHeight)
+            imgCtx.lineTo(imgRadius, imgHeight)
+            imgCtx.quadraticCurveTo(0, imgHeight, 0, imgHeight - imgRadius)
+            imgCtx.lineTo(0, imgRadius)
+            imgCtx.quadraticCurveTo(0, 0, imgRadius, 0)
             imgCtx.closePath()
             imgCtx.clip()
 
             imgCtx.drawImage(this, 0, 0)
 
-            if (this.shine == true) {
-                console.log('REACHED 1')
-                var shineImg = new Image()
-                shineImg.i = this.i
-                shineImg.canvas = imgCanvas
-                shineImg.onload = function () {
-                    var shineImgCanvas = this.canvas
-                    var shineImgCtx = shineImgCanvas.getContext('2d')
-                    shineImgCtx.globalAlpha = 0.4;
-                    shineImgCtx.drawImage(this, 0, 0, shineImgCanvas.height * this.width / this.height, shineImgCanvas.height)
+            if (this.holo == true) {
+                var holoImg = new Image()
+                holoImg.i = this.i
+                holoImg.canvas = imgCanvas
+                holoImg.exportCanvas = exportCanvas
+                holoImg.borderSize = this.borderSize
+                holoImg.onload = function () {
+                    var holoImgCanvas = this.canvas
+                    var holoImgCtx = holoImgCanvas.getContext('2d')
+                    holoImgCtx.globalAlpha = 0.4;
+                    holoImgCtx.drawImage(this, 0, 0, holoImgCanvas.height * this.width / this.height, holoImgCanvas.height)
                     // add finished card to main export canvas
-                    ctx.drawImage(shineImgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
-                    // shineImgCanvas.remove()
+                    if (this.i < finalRow) {
+                        // holoImgCanvas, card spacing + horizontal shift, card spacing + vertical shift, width, height
+                        ctx.drawImage(holoImgCanvas, efficientCardSpacing/2 + ((this.i % cardsPerRow) * efficientCardSpacing) + (this.i % cardsPerRow) * efficientCardWidth + horizontalOffset, efficientCardSpacing/2 + (Math.floor(this.i/cardsPerRow) * efficientCardSpacing) + Math.floor(this.i/cardsPerRow) * efficientCardHeight + verticalOffset, efficientCardWidth, efficientCardHeight)
+                    }
+                    else {
+                        // holoImgCanvas, card spacing + horizontal shift + remainder shift, card spacing + vertical shift, width, height
+                        ctx.drawImage(holoImgCanvas, efficientCardSpacing/2 + ((this.i % cardsPerRow) * efficientCardSpacing) + (this.i % cardsPerRow) * efficientCardWidth + horizontalOffset + (efficientCardWidth * cardRemainder)/2, efficientCardSpacing/2 + (Math.floor(this.i/cardsPerRow) * efficientCardSpacing) + Math.floor(this.i/cardsPerRow) * efficientCardHeight + verticalOffset, efficientCardWidth, efficientCardHeight)
+                    }
+                    holoImgCanvas.remove()
                     completed--
                     if (completed == 0) {
-                        downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+                        finishExportDeckImage(exportCanvas)
                     }
                 }
-                shineImg.crossOrigin = 'Anonymous'
-                // shineImg.src = 'https://images.pokemontcg.io/dp1/130_hires.png'
-                shineImg.src = 'images/holo_overlay.png'
+                holoImg.crossOrigin = 'Anonymous'
+// switch for upload
+                // holoImg.src = 'https://images.pokemontcg.io/dp1/130_hires.png'
+                holoImg.src = 'images/holo_overlay.png'
             }
             else {
                 // add finished card to main export canvas
-                ctx.drawImage(imgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
+                if (this.i < finalRow) {
+                    // imgCanvas, card spacing + horizontal shift, card spacing + vertical shift, width, height
+                    ctx.drawImage(imgCanvas, efficientCardSpacing/2 + ((this.i % cardsPerRow) * efficientCardSpacing) + (this.i % cardsPerRow) * efficientCardWidth + horizontalOffset, efficientCardSpacing/2 + (Math.floor(this.i/cardsPerRow) * efficientCardSpacing) + Math.floor(this.i/cardsPerRow) * efficientCardHeight + verticalOffset, efficientCardWidth, efficientCardHeight)
+                }
+                else {
+                    // imgCanvas, card spacing + horizontal shift + remainder shift, card spacing + vertical shift, width, height
+                    ctx.drawImage(imgCanvas, efficientCardSpacing/2 + ((this.i % cardsPerRow) * efficientCardSpacing) + (this.i % cardsPerRow) * efficientCardWidth + horizontalOffset + ((efficientCardWidth + efficientCardSpacing) * cardRemainder)/2, efficientCardSpacing/2 + (Math.floor(this.i/cardsPerRow) * efficientCardSpacing) + Math.floor(this.i/cardsPerRow) * efficientCardHeight + verticalOffset, efficientCardWidth, efficientCardHeight)
+                }
                 imgCanvas.remove()
                 completed--
                 if (completed == 0) {
-                    downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+                    finishExportDeckImage(exportCanvas)
                 }
             }
         }
@@ -1856,15 +1971,41 @@ function exportDeckImage () {
     }
 }
 
-function tempImgHandler () {
-    // add finished card to main export canvas
-    ctx.drawImage(imgCanvas, (exportCanvas.width/8) * this.i % exportCanvas.width, (exportCanvas.height/3)*Math.floor(this.i/8), exportCanvas.width/8, (exportCanvas.height/3))
-    imgCanvas.remove()
-    completed++
-    if (completed == cards.length) {
-        // EXPORT IMAGE
-        downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
-    }
+function finishExportDeckImage (exportCanvas) {
+    var ctx = exportCanvas.getContext('2d')
+    var height = exportCanvas.height
+    var width = exportCanvas.width
+    var borderSize = exportCanvas.borderSize
+
+        // top small circle shadow
+    ctx.beginPath()
+    ctx.fillStyle = '#b1e2f8'
+    ctx.arc(width/2, height/150, borderSize*4/3, 0, 2 * Math.PI, false);
+    ctx.fill()
+    ctx.closePath()
+
+        // top small circle
+    ctx.beginPath()
+    ctx.fillStyle = '#d0edfc'
+    ctx.arc(width/2, -height/150, borderSize*4/3, 0, 2 * Math.PI, false);
+    ctx.fill()
+    ctx.closePath()
+
+        // bottom small circle shadow
+    ctx.beginPath()
+    ctx.fillStyle = '#b1e2f8'
+    ctx.arc(width/2, height + height/150, borderSize*4/3, 0, 2 * Math.PI, false);
+    ctx.fill()
+    ctx.closePath()
+
+        // bottom small circle
+    ctx.beginPath()
+    ctx.fillStyle = '#d0edfc'
+    ctx.arc(width/2, height - height/150, borderSize*4/3, 0, 2 * Math.PI, false);
+    ctx.fill()
+    ctx.closePath()
+
+    downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
 }
 
 function sortDeck () {
