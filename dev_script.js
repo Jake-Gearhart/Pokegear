@@ -2039,13 +2039,14 @@ function drawNumber (canvas, number) {
     ctx.fill()
     ctx.closePath()
 
-    ctx.fillStyle = 'ffffff'
+    // number
     var fontSize = width / 4
     ctx.font = `${fontSize}px sans-serif`;
     ctx.textAlign = 'center'; 
     ctx.textBaseline = 'middle';
     ctx.shadowColor = '#130f36';
     ctx.shadowBlur = 16;
+    ctx.fillStyle = 'white'
     ctx.fillText(number, numberHorizontalOffset + numberSize/2, numberVerticalOffset + numberSize/2);
 }
 
