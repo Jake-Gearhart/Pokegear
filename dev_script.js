@@ -733,11 +733,11 @@ function exportConsole() {
 function toggleIndividualCardNumbers() {
     const cardCountVisible = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--cardCountVisible'))
     if (cardCountVisible == -1) {
-        document.documentElement.style.setProperty('--cardCountVisible', 0);
+        document.documentElement.style.setProperty('--cardCountVisible', 1);
         LOG_normal('Made card count visible')
     }
     else {
-        document.documentElement.style.setProperty('--cardCountVisible', -1);
+        document.documentElement.style.setProperty('--cardCountVisible', 0);
         LOG_normal('Made card count invisible')
     }
 }
@@ -1412,7 +1412,7 @@ function modifyDeckCardCount (card, value) {
         deckCardCount.setAttribute('style', 'color: #00ff00')
     }
     else {
-        deckCardCount.setAttribute('style', 'color: white')
+        deckCardCount.setAttribute('style', 'color: var(--yellow)')
     }
 }
 
@@ -1670,7 +1670,7 @@ function exportButtonHover (button) {
         'style': 'width: calc(100%/3)'
     }))
     button.appendChild(createElement('button', '📷', {
-        'title': 'Export Deck As Image Or Gif',
+        'title': 'Export Deck As Image',
         'class': 'deckSubButton',
         'onclick': 'exportDeckImage()',
         'style': 'width: calc(100%/3)'
@@ -1773,8 +1773,8 @@ function optimizeCardPlacement (n, a, b, spacing, A, B) {
 }
 
 function exportDeckImage () {
-    // HERE
-    console.log('EXPORTING DECK IMAGE')
+    LOG_normal('Exporting Deck Image')
+
     if (document.getElementById('exportCanvas')) {
         document.getElementById('exportCanvas').remove()
     }
@@ -1782,8 +1782,8 @@ function exportDeckImage () {
     var exportCanvas = document.createElement('canvas')
     exportCanvas.id = 'exportCanvas'
     document.body.appendChild(exportCanvas)
-    exportCanvas.setAttribute('style', 'position: absolute; pointer-events: none; transform: scale(0.25);')
-    // exportCanvas.setAttribute('style', 'position: absolute; visibility: hidden')
+    exportCanvas.classList.add('fadeIn')
+    exportCanvas.setAttribute('style', 'position: absolute; pointer-events: none; width: calc(50% - var(--cardHeight) * 15/12); right: calc(var(--cardHeight) * 11/12); top: calc(var(--cardHeight) * 1/12);')
     var ctx = exportCanvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
 
@@ -1859,7 +1859,7 @@ function exportDeckImage () {
     
     var cards = document.getElementById('deckCards').children
     var cardSpacing = 8.8 * 30/1024
-    var efficientPlacement = optimizeCardPlacement(cards.length, 6.3, 8.8, cardSpacing, width - borderSize * 8/3, height - borderSize * 8/3)
+    var efficientPlacement = optimizeCardPlacement(cards.length, 6.3, 8.8, cardSpacing, width - (borderSize * 3/2 * 2) + (cardSpacing * 2), height - (borderSize * 3/2 * 2) + (cardSpacing * 2))
     var scale = efficientPlacement['scale']
     var efficientCardWidth = 6.3 * scale
     var efficientCardHeight = 8.8 * scale
@@ -1870,15 +1870,17 @@ function exportDeckImage () {
     var cardRemainder = (cardsPerRow * efficientPlacement['cards_per_column']) - cards.length
     var finalRow = cards.length - cardsPerRow + cardRemainder
 
-    var verticalOffset = efficientPlacement['vertical_offset'] + borderSize * 4/3
-    var horizontalOffset = efficientPlacement['horizontal_offset'] + borderSize * 4/3
+    var verticalOffset = efficientPlacement['vertical_offset'] + borderSize * 3/2 - cardSpacing
+    var horizontalOffset = efficientPlacement['horizontal_offset'] + borderSize * 3/2 - cardSpacing
     var completed = cards.length
+
+    var holoVisible = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--holoVisible'))
+    var cardCountVisible = Number(window.getComputedStyle(document.documentElement).getPropertyValue('--cardCountVisible'))
+
     for (i=0; i<cards.length; i++) {
         var tempCanvas = document.createElement('canvas')
         document.body.appendChild(tempCanvas)
-// switch for upload
-        // tempCanvas.setAttribute('style', 'position: absolute; transform: translateY(100px) scale(0.5)')
-        tempCanvas.setAttribute('style', 'position: absolute; visibility: hidden')
+        tempCanvas.setAttribute('style', 'position: absolute; visibility: hidden;')
         var tempCtx = tempCanvas.getContext('2d')
         tempCtx.imageSmoothingEnabled = false
 
@@ -1887,11 +1889,19 @@ function exportDeckImage () {
         img.canvas = tempCanvas
         img.exportCanvas = exportCanvas
         img.borderSize = borderSize
-        if (cards[i].getElementsByClassName('holo')[0]) {
+        img.number = cards[i].getElementsByClassName('individualCardCount')[0].value
+
+        if (holoVisible == 1 && cards[i].getElementsByClassName('holo')[0]) {
             img.holo = true
         }
         else {
             img.holo = false
+        }
+        if (cardCountVisible == 1) {
+            img.numberVisible = true
+        }
+        else {
+            img.numberVisible = false
         }
         img.onload = function () {
             var imgWidth = this.width
@@ -1904,6 +1914,7 @@ function exportDeckImage () {
 
             var imgRadius = imgHeight/26
 
+            imgCtx.beginPath()
             imgCtx.moveTo(imgRadius, 0)
             imgCtx.lineTo(imgWidth - imgRadius, 0)
             imgCtx.quadraticCurveTo(imgWidth, 0, imgWidth, imgRadius)
@@ -1914,21 +1925,33 @@ function exportDeckImage () {
             imgCtx.lineTo(0, imgRadius)
             imgCtx.quadraticCurveTo(0, 0, imgRadius, 0)
             imgCtx.closePath()
+
             imgCtx.clip()
 
             imgCtx.drawImage(this, 0, 0)
 
             if (this.holo == true) {
                 var holoImg = new Image()
+
                 holoImg.i = this.i
                 holoImg.canvas = imgCanvas
                 holoImg.exportCanvas = exportCanvas
                 holoImg.borderSize = this.borderSize
+                holoImg.number = this.number
+                holoImg.numberVisible = this.numberVisible
+
                 holoImg.onload = function () {
                     var holoImgCanvas = this.canvas
                     var holoImgCtx = holoImgCanvas.getContext('2d')
                     holoImgCtx.globalAlpha = 0.4;
-                    holoImgCtx.drawImage(this, 0, 0, holoImgCanvas.height * this.width / this.height, holoImgCanvas.height)
+                    var holoImgWidth = this.width
+                    var holoImgHeight = this.height
+                    holoImgCtx.drawImage(this, 0, 0, holoImgCanvas.height * holoImgWidth / holoImgHeight, holoImgCanvas.height)
+
+                    if (this.numberVisible == true) {
+                        drawNumber(holoImgCanvas, this.number)
+                    }
+
                     // add finished card to main export canvas
                     if (this.i < finalRow) {
                         // holoImgCanvas, card spacing + horizontal shift, card spacing + vertical shift, width, height
@@ -1945,11 +1968,13 @@ function exportDeckImage () {
                     }
                 }
                 holoImg.crossOrigin = 'Anonymous'
-// switch for upload
-                // holoImg.src = 'https://images.pokemontcg.io/dp1/130_hires.png'
                 holoImg.src = 'images/holo_overlay.png'
             }
             else {
+                if (this.numberVisible == true) {
+                    drawNumber(imgCanvas, this.number)
+                }
+
                 // add finished card to main export canvas
                 if (this.i < finalRow) {
                     // imgCanvas, card spacing + horizontal shift, card spacing + vertical shift, width, height
@@ -1967,8 +1992,61 @@ function exportDeckImage () {
             }
         }
         img.crossOrigin = 'Anonymous'
-        img.src = JSON.parse(cards[i].getElementsByClassName('data')[0].getAttribute('images'))['large']
+        img.src = JSON.parse(cards[i].getElementsByClassName('data')[0].getAttribute('images'))['small']
     }
+}
+
+function drawNumber (canvas, number) {
+    var width = canvas.width
+    var height = canvas.height
+
+    var ctx = canvas.getContext('2d')
+
+    var numberSize = height / 3
+    var numberRadius = height / (28/3)
+    var numberVerticalOffset = height - numberSize - (width / 26)
+    var numberHorizontalOffset = (width - numberSize)/2
+
+    // number background
+    ctx.globalAlpha = 0.75;
+    ctx.beginPath()
+    ctx.fillStyle = '#afe0eb'
+    ctx.moveTo(numberHorizontalOffset + numberRadius, numberVerticalOffset);
+    ctx.lineTo(numberHorizontalOffset + numberSize - numberRadius, numberVerticalOffset);
+    ctx.quadraticCurveTo(numberHorizontalOffset + numberSize, numberVerticalOffset, numberHorizontalOffset + numberSize, numberVerticalOffset + numberRadius);
+    ctx.lineTo(numberHorizontalOffset + numberSize, numberVerticalOffset + numberSize - numberRadius);
+    ctx.quadraticCurveTo(numberHorizontalOffset + numberSize, numberVerticalOffset + numberSize, numberHorizontalOffset + numberSize - numberRadius, numberVerticalOffset + numberSize);
+    ctx.lineTo(numberHorizontalOffset + numberRadius, numberVerticalOffset + numberSize);
+    ctx.quadraticCurveTo(numberHorizontalOffset, numberVerticalOffset + numberSize, numberHorizontalOffset, numberVerticalOffset + numberSize - numberRadius);
+    ctx.lineTo(numberHorizontalOffset, numberVerticalOffset + numberRadius);
+    ctx.quadraticCurveTo(numberHorizontalOffset, numberVerticalOffset, numberHorizontalOffset + numberRadius, numberVerticalOffset);
+    ctx.fill()
+    ctx.closePath()
+
+    var numberBorderWidth = width / 26
+
+    // number bottom border
+    ctx.globalAlpha = 1;
+    ctx.beginPath()
+    ctx.fillStyle = '#6dcacd'
+    ctx.moveTo(numberHorizontalOffset + numberSize, numberVerticalOffset + numberSize - numberRadius);
+    ctx.quadraticCurveTo(numberHorizontalOffset + numberSize, numberVerticalOffset + numberSize, numberHorizontalOffset + numberSize - numberRadius, numberVerticalOffset + numberSize);
+    ctx.lineTo(numberHorizontalOffset + numberRadius, numberVerticalOffset + numberSize);
+    ctx.quadraticCurveTo(numberHorizontalOffset, numberVerticalOffset + numberSize, numberHorizontalOffset, numberVerticalOffset + numberSize - numberRadius);
+    ctx.quadraticCurveTo(numberHorizontalOffset, numberVerticalOffset + numberSize - numberBorderWidth, numberHorizontalOffset + numberRadius, numberVerticalOffset + numberSize - numberBorderWidth)
+    ctx.lineTo(numberHorizontalOffset + numberSize - numberRadius, numberVerticalOffset + numberSize - numberBorderWidth)
+    ctx.quadraticCurveTo(numberHorizontalOffset + numberSize, numberVerticalOffset + numberSize - numberBorderWidth, numberHorizontalOffset + numberSize, numberVerticalOffset + numberSize - numberRadius)
+    ctx.fill()
+    ctx.closePath()
+
+    ctx.fillStyle = 'ffffff'
+    var fontSize = width / 4
+    ctx.font = `${fontSize}px sans-serif`;
+    ctx.textAlign = 'center'; 
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = '#130f36';
+    ctx.shadowBlur = 16;
+    ctx.fillText(number, numberHorizontalOffset + numberSize/2, numberVerticalOffset + numberSize/2);
 }
 
 function finishExportDeckImage (exportCanvas) {
@@ -1980,32 +2058,36 @@ function finishExportDeckImage (exportCanvas) {
         // top small circle shadow
     ctx.beginPath()
     ctx.fillStyle = '#b1e2f8'
-    ctx.arc(width/2, height/150, borderSize*4/3, 0, 2 * Math.PI, false);
+    ctx.arc(width/2, height/150, borderSize * 3/2 , 0, 2 * Math.PI, false);
     ctx.fill()
     ctx.closePath()
 
         // top small circle
     ctx.beginPath()
     ctx.fillStyle = '#d0edfc'
-    ctx.arc(width/2, -height/150, borderSize*4/3, 0, 2 * Math.PI, false);
+    ctx.arc(width/2, -height/150, borderSize * 3/2, 0, 2 * Math.PI, false);
     ctx.fill()
     ctx.closePath()
 
         // bottom small circle shadow
     ctx.beginPath()
     ctx.fillStyle = '#b1e2f8'
-    ctx.arc(width/2, height + height/150, borderSize*4/3, 0, 2 * Math.PI, false);
+    ctx.arc(width/2, height + height/150, borderSize * 3/2, 0, 2 * Math.PI, false);
     ctx.fill()
     ctx.closePath()
 
         // bottom small circle
     ctx.beginPath()
     ctx.fillStyle = '#d0edfc'
-    ctx.arc(width/2, height - height/150, borderSize*4/3, 0, 2 * Math.PI, false);
+    ctx.arc(width/2, height - height/150, borderSize * 3/2, 0, 2 * Math.PI, false);
     ctx.fill()
     ctx.closePath()
 
     downloadTempButton('pokégear-export.png', exportCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+
+    animateRemoveElement(exportCanvas, 'fadeOut')
+
+    LOG_normal('Exported Deck Image')
 }
 
 function sortDeck () {
@@ -2218,5 +2300,5 @@ function removeDeckCards (immediate) {
         }
     }
     deckCardCount.value = 0;
-    deckCardCount.setAttribute('style', 'color: white')
+    deckCardCount.setAttribute('style', 'color: var(--yellow)')
 }
