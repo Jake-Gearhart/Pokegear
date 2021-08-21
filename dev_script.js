@@ -3,7 +3,7 @@
 var windowHeight = window.innerHeight
 var windowWidth = window.innerWidth
 
-//logs
+//logss
 var logs = []
 
 const holoRarities = [
