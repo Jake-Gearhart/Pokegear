@@ -253,26 +253,57 @@ async function populateSets () {
     }
 
     leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
-    var subtypes = [
-        'Basic',
-        'Stage 1',
-        'Stage 2',
-        'Supporter',
-        'Item',
-        'Stadium'
-    ]
-    for (i=0; i<subtypes.length; i++) {
+    var typeFilters = {
+        'Basic': {
+            'supertype': ['Pokémon'],
+            'subtypes': ['Basic']
+        },
+        'Stage 1': {
+            'supertype': ['Pokémon'],
+            'subtypes': ['Stage%201']
+        },
+        'Stage 2': {
+            'supertype': ['Pokémon'],
+            'subtypes': ['Stage%202']
+        },
+        'Supporter': {
+            'supertype': ['Trainer'],
+            'subtypes': ['Supporter']
+        },
+        'Item': {
+            'supertype': ['Trainer'],
+            '-subtypes': ['*'],
+            'subtypes': ['Item', 'Tool', 'Rocket%27s%20Secret%20Machine', 'Technical%20Machine']
+        },
+        'Stadium': {
+            'supertype': ['Trainer'],
+            'subtypes': ['Stadium']
+        }
+    }
+    for (filter in typeFilters) {
+        var id = ''
+        for (type in typeFilters[filter]) {
+            if (id != '' && id.slice(-1) != '(') {
+                id += '+OR+'
+            }
+            if (type == 'supertype') {
+                id += type + ':%22' + typeFilters[filter][type].join(`%22+OR+${type}:%22`) + '%22)+('  
+            }
+            else {
+                id += type + ':%22' + typeFilters[filter][type].join(`%22+OR+${type}:%22`) + '%22'
+            }
+        }
         leftButtons.appendChild(
             createElement('div', null, {
-                'id': 'subtypes:%22' + subtypes[i].toLocaleLowerCase() + '%22',
+                'id': id,
                 'class': 'parameterButtonDiv parameterButtonDivWide',
-                'title': subtypes[i],
+                'title': filter,
                 'onclick': 'toggleParameterButton(this, true)'
             })
         ).appendChild(
             createElement('img', null, {
                 'class': 'parameterButton parameterButtonWide fadeIn',
-                'src': 'images/subtypes/' + subtypes[i].toLowerCase() + '.png'
+                'src': 'images/subtypes/' + filter.toLowerCase() + '.png'
             })
         )
     }
@@ -308,8 +339,9 @@ async function populateSets () {
 
     leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
     var yearLegalities = {
-        '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6'],
-        '2011 - 2021 (Expanded)': ['bwp', 'bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xyp', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'smp', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sma', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6'],
+        'standard': ['swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7'],
+        'expanded': ['bwp', 'bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xyp', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'smp', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sma', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6'],
+        '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7'],
         '2019 - 2020': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3'],
         '2018 - 2019': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11'],
         '2017 - 2018': ['xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7'],
@@ -1605,9 +1637,10 @@ async function importDeck (text) {
     var overwriteDeck = true
     if (cardsToSearch.length == 0) {
         LOG_alertError('No cards were found on the clipboard:\n\n' + text)
+        return
     }
     else if (deckCards.firstChild && !confirm('Would you like to overwrite the existing deck?')) {
-        if (confirm('Are you sure you want to import new cards? (This will add cards on top of the existing deck)')) {
+        if (confirm('Would you like to import on top of the existing deck?')) {
             overwriteDeck = false
         }
         else {
@@ -1615,45 +1648,43 @@ async function importDeck (text) {
         }
     }
     //begin import
+    var url = 'https://api.pokemontcg.io/v2/cards?q='
+    cardIDs = []
+    for (i=0; i<cardsToSearch.length; i++) {
+        // REMOVING NEWLINES
+        cardsToSearch[i]['id'] = cardsToSearch[i]['id'].replace(/[\r\n]+/gm, '')
+        cardIDs.push(cardsToSearch[i]['id'])
+    }
+    var url = `https://api.pokemontcg.io/v2/cards?q=id:${cardIDs.join('+OR+id:')}+`
+
+    const response = await fetchCards(url)
+
+    var cardData
+    //if response did not contain card data
+    if (!response['cards']) {
+        LOG_alertNormal('The deck you tried to import was malformed:\n\n' + text)
+    }
     else {
-        var url = 'https://api.pokemontcg.io/v2/cards?q='
-        cardIDs = []
-        for (i=0; i<cardsToSearch.length; i++) {
-            // REMOVING NEWLINES
-            cardsToSearch[i]['id'] = cardsToSearch[i]['id'].replace(/[\r\n]+/gm, '')
-            cardIDs.push(cardsToSearch[i]['id'])
-        }
-        var url = `https://api.pokemontcg.io/v2/cards?q=id:${cardIDs.join('+OR+id:')}+`
+        cardData = response['cards']
+    }
 
-        const response = await fetchCards(url)
+    //match requests to fetched data
+    var removedCards = false
 
-        var cardData
-        //if response did not contain card data
-        if (!response['cards']) {
-            LOG_alertNormal('The deck you tried to import was malformed:\n\n' + text)
+    for (i=0; i<cardsToSearch.length; i++) {
+        var newCard = cardData.filter(function(card) {
+            return card['id'] == cardsToSearch[i]['id']
+        })[0]
+        if (newCard) {
+            if (overwriteDeck == true && removedCards == false) {
+                removeDeckCards(true)
+                removedCards = true
+            }
+            addDeckCard(createCard(newCard), cardsToSearch[i]['count'])
         }
         else {
-            cardData = response['cards']
-        }
-
-        //match requests to fetched data
-        var removedCards = false
-
-        for (i=0; i<cardsToSearch.length; i++) {
-            var newCard = cardData.filter(function(card) {
-                return card['id'] == cardsToSearch[i]['id']
-            })[0]
-            if (newCard) {
-                if (overwriteDeck == true && removedCards == false) {
-                    removeDeckCards(true)
-                    removedCards = true
-                }
-                addDeckCard(createCard(newCard), cardsToSearch[i]['count'])
-            }
-            else {
-                LOG_error(`Failed to import ${cardsToSearch[i]['id']}`)
-                importedCorrectly = false 
-            }
+            LOG_error(`Failed to import ${cardsToSearch[i]['id']}`)
+            importedCorrectly = false 
         }
     }
     if (importedCorrectly == false) {
