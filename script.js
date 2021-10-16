@@ -154,9 +154,6 @@ document.addEventListener('drop', e => {
             fileReader.readAsDataURL(inputFiles[i])
         }
     }
-    else {
-        LOG_alertNormal('The deck is locked!')
-    }
 })
 
 //populate sets
