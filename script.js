@@ -1,5 +1,3 @@
-//SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP –––––––– SETUP
-
 var windowHeight = window.innerHeight
 var windowWidth = window.innerWidth
 
@@ -108,23 +106,27 @@ var ptcgoCodeTranslations = {
 
 //add event listeners
 document.addEventListener('keydown', e => {
-    if (currentFocused && (event.keyCode == 39 || event.keyCode == 68)) {
-        //left arrow, D key
-        event.preventDefault()
+    if (currentFocused && (e.key == 'ArrowRight' || e.key == 'd')) {
+        e.preventDefault()
         cycleFocused('right')
     }
-    else if (currentFocused && (event.keyCode == 37 || event.keyCode == 65)) {
-        //right arrow, A key
-        event.preventDefault()
+    else if (currentFocused && (e.key == "ArrowLeft" || e.key == "a")) {
+        e.preventDefault()
         cycleFocused('left')
     }
-    else if (document.getElementById('focused') && (event.keyCode == 27)) {
-        // escape
+    else if (document.getElementById('focused') && (e.key == "Escape")) {
         animateRemoveElement(document.getElementById('focused'), 'fadeOut'); 
         currentFocused = null
     }
 });
 document.addEventListener('mousemove', e => {
+    checkCardHover(e)
+});
+document.addEventListener('drag', e => {
+    checkCardHover(e)
+});
+
+function checkCardHover (e) {
     var hoveredCards = document.getElementsByClassName('hoveredCard')
     for (i=0; i<hoveredCards.length; i++) {
         // if mouse not over card and not over a hover menu button
@@ -132,7 +134,8 @@ document.addEventListener('mousemove', e => {
             cardUnhover(hoveredCards[i])
         }
     }
-});
+}
+
 document.addEventListener("dragover", e => {
     e.preventDefault()
 });
@@ -201,15 +204,15 @@ async function populateSets () {
             combinationButtons[reverseSet['series']]['sets'].push(reverseSet['id'])
         }
         rightButtons.appendChild(
-            createElement('div', null, {
+            createElement('button', null, {
                 'id': 'set.id:' + set['id'],
-                'class': 'parameterButtonDiv',
+                'class': 'parameterButton',
                 'title': set['name'],
                 'onclick': 'toggleParameterButton(this, true)'
             })
         ).appendChild(
             createElement('img', null, {
-                'class': 'parameterButton fadeIn',
+                'class': 'parameterButtonImage fadeIn',
                 'src': set['images']['symbol'],
                 'alt': 'set.id:' + set['id']
             })
@@ -235,15 +238,15 @@ async function populateSets () {
     ]
     for (i=0; i<types.length; i++) {
         leftButtons.appendChild(
-            createElement('div', null, {
+            createElement('button', null, {
                 'id': 'types:%22' + types[i].toLocaleLowerCase() + '%22',
-                'class': 'parameterButtonDiv',
+                'class': 'parameterButton',
                 'title': types[i],
                 'onclick': 'toggleParameterButton(this, true)'
             })
         ).appendChild(
             createElement('img', null, {
-                'class': 'parameterButton fadeIn',
+                'class': 'parameterButtonImage fadeIn',
                 'src': 'images/type_symbols/' + types[i].toLowerCase() + '.png'
             })
         )
@@ -291,15 +294,15 @@ async function populateSets () {
             }
         }
         leftButtons.appendChild(
-            createElement('div', null, {
+            createElement('button', null, {
                 'id': id,
-                'class': 'parameterButtonDiv parameterButtonDivWide',
+                'class': 'parameterButton parameterButtonWide',
                 'title': filter,
                 'onclick': 'toggleParameterButton(this, true)'
             })
         ).appendChild(
             createElement('img', null, {
-                'class': 'parameterButton parameterButtonWide fadeIn',
+                'class': 'parameterButtonImage parameterButtonImageWide fadeIn',
                 'src': 'images/subtypes/' + filter.toLowerCase() + '.png'
             })
         )
@@ -312,32 +315,32 @@ async function populateSets () {
             continue
         }
         var newButton = leftButtons.appendChild(
-            createElement('div', null, {
+            createElement('button', null, {
                 'id': key,
-                'class': 'parameterButtonDiv fadeIn',
+                'class': 'parameterButton fadeIn',
                 'title': key,
                 'onclick': `toggleParameterButton(this, true, ['set.id:${combinationButton['sets'].join("','set.id:")}'], true)`
             }))
         newButton.appendChild(
             createElement('img', null, {
-                'class': 'parameterButton',
+                'class': 'parameterButtonImage',
                 'src': combinationButton['setB_img'],
-                'style': 'transform: translateX(calc(var(--cardWidth)/12)) translateY(calc(-1 * var(--cardWidth)/12)) scale(0.85)'
+                'style': 'transform: translateX(-25%) translateY(-25%) scale(0.75)'
             })
         )
         newButton.appendChild(
             createElement('img', null, {
-                'class': 'parameterButton',
+                'class': 'parameterButtonImage',
                 'src': combinationButton['setA_img'],
-                'style': 'transform: translateX(calc(-1 * var(--cardWidth)/12)) translateY(calc(var(--cardWidth)/12)) scale(0.85)'
+                'style': 'transform: translateX(-75%) translateY(-75%) scale(0.75)'
             })
         )
     }
 
     leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
     var yearLegalities = {
-        'standard': ['swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7'],
-        'expanded': ['bwp', 'bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xyp', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'smp', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sma', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7'],
+        'standard': ['swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7', 'cel25'],
+        'expanded': ['bwp', 'bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xyp', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'smp', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sma', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7', 'cel25'],
         '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7'],
         '2019 - 2020': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3'],
         '2018 - 2019': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11'],
@@ -362,15 +365,15 @@ async function populateSets () {
     }
     for (key in yearLegalities) {
         leftButtons.appendChild(
-            createElement('div', null, {
+            createElement('button', null, {
                 'id': key,
-                'class': 'parameterButtonDiv parameterButtonDivLarge',
+                'class': 'parameterButton parameterButtonLarge',
                 'title': key,
                 'onclick': `toggleParameterButton(this, true, ['set.id:${yearLegalities[key].join("','set.id:")}'], true)`
             })
         ).appendChild(
             createElement('img', null, {
-                'class': 'parameterButton parameterButtonLarge fadeIn',
+                'class': 'parameterButtonImage parameterButtonImageLarge fadeIn',
                 'src': 'images/legalities/' + key + '.png'
             })
         )
@@ -546,8 +549,7 @@ function createCard (data) {
     var container = createElement('div', null, {
         'id': data['id'],
         'class': 'card fadeIn',
-        'oncontextmenu': 'event.preventDefault(); focusCard(this)',
-        'onclick': 'if(event.target === this) {focusCard(this)}',
+        'onclick': 'cardClick(this, event)',
         'onmouseenter': 'sidebarCardHover(this)',
         'ontouchstart': 'sidebarCardHover(this)'
     })
@@ -605,7 +607,7 @@ function cloneCard (card, modifications) {
                 createElement('img', null, {
                     'src': mod,
                     'class': 'cardImage',
-                    'onload': 'if(this.parentNode && this.parentNode.getElementsByClassName("cardImage")[1]) {this.parentNode.getElementsByClassName("cardImage")[1].remove()}'
+                    'onload': 'cloneCardOnload(this)'
                 })
             )
         }
@@ -627,6 +629,12 @@ function cloneCard (card, modifications) {
         }
     }
     return newCard
+}
+
+function cloneCardOnload(elem) {
+    if(elem.parentNode && elem.parentNode.getElementsByClassName("cardImage")[1]) {
+        elem.parentNode.getElementsByClassName("cardImage")[1].remove()
+    }
 }
 
 function exportTxt(text, filename) {
@@ -820,6 +828,13 @@ function cardUnhover (card) {
     }
 }
 
+function cardClick(card, event) {
+    if(event.target === card) {
+        focusCard(card);
+        cardUnhover(card);
+    }
+}
+
 function focusCard (card) {
     if (!isCardInView(card)) {
         card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
@@ -946,9 +961,9 @@ function focusCard (card) {
             'style': 'height: 75%; width: 75%; object-fit: contain'
         }))
         if (document.getElementById(`set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}`).classList.contains('selectedButton')) {
-            focusedSet.classList.add('parameterButtonDivSelected')
+            focusedSet.classList.add('parameterButtonSelected')
         }
-        focusedSet.setAttribute('onclick', `toggleParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true); if (this.classList.contains('parameterButtonDivSelected')) {this.classList.remove('parameterButtonDivSelected')} else {this.classList.add('parameterButtonDivSelected')}`)
+        focusedSet.setAttribute('onclick', `toggleParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true); if (this.classList.contains('parameterButtonSelected')) {this.classList.remove('parameterButtonSelected')} else {this.classList.add('parameterButtonSelected')}`)
     }
     else {
         focusedSet.innerHTML = '?'
@@ -1066,20 +1081,20 @@ function fullScreenSidebar (fullScreen) {
     var sidebarArrow = document.getElementById('sidebarArrow')
     if (fullScreen == true) {
         sidebarDiv.setAttribute('style', 'width: 100%; margin-left: 0%')
-        sidebarArrow.setAttribute('value', '❮')
+        sidebarArrow.innerHTML = '❮'
         sidebarArrow.title = 'Click to Minimize'
         sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(false)')
     }
     if (fullScreen == false) {
         sidebarDiv.style = ''
-        sidebarArrow.setAttribute('value', '❯')
+        sidebarArrow.innerHTML = '❯'
         sidebarArrow.title = 'Click to Expand'
         sidebarArrow.setAttribute('onclick', 'fullScreenSidebar(true)')
     }
 }
 
 function toggleParameterButton (elem, initiateSearch, group, conform) {
-    if (!elem.classList.contains('parameterButtonDivSelected')) {
+    if (!elem.classList.contains('parameterButtonSelected')) {
         enableParameterButton(elem, initiateSearch, group, conform)
     }
     else {
@@ -1088,7 +1103,7 @@ function toggleParameterButton (elem, initiateSearch, group, conform) {
 }
 
 function enableParameterButton (elem, initiateSearch, group, conform) {
-    elem.classList.add('parameterButtonDivSelected')
+    elem.classList.add('parameterButtonSelected')
     if (!group || group.length < 1) {
         elem.classList.add('selectedButton')
     }
@@ -1108,7 +1123,7 @@ function enableParameterButton (elem, initiateSearch, group, conform) {
 }
 
 function disableParameterButton (elem, initiateSearch, group, conform) {
-    elem.classList.remove('parameterButtonDivSelected')
+    elem.classList.remove('parameterButtonSelected')
     if (!group || group.length < 1) {
         elem.classList.remove('selectedButton')
     }
@@ -1299,18 +1314,37 @@ function sidebarCardHover (card) {
 
 //DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST –––––––– DECKLIST
 
+function cardOnDragStart(elem, event) {
+    event.dataTransfer.setDragImage(elem.getElementsByClassName('cardImageContainer')[0], elem.getElementsByClassName('cardImage')[0].width/2, elem.getElementsByClassName('cardImage')[0].height/2)
+    cardUnhover(elem)
+}
+
+function cardOnDragEnd(elem) {
+    if(isDeckLocked == false) {
+        drop(elem, cardDropTarget)
+        elem.removeAttribute('style')
+    }
+}
+
+function cardOnDragOver(elem, event) {
+    if(isDeckLocked == false) {
+        allowDrop(event)
+        cardDropTarget = elem
+    }
+}
+
 var cardDropTarget
 function allowDrop(event) {
-    event.preventDefault();
+    event.preventDefault()
 }
 
 function drop(elem, target) {
     var siblings = target.parentElement.children
     if(Array.prototype.indexOf.call(siblings, target) > Array.prototype.indexOf.call(siblings, elem)) {
-        cardDropTarget.after(elem);
+        cardDropTarget.after(elem)
     }
     else {
-        cardDropTarget.before(elem);
+        cardDropTarget.before(elem)
     }
 }
 
@@ -1330,9 +1364,9 @@ function addDeckCard(card, count) {
             'onmouseenter': 'deckCardHover(this)',
             'ontouchstart': 'deckCardHover(this)',
             'draggable': 'true',
-            'ondragstart': 'if(isDeckLocked == false) {this.setAttribute("style", "transform: scale(1); box-shadow: none")}',
-            'ondragend': 'if(isDeckLocked == false) {drop(this, cardDropTarget); this.removeAttribute("style")}',
-            'ondragover': 'if(isDeckLocked == false) {allowDrop(event); cardDropTarget = this}',
+            'ondragstart': 'cardOnDragStart(this, event)',
+            'ondragend': 'cardOnDragEnd(this)',
+            'ondragover': 'cardOnDragOver(this, event)',
             'count': count
 
         })
@@ -1345,7 +1379,7 @@ function addDeckCard(card, count) {
     newCard.appendChild(createElement('input', null, {
         'type': 'button',
         'value': count,
-        'class': 'individualCardCount scaledButtonObject'
+        'class': 'individualCardCount buttonObject scaledButtonObject'
     }))
     deckCards.appendChild(newCard)
     modifyDeckCardCount(null, count)
@@ -1363,13 +1397,13 @@ function deckCardHover (card) {
     if (hoverMenu) {
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
-            'class': 'deckCardHoverButtonAdd scaledButtonObject',
+            'class': 'deckCardHoverButtonAdd buttonObject scaledButtonObject',
             'value': '＋',
             'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDeckCardCount(this.parentNode.parentNode, +1)}'
         }))
         hoverMenu.appendChild(createElement('input', null, {
             'type': 'button',
-            'class': 'deckCardHoverButtonRemove scaledButtonObject',
+            'class': 'deckCardHoverButtonRemove buttonObject scaledButtonObject',
             'value': '－',
             'onclick': 'if (!this.parentNode.parentNode.classList.contains("fadeOut")) {modifyDeckCardCount(this.parentNode.parentNode, -1)}'
         }))
@@ -1394,12 +1428,32 @@ function modifyDeckCardCount (card, value) {
             animateRemoveElement(card, 'fadeOut')
         }
         else if (
-            (individualCardCount + value > 1 && dataContainer.getAttribute('rarity') && dataContainer.getAttribute('rarity') == 'Rare ACE') ||
-            (individualCardCount + value > 1 && dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("◇ (Prism Star) Rule: You can't have more than 1 ◇ card with the same name in your deck. If a ◇ card would go to the discard pile, put it in the Lost Zone instead.")) ||
-            (individualCardCount + value > 1 && dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You can't have more than 1 Pokémon Star in your deck.")) ||
-            (individualCardCount + value > 4 && !(dataContainer.getAttribute('supertype') == 'Energy' && dataContainer.getAttribute('subtypes').includes('Basic'))) && 
-            (individualCardCount + value > 4 && !(dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You may have as many of this card in your deck as you like.")))
-        ) {
+            (
+                individualCardCount + value > 1 && (
+                    (
+                        dataContainer.getAttribute('rarity') && dataContainer.getAttribute('rarity') == 'Rare ACE'
+                    ) ||
+                    (
+                        dataContainer.getAttribute('rules') && (
+                            dataContainer.getAttribute('rules').includes("◇ (Prism Star) Rule: You can't have more than 1 ◇ card with the same name in your deck. If a ◇ card would go to the discard pile, put it in the Lost Zone instead.") ||
+                            dataContainer.getAttribute('rules').includes("You can't have more than 1 Pokémon Star in your deck.")
+                        )
+                    )
+                )
+            ) ||
+            (
+                individualCardCount + value > 4 && !(
+                    (
+                        dataContainer.getAttribute('rules') && dataContainer.getAttribute('rules').includes("You may have as many of this card in your deck as you like.")
+                    ) ||
+                    (
+                        dataContainer.getAttribute('supertype') && dataContainer.getAttribute('supertype') == 'Energy' &&
+                        dataContainer.getAttribute('subtypes') && dataContainer.getAttribute('subtypes').includes('Basic')
+                    )
+                )
+            )
+        )
+        {
             card.getElementsByClassName('individualCardCount')[0].setAttribute('style', 'color: red')
         }
         else {
