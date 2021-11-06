@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-LOG_normal('Version 1.4.0.1')
+LOG_normal('Version 1.4.0.2')
 
 const holoRarities = [
     'Amazing Rare',
@@ -189,6 +189,7 @@ async function populateSets () {
     var expanded = []
     var setsRegular = []
     var setsOther = []
+    var setsPOP = []
     for (i=0; i<sets.length; i++) {
         var set = sets[i]
 
@@ -209,11 +210,14 @@ async function populateSets () {
             combinationButtons[series]['sets'].push(set['id'])
         }
 
-        if (series != 'Other') {
-            setsRegular.push(set['id'])
+        if (series == 'Other') {
+            setsOther.push(set['id'])
+        }
+        else if (series == 'POP') {
+            setsPOP.push(set['id'])
         }
         else {
-            setsOther.push(set['id'])
+            setsRegular.push(set['id'])
         }
 
         // if set image is first in block, set setB_img
@@ -248,7 +252,7 @@ async function populateSets () {
 
     // store base64 abbreviations for sets
     setsRegular = setsRegular.reverse()
-    setsOther = setsOther.reverse()
+    setsOther = setsPOP.reverse().concat(setsOther.reverse())
 
     for (i = 0; i<setsRegular.length; i++) {
         sets4096[i + 1] = setsRegular[i]
@@ -257,6 +261,8 @@ async function populateSets () {
     for (i = 0; i<setsOther.length; i++) {
         sets4096[4095 - i] = setsOther[i]
     }
+
+    console.log(sets4096)
 
     setsLoaded = true
 
