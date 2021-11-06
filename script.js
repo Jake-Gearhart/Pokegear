@@ -1,3 +1,5 @@
+LOG_normal('Version 1.4.0')
+
 var windowHeight = window.innerHeight
 var windowWidth = window.innerWidth
 
@@ -250,12 +252,10 @@ async function populateSets () {
     setsOther = setsOther.reverse()
 
     for (i = 0; i<setsRegular.length; i++) {
-        // base64Sets[setsRegular[i]] = encodeBase64WithSize(i + 1, 2)
         sets4096[i + 1] = setsRegular[i]
     }
 
     for (i = 0; i<setsOther.length; i++) {
-        // base64Sets[setsOther[i]] = encodeBase64WithSize(4095 - i, 2)
         sets4096[4095 - i] = setsOther[i]
     }
 
