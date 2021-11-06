@@ -1,10 +1,9 @@
-LOG_normal('Version 1.4.0')
-
 var windowHeight = window.innerHeight
 var windowWidth = window.innerWidth
 
 //logs
 var logs = []
+LOG_normal('Version 1.4.0')
 
 const holoRarities = [
     'Amazing Rare',
