@@ -263,45 +263,47 @@ async function populateSets () {
 
     // import cards from url
     var cardsInUrl = window.location.search.split('cards=')[1]
-    var cardsToSearch = {}
-    while (cardsInUrl.length > 0) {
-        var count = decodeBase64(cardsInUrl.slice(0,1))
-        var set = sets4096[decodeBase64(cardsInUrl.slice(1,3))]
-        var number = decodeBase64(cardsInUrl.slice(3,5))
-
-        cardsToSearch[`${set}-${number}`] = count
-
-        cardsInUrl = cardsInUrl.slice(5)
-    }
-
-    var url = `https://api.pokemontcg.io/v2/cards?q=id:${Object.keys(cardsToSearch).join('+OR+id:')}+`
-    var response = await fetchCards(url)
-
-    var importedCorrectly = true
-    var cardData
-    // //if response did not contain card data
-    if (!response['cards']) {
-        LOG_alertNormal('The deck you tried to import was malformed:\n\n' + text)
-    }
-    else {
-        cardData = response['cards']
-    }
-
-    //match requests to fetched data
-    for (key in cardsToSearch) {
-        var newCard = cardData.filter(function(card) {
-            return card['id'] == key
-        })[0]
-        if (newCard) {
-            addDeckCard(createCard(newCard), cardsToSearch[key])
+    if (cardsInUrl && cardsInUrl.length > 0) {
+        var cardsToSearch = {}
+        while (cardsInUrl.length > 0) {
+            var count = decodeBase64(cardsInUrl.slice(0,1))
+            var set = sets4096[decodeBase64(cardsInUrl.slice(1,3))]
+            var number = decodeBase64(cardsInUrl.slice(3,5))
+    
+            cardsToSearch[`${set}-${number}`] = count
+    
+            cardsInUrl = cardsInUrl.slice(5)
+        }
+    
+        var url = `https://api.pokemontcg.io/v2/cards?q=id:${Object.keys(cardsToSearch).join('+OR+id:')}+`
+        var response = await fetchCards(url)
+    
+        var importedCorrectly = true
+        var cardData
+        // //if response did not contain card data
+        if (!response['cards']) {
+            LOG_alertNormal('The deck you tried to import was malformed:\n\n' + text)
         }
         else {
-            LOG_error(`Failed to import ${key}`)
-            importedCorrectly = false 
+            cardData = response['cards']
         }
-    }
-    if (importedCorrectly == false) {
-        LOG_alertNormal('One or more cards failed to import. See the console for more details.')
+    
+        //match requests to fetched data
+        for (key in cardsToSearch) {
+            var newCard = cardData.filter(function(card) {
+                return card['id'] == key
+            })[0]
+            if (newCard) {
+                addDeckCard(createCard(newCard), cardsToSearch[key])
+            }
+            else {
+                LOG_error(`Failed to import ${key}`)
+                importedCorrectly = false 
+            }
+        }
+        if (importedCorrectly == false) {
+            LOG_alertNormal('One or more cards failed to import. See the console for more details.')
+        }
     }
 
     // LEFT SIDE
