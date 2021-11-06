@@ -262,8 +262,6 @@ async function populateSets () {
         sets4096[4095 - i] = setsOther[i]
     }
 
-    console.log(sets4096)
-
     setsLoaded = true
 
     // import cards from url
