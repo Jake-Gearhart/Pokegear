@@ -145,11 +145,12 @@ document.addEventListener('drop', e => {
         var inputFiles = e['dataTransfer']['files']
         for (i=0; i<inputFiles.length; i++) {
             var fileReader = new FileReader()
-            fileReader.filename = 'custom-card-' + inputFiles[i]['name']
+            var filename = inputFiles[i]['name'].replace('.', '-')
+            fileReader.filename = 'custom-card-' + filename
             fileReader.onload = function (event) {
                 addDeckCard(createCard({
-                    'id': fileReader['filename'],
-                    'name': fileReader['filename'],
+                    'id': filename,
+                    'name': filename,
                     'custom-card': true,
                     'images': {'small': fileReader['result']}
                 }), +1)
@@ -161,6 +162,7 @@ document.addEventListener('drop', e => {
 
 //populate sets
 var setsLoaded = false
+var sets4096 = []
 populateSets()
 async function populateSets () {
     var url = 'https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate'
@@ -182,27 +184,42 @@ async function populateSets () {
 
     var sets = json['data']
     var combinationButtons = {}
+    var standard = []
+    var expanded = []
+    var setsRegular = []
+    var setsOther = []
     for (i=0; i<sets.length; i++) {
         var set = sets[i]
-        var reverseSet = sets[sets.length -1 -i]
+
+        // update PTCGO Codes
         if (set['ptcgoCode'] && !setIdTranslations[set['ptcgoCode'].toLowerCase()]) {
             setIdTranslations[set['ptcgoCode'].toLowerCase()] = set['id']
         }
-        if (!combinationButtons[reverseSet['series']]) {
-            combinationButtons[reverseSet['series']] = {
-                'setA_img': reverseSet['images']['symbol'],
-                'setB_img': reverseSet['images']['symbol'],
-                'sets': [reverseSet['id']]
+
+        // create set series (ex: Sun & Moon block), and add setA_img
+        var series = set['series']
+        if (!combinationButtons[series]) {
+            combinationButtons[series] = {
+                'setA_img': set['images']['symbol'],
+                'sets': [set['id']]
             }
         }
         else {
-            //prevent promo from being image
-            if(combinationButtons[reverseSet['series']]['setA_img'].split('/symbol.png')[0].slice(-1) != '1') {
-                combinationButtons[reverseSet['series']]['setA_img'] = reverseSet['images']['symbol']
-            }
-            combinationButtons[reverseSet['series']]['setB_img'] = reverseSet['images']['symbol']
-            combinationButtons[reverseSet['series']]['sets'].push(reverseSet['id'])
+            combinationButtons[series]['sets'].push(set['id'])
         }
+
+        if (series != 'Other') {
+            setsRegular.push(set['id'])
+        }
+        else {
+            setsOther.push(set['id'])
+        }
+
+        // if set image is first in block, set setB_img
+        if(set['images']['symbol'].split('/symbol.png')[0].slice(-1) == '1') {
+            combinationButtons[series]['setB_img'] = set['images']['symbol']
+        }
+
         rightButtons.appendChild(
             createElement('button', null, {
                 'id': 'set.id:' + set['id'],
@@ -217,8 +234,75 @@ async function populateSets () {
                 'alt': 'set.id:' + set['id']
             })
         )
+
+        // TEMPORARY FIX smp set is wrongly included as standard legal
+        if(set['legalities']['standard'] == 'Legal' && set['id'] != 'smp') {
+            standard.push(set['id'])
+        }
+
+        if(set['legalities']['expanded'] == 'Legal') {
+            expanded.push(set['id'])
+        }
     }
+
+    // store base64 abbreviations for sets
+    setsRegular = setsRegular.reverse()
+    setsOther = setsOther.reverse()
+
+    for (i = 0; i<setsRegular.length; i++) {
+        // base64Sets[setsRegular[i]] = encodeBase64WithSize(i + 1, 2)
+        sets4096[i + 1] = setsRegular[i]
+    }
+
+    for (i = 0; i<setsOther.length; i++) {
+        // base64Sets[setsOther[i]] = encodeBase64WithSize(4095 - i, 2)
+        sets4096[4095 - i] = setsOther[i]
+    }
+
     setsLoaded = true
+
+    // import cards from url
+    var cardsInUrl = window.location.search.split('cards=')[1]
+    var cardsToSearch = {}
+    while (cardsInUrl.length > 0) {
+        var count = decodeBase64(cardsInUrl.slice(0,1))
+        var set = sets4096[decodeBase64(cardsInUrl.slice(1,3))]
+        var number = decodeBase64(cardsInUrl.slice(3,5))
+
+        cardsToSearch[`${set}-${number}`] = count
+
+        cardsInUrl = cardsInUrl.slice(5)
+    }
+
+    var url = `https://api.pokemontcg.io/v2/cards?q=id:${Object.keys(cardsToSearch).join('+OR+id:')}+`
+    var response = await fetchCards(url)
+
+    var importedCorrectly = true
+    var cardData
+    // //if response did not contain card data
+    if (!response['cards']) {
+        LOG_alertNormal('The deck you tried to import was malformed:\n\n' + text)
+    }
+    else {
+        cardData = response['cards']
+    }
+
+    //match requests to fetched data
+    for (key in cardsToSearch) {
+        var newCard = cardData.filter(function(card) {
+            return card['id'] == key
+        })[0]
+        if (newCard) {
+            addDeckCard(createCard(newCard), cardsToSearch[key])
+        }
+        else {
+            LOG_error(`Failed to import ${key}`)
+            importedCorrectly = false 
+        }
+    }
+    if (importedCorrectly == false) {
+        LOG_alertNormal('One or more cards failed to import. See the console for more details.')
+    }
 
     // LEFT SIDE
     var leftButtons = parameterButtonsDiv.appendChild(createElement('div', null, {'id': 'leftButtons', 'class': 'parameterButtonsSubContainer', 'style': 'left: 0;'}))
@@ -309,14 +393,15 @@ async function populateSets () {
     }
 
     leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
-    for (key in combinationButtons) {
+
+    function createCombinationButton (key) {
         var combinationButton = combinationButtons[key]
         if (combinationButton['sets'].length == 1) {
-            continue
+            return
         }
         var newButton = leftButtons.appendChild(
             createElement('button', null, {
-                'id': key,
+                'id': key.toLowerCase().replaceAll(' ', '-') + '-parameter-button',
                 'class': 'parameterButton fadeIn',
                 'title': key,
                 'onclick': `toggleParameterButton(this, true, ['set.id:${combinationButton['sets'].join("','set.id:")}'], true)`
@@ -324,23 +409,30 @@ async function populateSets () {
         newButton.appendChild(
             createElement('img', null, {
                 'class': 'parameterButtonImage',
-                'src': combinationButton['setB_img'],
-                'style': 'transform: translateX(-25%) translateY(-25%) scale(0.75)'
+                'src': combinationButton['setA_img'],
+                'style': 'transform: translateX(-75%) translateY(-75%) scale(0.75)'
             })
         )
         newButton.appendChild(
             createElement('img', null, {
                 'class': 'parameterButtonImage',
-                'src': combinationButton['setA_img'],
-                'style': 'transform: translateX(-75%) translateY(-75%) scale(0.75)'
+                'src': combinationButton['setB_img'],
+                'style': 'transform: translateX(-25%) translateY(-25%) scale(0.75)'
             })
         )
     }
 
+    for (key in combinationButtons) {
+        if (key != 'Other') {
+            createCombinationButton(key)
+        }
+    }
+    createCombinationButton('Other')
+
     leftButtons.appendChild(createElement('div', null, {'class': 'parameterButtonSpacer'}))
     var yearLegalities = {
-        'standard': ['swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7', 'cel25'],
-        'expanded': ['bwp', 'bw1', 'mcd11', 'bw2', 'bw3', 'bw4', 'bw5', 'mcd12', 'bw6', 'dv1', 'bw7', 'bw8', 'bw9', 'bw10', 'bw11', 'xyp', 'xy0', 'xy1', 'xy2', 'xy3', 'xy4', 'xy5', 'dc1', 'xy6', 'xy7', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'xy8', 'xy9', 'g1', 'xy10', 'xy11', 'mcd16', 'xy12', 'smp', 'sm1', 'sm2', 'sm3', 'sm35', 'sm4', 'sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sma', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7', 'cel25'],
+        'standard': standard,
+        'expanded': expanded,
         '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7'],
         '2019 - 2020': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3'],
         '2018 - 2019': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11'],
@@ -458,6 +550,8 @@ function darkenScreen () {
 
 var elementsToRemove = {}
 function removeElement (elem, time) {
+    elem.classList.add('removing')
+
     if (elementsToRemove[time]) {
         elementsToRemove[time].push(elem)
     }
@@ -945,6 +1039,10 @@ function focusCard (card) {
         focusedCount.innerHTML = cardCount
         focusedCount.setAttribute('count', cardCount)
     }
+    else {
+        focusedCount.innerHTML = 0
+        focusedCount.setAttribute('count', 0)
+    }
 
     var dataContainer = card.getElementsByClassName('data')[0]
 
@@ -963,10 +1061,15 @@ function focusCard (card) {
         if (document.getElementById(`set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}`).classList.contains('selectedButton')) {
             focusedSet.classList.add('parameterButtonSelected')
         }
+        else {
+            focusedSet.classList.remove('parameterButtonSelected')
+        }
         focusedSet.setAttribute('onclick', `toggleParameterButton(document.getElementById('set.id:${JSON.parse(dataContainer.getAttribute('set'))['id']}'), true); if (this.classList.contains('parameterButtonSelected')) {this.classList.remove('parameterButtonSelected')} else {this.classList.add('parameterButtonSelected')}`)
     }
     else {
         focusedSet.innerHTML = '?'
+        focusedSet.classList.remove('parameterButtonSelected')
+        focusedSet.removeAttribute('onclick')
     }
 
     focusedCenter.prepend(cloneCard(card, {
@@ -1346,6 +1449,8 @@ function drop(elem, target) {
     else {
         cardDropTarget.before(elem)
     }
+
+    updateUrl()
 }
 
 function addDeckCard(card, count) {
@@ -1367,7 +1472,7 @@ function addDeckCard(card, count) {
             'ondragstart': 'cardOnDragStart(this, event)',
             'ondragend': 'cardOnDragEnd(this)',
             'ondragover': 'cardOnDragOver(this, event)',
-            'count': count
+            'count': 0
 
         })
     if (newCard.getElementsByClassName('holo')[0]) {
@@ -1378,11 +1483,13 @@ function addDeckCard(card, count) {
     }
     newCard.appendChild(createElement('input', null, {
         'type': 'button',
-        'value': count,
+        'value': 0,
         'class': 'individualCardCount buttonObject scaledButtonObject'
     }))
     deckCards.appendChild(newCard)
-    modifyDeckCardCount(null, count)
+
+    // set card count (and update color on count)
+    modifyDeckCardCount(newCard, count)
 
     // focused count
     var focusedCard = document.getElementsByClassName('focusedCard')[0]
@@ -1497,6 +1604,8 @@ function modifyDeckCardCount (card, value) {
     else {
         deckCardCount.setAttribute('style', 'color: var(--yellow)')
     }
+
+    updateUrl()
 }
 
 function lockDeck (button) {
@@ -2198,57 +2307,47 @@ function sortDeck () {
         var rules = JSON.parse(dataContainer.getAttribute('rules'))
         if (supertype == 'Pokémon') {
             sortTypes['pokemon'].push(card)
-            continue
         }
         else if (supertype && supertype == 'Trainer') {
             if (subtypes && subtypes.includes('Supporter')) {
                 sortTypes['supporter'].push(card)
-                continue
             }
             else if (!subtypes) {
                 sortTypes['item'].push(card)
-                continue
             }
             else if (rules && rules.includes("You can't have more than 1 ACE SPEC card in your deck.")) {
                 sortTypes['acespec'].push(card)
-                continue
             }
             else if (subtypes && subtypes.includes('Item')) {
                 sortTypes['item'].push(card)
-                continue
             }
             else if (subtypes && subtypes.includes("Rocket's Secret Machine")) {
                 sortTypes['item'].push(card)
-                continue
             }
             else if (subtypes && subtypes.includes('Pokémon Tool')) {
                 sortTypes['tool'].push(card)
-                continue
             }
             else if (subtypes && subtypes.includes('Technical Machine')) {
                 sortTypes['tool'].push(card)
-                continue
             }
             else if (subtypes && subtypes.includes('Stadium')) {
                 sortTypes['stadium'].push(card)
-                continue
             }
             else if (subtypes && subtypes.includes('Pokémon Tool F')) {
                 sortTypes['flare-tool'].push(card)
-                continue
             }
         }
         else if (supertype && supertype == 'Energy') {
             if (subtypes && subtypes.includes('Special')) {
                 sortTypes['specialEnergy'].push(card)
-                continue
             }
             else if (subtypes && subtypes.includes('Basic Energy')) {
                 sortTypes['basicEnergy'].push(card)
-                continue
             }
         }
-        sortTypes['unknown'].push(card)
+        else {
+            sortTypes['unknown'].push(card)
+        }
     }
 
     for (sortType in sortTypes) {
@@ -2384,4 +2483,60 @@ function removeDeckCards (immediate) {
     }
     deckCardCount.value = 0;
     deckCardCount.setAttribute('style', 'color: var(--yellow)')
+
+    updateUrl()
+}
+
+var base64Map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_'
+function encodeBase64 (input) {
+    var returnString = ''
+    while (input > 0) {
+        returnString = base64Map[input % 64] + returnString
+        input = Math.floor(input / 64)
+    }
+    return returnString
+}
+
+function encodeBase64WithSize (input, size) {
+    var returnString = encodeBase64(input)
+    if (returnString.length > size) {
+        returnString = encodeBase64(Math.pow(64, size) - 1 )
+    }
+    else if (returnString.length < size) {
+        while (returnString.length < size) {
+            returnString = 0 + returnString
+        }
+    }
+    return returnString
+}
+
+function decodeBase64 (input) {
+    var returnNumber = 0
+    for (i = 0; i < input.length; i++) {
+        returnNumber += base64Map.indexOf(input[i]) * Math.pow(64, input.length - i - 1)
+    }
+    return returnNumber
+}
+
+function updateUrl() {
+    var url = ''
+    // FIX: i was being influenced
+    for (j = 0; j<deckCards.children.length; j++) {
+        var card = deckCards.children[j]
+        if (card.classList.contains('removing')) {
+            continue
+        }
+
+        var dataContainer = card.getElementsByClassName('data')[0]
+
+        url += encodeBase64WithSize(card.getAttribute('count'), 1)
+        url += encodeBase64WithSize(sets4096.indexOf(JSON.parse(dataContainer.getAttribute('set'))['id']), 2)
+        url += encodeBase64WithSize(dataContainer.getAttribute('number'), 2)
+    }
+    if (url.length > 0) {
+        history.replaceState({}, '', `?cards=${url}`)
+    }
+    else {
+        history.replaceState({}, '', '?')
+    }
 }
