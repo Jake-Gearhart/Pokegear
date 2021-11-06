@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-LOG_normal('Version 1.4.0')
+LOG_normal('Version 1.4.0.1')
 
 const holoRarities = [
     'Amazing Rare',
@@ -2530,9 +2530,11 @@ function updateUrl() {
 
         var dataContainer = card.getElementsByClassName('data')[0]
 
-        url += encodeBase64WithSize(card.getAttribute('count'), 1)
-        url += encodeBase64WithSize(sets4096.indexOf(JSON.parse(dataContainer.getAttribute('set'))['id']), 2)
-        url += encodeBase64WithSize(dataContainer.getAttribute('number'), 2)
+        if (dataContainer.getAttribute('set')) {
+            url += encodeBase64WithSize(card.getAttribute('count'), 1)
+            url += encodeBase64WithSize(sets4096.indexOf(JSON.parse(dataContainer.getAttribute('set'))['id']), 2)
+            url += encodeBase64WithSize(dataContainer.getAttribute('number'), 2)
+        }
     }
     if (url.length > 0) {
         history.replaceState({}, '', `?cards=${url}`)
