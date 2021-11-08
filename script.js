@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-LOG_normal('Version 1.4.0.3')
+LOG_normal('Version 1.4.0.4')
 
 const holoRarities = [
     'Amazing Rare',
@@ -2309,7 +2309,7 @@ function sortDeck () {
         var supertype = dataContainer.getAttribute('supertype')
         var subtypes = JSON.parse(dataContainer.getAttribute('subtypes'))
         var rules = JSON.parse(dataContainer.getAttribute('rules'))
-        if (supertype == 'Pokémon') {
+        if (supertype && supertype == 'Pokémon') {
             sortTypes['pokemon'].push(card)
         }
         else if (supertype && supertype == 'Trainer') {
@@ -2345,7 +2345,7 @@ function sortDeck () {
             if (subtypes && subtypes.includes('Special')) {
                 sortTypes['specialEnergy'].push(card)
             }
-            else if (subtypes && subtypes.includes('Basic Energy')) {
+            else if (subtypes && subtypes.includes('Basic')) {
                 sortTypes['basicEnergy'].push(card)
             }
         }
