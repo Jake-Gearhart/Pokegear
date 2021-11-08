@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-LOG_normal('Version 1.4.0.2')
+LOG_normal('Version 1.4.0.3')
 
 const holoRarities = [
     'Amazing Rare',
@@ -146,8 +146,7 @@ document.addEventListener('drop', e => {
         var inputFiles = e['dataTransfer']['files']
         for (i=0; i<inputFiles.length; i++) {
             var fileReader = new FileReader()
-            var filename = inputFiles[i]['name'].replace('.', '-')
-            fileReader.filename = 'custom-card-' + filename
+            var filename = 'custom-card-' + inputFiles[i]['name'].replace('.', '-')
             fileReader.onload = function (event) {
                 addDeckCard(createCard({
                     'id': filename,
