@@ -1251,8 +1251,8 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			}
 		}
 		show (event) {
-			alert('SHOWING!');
-			
+			alert('SHOWING! 2');
+
 			let image = this.popUpContainer;
 			const text = this.getBoundingClientRect();
 			const mainRect = document.getElementById('main').getBoundingClientRect();
@@ -1268,6 +1268,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			if (event.sourceCapabilities.firesTouchEvents == true && !image.tooltip) {
 				image.createTooltip();
 				image.style.pointerEvents = 'all';
+				event.preventDefault();
 			}
 			else if (image.tooltip) {
 				image.removeTooltip();
