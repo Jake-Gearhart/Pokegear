@@ -1069,8 +1069,6 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			this.width = 0;
 			this.height = 0;
 
-			this.naturalWidth = 0;
-			this.naturalHeight = 0;
 			this.tooltipRatio = 0;
 
 			this.horizontal = 0;
@@ -1127,6 +1125,9 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		get bottom () {return this.vertical - this.alignmentYOffset + this.height}
 		set bottom (value) {this.vertical = value + this.alignmentYOffset - this.height}
 
+		get naturalWidth () {return this.img.naturalWidth}
+		get naturalHeight () {return this.img.naturalHeight}
+
 		get widthProportion () {return this.naturalWidth}
 		get heightProportion () {return this.naturalHeight + (this.naturalHeight * this.tooltipRatio)}
 
@@ -1135,8 +1136,6 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			this.img.src = src;
 			this.img.classList.add('pop-up-image');
 			this.img.classList.add('card');
-			this.naturalHeight = this.img.naturalHeight;
-			this.naturalWidth = this.img.naturalWidth;
 			this.appendChild(this.img);
 		}
 
@@ -1205,9 +1204,8 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			this.updateStyle();
 		}
 
-		openTCGPlayer () {
+		linkClick () {
 			this.parentElement.openTCGPlayer();
-			this.parentElement.classList.remove('persistent-pop-up');
 		}
 	}
 	customElements.define('pop-up-container', PopUpContainer);
@@ -1240,36 +1238,38 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				this.popUpContainer.setImage(this.getAttribute('src'));
 				this.appendChild(this.popUpContainer);
 
-				this.setAttribute('onmouseenter', 'show(0.35, false)');
-				this.setAttribute('onmouseleave', 'hide(0.35)');
+				this.setAttribute('onmouseenter', 'show(event)');
+				this.setAttribute('onmouseleave', 'hide(event)');
 
-				this.setAttribute('ontouchstart', 'show(0.35, true)');
+				this.setAttribute('ontouchstart', 'show(event)');
 			}
 
 			if (this.getAttribute('tcgplayer')) {
 				this.classList.add('pop-up-link');
-				this.setAttribute('onmouseup', 'openTCGPlayer()');
-				this.popUpContainer.setAttribute('onclick', 'openTCGPlayer()')
+				this.setAttribute('onclick', 'linkClick(event)');
+				this.popUpContainer.setAttribute('onclick', 'linkClick()')
 			}
 		}
-		show (speed, touchscreen) {
+		show (event) {
 			let image = this.popUpContainer;
 			const text = this.getBoundingClientRect();
 			const mainRect = document.getElementById('main').getBoundingClientRect();
-			const mainWidth = mainRect.width;
-			const mainMargin = (window.innerWidth - mainWidth)/2;
+
+			const actionBar = document.querySelector('#actionbar:not(.actnbr-hidden)')
+			const windowWidth = window.innerWidth;
+			const windowHeight = actionBar ? window.innerHeight - actionBar.getBoundingClientRect().height : window.innerHeight;
+
+			const mainWidth = Math.max(mainRect.width, 1400/3);
+			const mainMargin = (windowWidth - mainWidth)/2;
 			const minMargin = 15;
 
-			if (touchscreen == true) {
-				this.classList.add('new-persistent-pop-up');
-				if (this.getAttribute('tcgplayer') && !image.tooltip) {
-					image.createTooltip();
-					image.style.pointerEvents = 'all';
-				}
+			if (event.sourceCapabilities.firesTouchEvents == true && !image.tooltip) {
+				image.createTooltip();
+				image.style.pointerEvents = 'all';
 			}
 			else if (image.tooltip) {
 				image.removeTooltip();
-				image.style.pointerEvents = null;
+				image.style.pointerEvents = 'none';
 			}
 
 			if (this.windowWidth != window.innerWidth || this.windowHeight != window.innerHeight) {
@@ -1280,8 +1280,8 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			}
 
 			let textSideHorizontal;
-			if (this.parentElement.tagName == 'TD' && text.x <= window.innerWidth/2) textSideHorizontal = 'left';
-			else if (text.x + text.width/2 <= window.innerWidth/2) textSideHorizontal = 'left';
+			if (this.parentElement.tagName == 'TD' && text.x <= windowWidth/2) textSideHorizontal = 'left';
+			else if (text.x + text.width/2 <= windowWidth/2) textSideHorizontal = 'left';
 			else textSideHorizontal = 'right';
 
 			image.width = mainWidth/2;
@@ -1296,23 +1296,23 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 					image.horizontal = mainMargin/2;
 				}
 				else if (textSideHorizontal == 'right') {
-					image.horizontal = window.innerWidth - mainMargin/2
+					image.horizontal = windowWidth - mainMargin/2
 				}
-				image.fitVertical(minMargin, window.innerHeight - minMargin)
+				image.fitVertical(minMargin, windowHeight - minMargin)
 				image.conformDimensions();
 			} 
 			else {
 				if (textSideHorizontal == 'left') {
 					image.alignmentX = 'left';
 					image.horizontal = text.x + text.width + minMargin;
-					image.fitHorizontal(image.horizontal, window.innerWidth - minMargin)
+					image.fitHorizontal(image.horizontal, windowWidth - minMargin)
 				}
 				else if (textSideHorizontal == 'right') {
 					image.alignmentX = 'right';
 					image.horizontal = text.x - minMargin;
 					image.fitHorizontal(minMargin, image.horizontal)
 				}
-				image.fitVertical(minMargin, window.innerHeight - minMargin)
+				image.fitVertical(minMargin, windowHeight - minMargin)
 				image.conformDimensions();
 				const oldDimensions = image.dimensions;
 				const oldArea = image.area;
@@ -1321,12 +1321,12 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				image.setHeightFromWidth();
 				image.alignmentX = 'middle';
 				image.horizontal = text.x + text.width/2;
-				image.fitHorizontal(minMargin, window.innerWidth - minMargin);
+				image.fitHorizontal(minMargin, windowWidth - minMargin);
 				
-				if (text.y + text.height/2 <= window.innerHeight/2) {
+				if (text.y + text.height/2 <= windowHeight/2) {
 					image.alignmentY = 'top';
 					image.vertical = text.y + text.height + minMargin;
-					image.fitVertical(image.vertical, window.innerHeight - minMargin)
+					image.fitVertical(image.vertical, windowHeight - minMargin)
 				}
 				else {
 					image.alignmentY = 'bottom'; 
@@ -1338,34 +1338,23 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				if (image.area <= oldArea) image.dimensions = oldDimensions;
 			}
 
-			image.transition = `all ${speed}s`;
+			image.transition = `all 0.35s`;
 			image.opacity = 1;
 			image.updateStyle();
 		}
-		hide (speed) {
+		hide () {
 			const image = this.popUpContainer;
-			image.transition = `all ${speed}s`;
+			image.transition = `all 0.35s`;
 			image.setInitialPosition();
-
-			this.classList.remove('persistent-pop-up');
+		}
+		linkClick (event) {
+			if (!event.sourceCapabilities.firesTouchEvents) this.openTCGPlayer();
 		}
 		openTCGPlayer () {
 			window.open(`${this.getAttribute('tcgplayer')}&utm_campaign=affiliate&utm_medium=AFFILIATECODE&utm_source=AFFILIATECODE`);
 		}
 	}
 	customElements.define('pop-up', PopUp);
-
-	document.addEventListener('touchstart', () => {
-		const persistentPopUps = document.getElementsByClassName('persistent-pop-up');
-		for (i = 0; i<persistentPopUps.length; i++) {
-			persistentPopUps[i].hide();
-		}
-		const newPersistentPopUps = document.getElementsByClassName('new-persistent-pop-up');
-		for (i = 0; i<newPersistentPopUps.length; i++) {
-			newPersistentPopUps[i].classList.add('persistent-pop-up')
-			newPersistentPopUps[i].classList.remove('new-persistent-pop-up')
-		}
-	})
 </script>
 <style>
 	pop-up {
