@@ -1239,6 +1239,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				this.appendChild(this.popUpContainer);
 				
 				this.setAttribute('ontouchstart', 'show(event, true)')
+				this.setAttribute('onfocusout', 'hide()');
 
 				this.setAttribute('onmouseenter', 'show(event, false)');
 				this.setAttribute('onmouseleave', 'hide()');
@@ -1358,7 +1359,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 	}
 	customElements.define('pop-up', PopUp);
 
-	alert('Test 1 Loaded')
+	alert('Test 2 Loaded')
 </script>
 <style>
 	pop-up {
