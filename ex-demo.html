@@ -1217,7 +1217,6 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			super();
 
 			if (!this.getAttribute('src') || !this.getAttribute('tcgplayer')) { //autofill from other similar popups
-				console.log('Trying to autofill')
 				const popUps = document.getElementsByTagName('pop-up');
 				let previousSamePopUp
 				for (let i = 0; i < popUps.length; i++) {
