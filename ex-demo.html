@@ -1237,9 +1237,11 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				this.popUpContainer = document.createElement('pop-up-container', { is: 'div' });
 				this.popUpContainer.setImage(this.getAttribute('src'));
 				this.appendChild(this.popUpContainer);
+				
+				this.setAttribute('ontouchstart', 'show(event, true)')
 
-				this.setAttribute('onmouseenter', 'show(event)');
-				// this.setAttribute('onmouseleave', 'hide(event)');
+				this.setAttribute('onmouseenter', 'show(event, false)');
+				this.setAttribute('onmouseleave', 'hide()');
 			}
 
 			if (this.getAttribute('tcgplayer')) {
@@ -1248,7 +1250,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				this.popUpContainer.setAttribute('onclick', 'linkClick()')
 			}
 		}
-		show (event) {
+		show (event, touchscreen) {
 			let image = this.popUpContainer;
 			const text = this.getBoundingClientRect();
 			const mainRect = document.getElementById('main').getBoundingClientRect();
@@ -1261,9 +1263,11 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			const mainMargin = (windowWidth - mainWidth)/2;
 			const minMargin = 15;
 
-			if (event.sourceCapabilities.firesTouchEvents == true && !image.tooltip) {
+			// event.sourceCapabilities.firesTouchEvents == true 
+			if (touchscreen == true && !image.tooltip) {
 				image.createTooltip();
 				image.style.pointerEvents = 'all';
+				event.preventDefault();
 			}
 			else if (image.tooltip) {
 				image.removeTooltip();
@@ -1353,6 +1357,8 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		}
 	}
 	customElements.define('pop-up', PopUp);
+
+	alert('Test 1 Loaded')
 </script>
 <style>
 	pop-up {
