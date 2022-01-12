@@ -1129,11 +1129,14 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		get heightProportion () {return this.naturalHeight + (this.naturalHeight * this.tooltipRatio)}
 
 		setImage (src) {
+			this.link = document.createElement('a');
 			this.img = document.createElement('img');
 			this.img.src = src;
 			this.img.classList.add('pop-up-image');
 			this.img.classList.add('card');
-			this.appendChild(this.img);
+			// this.appendChild(this.img);
+			this.link.appendChild(this.img);
+			this.appendChild(this.link);
 		}
 
 		createTooltip () {
@@ -1149,7 +1152,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			text.setAttributeNS(null, 'font-size', this.naturalHeight/32)
 			text.setAttributeNS(null, 'textLength', this.naturalWidth * 2/3)
 			text.setAttributeNS(null, 'lengthAdjust', 'spacingAndGlyphs')
-			text.innerHTML = 'Tap Card to Open on TCGPlayer';
+			text.innerHTML = 'Double Tap Card to Open on TCGPlayer';
 
 			this.tooltip.appendChild(text);
 			this.appendChild(this.tooltip);
@@ -1239,6 +1242,8 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 
 			if (this.getAttribute('tcgplayer')) {
 				this.classList.add('pop-up-link');
+				this.popUpContainer.link.href = this.getAttribute('tcgplayer');
+				console.log(this.popUpContainer.link)
 				this.setAttribute('onclick', 'click()');
 			}
 		}
@@ -1250,7 +1255,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		}
 		touchStart () {
 			event.preventDefault();
-			alert(`id: ${event.target.id ? event.target.id : '?'} classes: ${event.target.classList}`);
+			// alert(`id: ${event.target.id ? event.target.id : '?'} classes: ${event.target.classList}`);
 			if (event.target.classList.contains('pop-up-active')) {
 				if (this.classList.contains('pop-up-link')) {
 					if (!this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
@@ -1261,9 +1266,9 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 					this.popUpContainer.style.pointerEvents = 'none';
 				}
 			}
-			else if (event.target.classList.contains('pop-up-image')) {
-				this.click();
-			}
+			// else if (event.target.classList.contains('pop-up-image')) {
+			// 	this.click();
+			// }
 
 			this.show();
 			this.popUpContainer.classList.add('touched');
@@ -1376,7 +1381,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		}
 	})
 
-	alert('Version 4 Loaded')
+	alert('Version 5 Loaded')
 </script>
 <style>
 	pop-up {
