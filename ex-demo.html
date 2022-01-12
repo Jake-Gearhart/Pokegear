@@ -1058,9 +1058,6 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 
 
 <!-- POP UP CODE -->
-
-
-
 <script type="text/javascript">
 	class PopUpContainer extends HTMLElement {
 		constructor() {
@@ -1203,10 +1200,6 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			this.middleY = text.y + text.height/2;
 			this.updateStyle();
 		}
-
-		linkClick () {
-			this.parentElement.openTCGPlayer();
-		}
 	}
 	customElements.define('pop-up-container', PopUpContainer);
 
@@ -1214,7 +1207,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		constructor() {
 			super();
 
-			if (!this.getAttribute('src') || !this.getAttribute('tcgplayer')) { //autofill from other similar popups
+			if (!this.getAttribute('src') || !this.getAttribute('tcgplayer')) {
 				const popUps = document.getElementsByTagName('pop-up');
 				let previousSamePopUp
 				for (let i = 0; i < popUps.length; i++) {
@@ -1238,42 +1231,57 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				this.popUpContainer.setImage(this.getAttribute('src'));
 				this.appendChild(this.popUpContainer);
 				
-				this.setAttribute('ontouchstart', 'show(event, true)')
-				this.setAttribute('onfocusout', 'hide()');
+				this.setAttribute('ontouchstart', 'touchStart()');
 
-				this.setAttribute('onmouseenter', 'show(event, false)');
+				this.setAttribute('onmouseenter', 'hover()');
 				this.setAttribute('onmouseleave', 'hide()');
 			}
 
 			if (this.getAttribute('tcgplayer')) {
 				this.classList.add('pop-up-link');
-				this.setAttribute('onclick', 'linkClick(event)');
-				this.popUpContainer.setAttribute('onclick', 'linkClick()')
+				this.setAttribute('onclick', 'click()');
 			}
+		}
+		hover () {
+			if (this.popUpContainer.tooltip) this.popUpContainer.removeTooltip();
+			this.popUpContainer.style.pointerEvents = 'none';
+
+			this.show();
+		}
+		touchStart () {
+			event.preventDefault();
+			if (event.target.classList.contains('pop-up-active')) {
+				if (this.classList.contains('pop-up-link')) {
+					if (!this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
+					this.popUpContainer.style.pointerEvents = 'all';
+				}
+				else {
+					if (this.popUpContainer.tooltip) this.popUpContainer.removeTooltip();
+					this.popUpContainer.style.pointerEvents = 'none';
+				}
+			}
+			else if (event.target.classList.contains('pop-up-image')) {
+				this.click();
+			}
+
+			this.show();
+			this.popUpContainer.classList.add('touched');
 		}
 		show (event, touchscreen) {
 			let image = this.popUpContainer;
+			image.classList.add('pop-up-container-active');
+
 			const text = this.getBoundingClientRect();
 			const mainRect = document.getElementById('main').getBoundingClientRect();
 
-			const actionBar = document.querySelector('#actionbar:not(.actnbr-hidden)')
+			const actionBar = document.querySelector('#actionbar:not(.actnbr-hidden)');
+			const actionBarHeight = actionBar ? (actionBar.getBoundingClientRect().width == window.innerWidth ? actionBar.getBoundingClientRect().height : 0) : 0;
 			const windowWidth = window.innerWidth;
-			const windowHeight = actionBar ? window.innerHeight - actionBar.getBoundingClientRect().height : window.innerHeight;
+			const windowHeight = window.innerHeight - actionBarHeight;
 
 			const mainWidth = Math.max(mainRect.width, 1400/3);
 			const mainMargin = (windowWidth - mainWidth)/2;
 			const minMargin = 15;
-
-			// event.sourceCapabilities.firesTouchEvents == true 
-			if (touchscreen == true && !image.tooltip) {
-				image.createTooltip();
-				image.style.pointerEvents = 'all';
-				event.preventDefault();
-			}
-			else if (image.tooltip) {
-				image.removeTooltip();
-				// image.style.pointerEvents = 'none';
-			}
 
 			if (this.windowWidth != window.innerWidth || this.windowHeight != window.innerHeight) {
 				this.windowWidth = window.innerWidth;
@@ -1349,17 +1357,23 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			const image = this.popUpContainer;
 			image.transition = `all 0.35s`;
 			image.setInitialPosition();
+			image.style.pointerEvents = 'none';
+			image.classList.remove('pop-up-container-active')
 		}
-		linkClick (event) {
-			if (!event.sourceCapabilities.firesTouchEvents) this.openTCGPlayer();
-		}
-		openTCGPlayer () {
-			window.open(`${this.getAttribute('tcgplayer')}&utm_campaign=affiliate&utm_medium=AFFILIATECODE&utm_source=AFFILIATECODE`);
+		click () {
+			window.open(`${this.getAttribute('tcgplayer')}&utm_campaign=affiliate&utm_medium=RetroPokemon&utm_source=RetroPokemon`);
 		}
 	}
 	customElements.define('pop-up', PopUp);
 
-	alert('Test 3 Loaded')
+	window.addEventListener('touchstart', () => {
+		const popUpContainers = document.getElementsByClassName('pop-up-container-active');
+		for (let i = 0; i < popUpContainers.length; i++) {
+			const popUpContainer = popUpContainers[i];
+			if (popUpContainer.classList.contains('touched')) popUpContainer.classList.remove('touched')
+			else popUpContainer.parentElement.hide();
+		}
+	})
 </script>
 <style>
 	pop-up {
