@@ -1250,6 +1250,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		}
 		touchStart () {
 			event.preventDefault();
+			alert(`id: ${event.target.id ? event.target.id : '?'} classes: ${event.target.classList}`);
 			if (event.target.classList.contains('pop-up-active')) {
 				if (this.classList.contains('pop-up-link')) {
 					if (!this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
