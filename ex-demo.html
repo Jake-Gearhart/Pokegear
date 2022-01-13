@@ -308,7 +308,7 @@ var actionbardata = {"siteID":"111255242","siteURL":"http:\/\/jklaczpokemon.word
 </tr>
 <tr>
 <td>4x <pop-up>Team Magma&#8217;s Groudon</pop-up><br />
-4x <pop-up src="https://i1.wp.com/pkmncards.com/wp-content/uploads/en_US-EX4-023-team_magmas_zangoose.jpeg">Team Magma&#8217;s Zangoose</pop-up><br />
+4x <pop-up src="https://i1.wp.com/pkmncards.com/wp-content/uploads/en_US-EX4-023-team_magmas_zangoose.jpeg" tcgplayer="https://www.tcgplayer.com/product/89846/pokemon-team-magma-vs-team-aqua-team-magmas-zangoose?xid=ci1d099835-8c80-45d1-aa1f-c0427b86480b&direct=true&page=1&Language=English">Team Magma&#8217;s Zangoose</pop-up><br />
 2x <pop-up src="https://i0.wp.com/pkmncards.com/wp-content/uploads/en_US-EX4-060-team_magmas_baltoy.jpg">Team Magma&#8217;s Baltoy</pop-up><br />
 2x <pop-up src="https://i2.wp.com/pkmncards.com/wp-content/uploads/en_US-EX4-008-team_magmas_claydol.jpg">Team Magma&#8217;s Claydol</pop-up><br />
 1x <pop-up src="https://i2.wp.com/pkmncards.com/wp-content/uploads/en_US-EX4-064-team_magmas_numel.jpg">Team Magma&#8217;s Numel</pop-up><br />
@@ -1059,6 +1059,10 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 
 <!-- POP UP CODE -->
 <script type="text/javascript">
+	let touch = false;
+	window.addEventListener('touchstart', () => {touch = true;})
+	window.addEventListener('mousedown', () => {touch = false;})
+
 	class PopUpContainer extends HTMLElement {
 		constructor() {
 			super();
@@ -1133,8 +1137,6 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			this.img.src = src;
 			this.img.classList.add('pop-up-image');
 			this.img.classList.add('card');
-			this.img.setAttribute('onclick', 'console.log("TESTING")');
-			// this.img.onclick = 'console.log("TESTING!")';
 			this.appendChild(this.img);
 		}
 
@@ -1166,7 +1168,6 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			this.removeChild(this.tooltip)
 			this.tooltip = null;
 			this.tooltipRatio = 0;
-
 			this.style.pointerEvents = 'none';
 		}
 
@@ -1237,9 +1238,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				this.popUpContainer.setImage(this.getAttribute('src'));
 				this.appendChild(this.popUpContainer);
 				
-				this.setAttribute('ontouchstart', 'touchStart()');
-
-				this.setAttribute('onmouseenter', 'hover()');
+				this.setAttribute('onmouseenter', 'show()');
 				this.setAttribute('onmouseleave', 'hide()');
 			}
 
@@ -1248,20 +1247,12 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				this.setAttribute('onclick', 'click()');
 			}
 		}
-		hover () {
-			if (this.popUpContainer.tooltip) this.popUpContainer.removeTooltip();
-			this.show();
-		}
-		touchStart () {
-			if (event.target.classList.contains('pop-up-link')) {
-				event.preventDefault();
-				if (!this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
-				this.show();
-			}
-		}
 		show (event, touchscreen) {
 			let image = this.popUpContainer;
 			image.classList.add('pop-up-container-active');
+
+			if (!this.popUpContainer.tooltip && touch == true && this.getAttribute('tcgplayer')) this.popUpContainer.createTooltip();
+			else if (this.popUpContainer.tooltip && (touch == false || !this.getAttribute('tcgplayer'))) this.popUpContainer.removeTooltip();
 
 			const text = this.getBoundingClientRect();
 			const mainRect = document.getElementById('main').getBoundingClientRect();
@@ -1347,28 +1338,17 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		}
 		hide () {
 			const image = this.popUpContainer;
+			image.pointerEvents = 'none';
 			image.transition = `all 0.35s`;
 			image.setInitialPosition();
 			image.classList.remove('pop-up-container-active')
 		}
 		click () {
-			// setTimeout(() => {
-			// 	window.open(`${this.getAttribute('tcgplayer')}&utm_campaign=affiliate&utm_medium=RetroPokemon&utm_source=RetroPokemon`);
-			// })
-			alert('CLICKED!')
+			if (this.popUpContainer.tooltip && !event.target.classList.contains('pop-up-image')) return;
+			window.open(`${this.getAttribute('tcgplayer')}&utm_campaign=affiliate&utm_medium=RetroPokemon&utm_source=RetroPokemon`);
 		}
 	}
 	customElements.define('pop-up', PopUp);
-
-	window.addEventListener('touchstart', () => {
-		const containers = document.getElementsByClassName('pop-up-container-active');
-		for (let i = 0; i < containers.length; i++) {
-			const container = containers[i];
-			if(container.parentElement != event.target && container != event.target.parentElement) container.parentElement.hide();
-		}
-	})
-
-	alert('VERSION 16 LOADED');
 </script>
 <style>
 	pop-up {
