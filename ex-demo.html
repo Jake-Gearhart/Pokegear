@@ -1257,8 +1257,9 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			if (event.target.classList.contains('pop-up-link')) {
 				event.preventDefault();
 				if (!this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
+				this.show();
 			}
-			if (!this.popUpContainer.classList.contains('pop-up-container-active')) this.show();
+			// if (!this.popUpContainer.classList.contains('pop-up-container-active')) this.show();
 		}
 		show (event, touchscreen) {
 			let image = this.popUpContainer;
@@ -1368,7 +1369,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		}
 	})
 
-	alert('VERSION 13 LOADED');
+	alert('VERSION 14 LOADED');
 </script>
 <style>
 	pop-up {
