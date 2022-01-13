@@ -1253,13 +1253,11 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			this.show();
 		}
 		touchStart () {
-			alert(event.target.classList);
 			if (event.target.classList.contains('pop-up-link')) {
 				event.preventDefault();
 				if (!this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
 				this.show();
 			}
-			// if (!this.popUpContainer.classList.contains('pop-up-container-active')) this.show();
 		}
 		show (event, touchscreen) {
 			let image = this.popUpContainer;
@@ -1357,6 +1355,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			setTimeout(() => {
 				window.open(`${this.getAttribute('tcgplayer')}&utm_campaign=affiliate&utm_medium=RetroPokemon&utm_source=RetroPokemon`);
 			})
+			alert('CLICKED!')
 		}
 	}
 	customElements.define('pop-up', PopUp);
@@ -1369,7 +1368,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		}
 	})
 
-	alert('VERSION 14 LOADED');
+	alert('VERSION 15 LOADED');
 </script>
 <style>
 	pop-up {
