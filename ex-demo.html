@@ -1257,7 +1257,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 				event.preventDefault();
 				if (!this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
 			}
-			if (!this.popUpContainer.classList.containers('pop-up-container-active')) this.show();
+			if (!this.popUpContainer.classList.contains('pop-up-container-active')) this.show();
 		}
 		show (event, touchscreen) {
 			let image = this.popUpContainer;
@@ -1367,7 +1367,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		}
 	})
 
-	alert('VERSION 11 LOADED');
+	alert('VERSION 12 LOADED');
 </script>
 <style>
 	pop-up {
