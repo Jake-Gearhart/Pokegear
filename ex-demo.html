@@ -1129,14 +1129,11 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		get heightProportion () {return this.naturalHeight + (this.naturalHeight * this.tooltipRatio)}
 
 		setImage (src) {
-			this.link = document.createElement('a');
 			this.img = document.createElement('img');
 			this.img.src = src;
 			this.img.classList.add('pop-up-image');
 			this.img.classList.add('card');
-			// this.appendChild(this.img);
-			this.link.appendChild(this.img);
-			this.appendChild(this.link);
+			this.appendChild(this.img);
 		}
 
 		createTooltip () {
@@ -1152,19 +1149,23 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			text.setAttributeNS(null, 'font-size', this.naturalHeight/32)
 			text.setAttributeNS(null, 'textLength', this.naturalWidth * 2/3)
 			text.setAttributeNS(null, 'lengthAdjust', 'spacingAndGlyphs')
-			text.innerHTML = 'Double Tap Card to Open on TCGPlayer';
+			text.innerHTML = 'Tap Card to Open on TCGPlayer';
 
 			this.tooltip.appendChild(text);
 			this.appendChild(this.tooltip);
 
 			this.tooltipRatio = 45/512;
 			this.height *= 1 + this.tooltipRatio;
+
+			this.style.pointerEvents = 'all';
 		}
 
 		removeTooltip () {
 			this.removeChild(this.tooltip)
 			this.tooltip = null;
 			this.tooltipRatio = 0;
+
+			this.style.pointerEvents = 'none';
 		}
 
 		updateStyle () {
@@ -1242,36 +1243,19 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 
 			if (this.getAttribute('tcgplayer')) {
 				this.classList.add('pop-up-link');
-				this.popUpContainer.link.href = this.getAttribute('tcgplayer');
-				console.log(this.popUpContainer.link)
 				this.setAttribute('onclick', 'click()');
 			}
 		}
 		hover () {
 			if (this.popUpContainer.tooltip) this.popUpContainer.removeTooltip();
-			this.popUpContainer.style.pointerEvents = 'none';
-
 			this.show();
 		}
 		touchStart () {
 			event.preventDefault();
-			// alert(`id: ${event.target.id ? event.target.id : '?'} classes: ${event.target.classList}`);
-			if (event.target.classList.contains('pop-up-active')) {
-				if (this.classList.contains('pop-up-link')) {
-					if (!this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
-					this.popUpContainer.style.pointerEvents = 'all';
-				}
-				else {
-					if (this.popUpContainer.tooltip) this.popUpContainer.removeTooltip();
-					this.popUpContainer.style.pointerEvents = 'none';
-				}
-			}
-			// else if (event.target.classList.contains('pop-up-image')) {
-			// 	this.click();
-			// }
+			if (event.target.classList.contains('pop-up-link') && !this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
+			else if (event.target.classList.contains('pop-up-image')) this.click();
 
 			this.show();
-			this.popUpContainer.classList.add('touched');
 		}
 		show (event, touchscreen) {
 			let image = this.popUpContainer;
@@ -1363,25 +1347,25 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			const image = this.popUpContainer;
 			image.transition = `all 0.35s`;
 			image.setInitialPosition();
-			image.style.pointerEvents = 'none';
 			image.classList.remove('pop-up-container-active')
 		}
 		click () {
-			window.open(`${this.getAttribute('tcgplayer')}&utm_campaign=affiliate&utm_medium=RetroPokemon&utm_source=RetroPokemon`);
+			setTimeout(() => {
+				window.open(`${this.getAttribute('tcgplayer')}&utm_campaign=affiliate&utm_medium=RetroPokemon&utm_source=RetroPokemon`);
+			})
 		}
 	}
 	customElements.define('pop-up', PopUp);
 
 	window.addEventListener('touchstart', () => {
-		const popUpContainers = document.getElementsByClassName('pop-up-container-active');
-		for (let i = 0; i < popUpContainers.length; i++) {
-			const popUpContainer = popUpContainers[i];
-			if (popUpContainer.classList.contains('touched')) popUpContainer.classList.remove('touched')
-			else popUpContainer.parentElement.hide();
+		const containers = document.getElementsByClassName('pop-up-container-active');
+		for (let i = 0; i < containers.length; i++) {
+			const container = containers[i];
+			if(container.parentElement != event.target && container != event.target.parentElement) container.parentElement.hide();
 		}
 	})
 
-	alert('Version 5 Loaded')
+	alert('VERSION 6 LOADED');
 </script>
 <style>
 	pop-up {
