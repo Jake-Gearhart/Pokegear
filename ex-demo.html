@@ -1253,15 +1253,12 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			this.show();
 		}
 		touchStart () {
-			// event.preventDefault();
+			alert(event.target.classList);
 			if (event.target.classList.contains('pop-up-link')) {
 				event.preventDefault();
 				if (!this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
 			}
-			else this.show();
-			// if (event.target.classList.contains('pop-up-link') && !this.popUpContainer.tooltip) this.popUpContainer.createTooltip();
-			// else if (event.target.classList.contains('pop-up-image')) alert('tapped');
-			// else if (event.target.classList.contains('pop-up-image')) this.click();
+			if (!this.popUpContainer.classList.contains('pop-up-container-active')) this.show();
 		}
 		show (event, touchscreen) {
 			let image = this.popUpContainer;
@@ -1371,7 +1368,7 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 		}
 	})
 
-	alert('VERSION 8 LOADED');
+	alert('VERSION 13 LOADED');
 </script>
 <style>
 	pop-up {
