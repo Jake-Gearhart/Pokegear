@@ -1199,15 +1199,15 @@ if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
 			if (this.getAttribute('tcgplayer')) {
 				this.classList.add('pop-up-link');
 				this.setAttribute('onclick', 'click()');
-				if (this.popUpContainer) this.popUpContainer.createTooltip();
 			}
 		}
 		show (event, touchscreen) {
 			let image = this.popUpContainer;
 			image.classList.add('pop-up-container-active');
 			
-			if (touch == true) this.popUpContainer.setMode('touch');
-			else this.popUpContainer.setMode('mouse');
+			if (!image.tooltip && this.getAttribute('tcgplayer')) image.createTooltip();
+			if (touch == true) image.setMode('touch');
+			else image.setMode('mouse');
 
 			const text = this.getBoundingClientRect();
 			const mainRect = document.getElementById('main').getBoundingClientRect();
