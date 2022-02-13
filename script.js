@@ -188,6 +188,7 @@ async function populateSets () {
     var expanded = []
     var setsRegular = []
     var setsOther = []
+    var setsTrainerKit = []
     var setsPOP = []
     for (i=0; i<sets.length; i++) {
         var set = sets[i]
@@ -197,8 +198,25 @@ async function populateSets () {
             setIdTranslations[set['ptcgoCode'].toLowerCase()] = set['id']
         }
 
-        // create set series (ex: Sun & Moon block), and add setA_img
         var series = set['series']
+
+        //set up base64 groups and fix trainer kits
+        if (series == 'Other') {
+            setsOther.push(set['id'])
+        }
+        else if (set['name'].includes('Trainer Kit')) {
+            setsTrainerKit.push(set['id'])
+            series = 'Trainer Kit'
+            set['series'] = series
+        }
+        else if (series == 'POP') {
+            setsPOP.push(set['id'])
+        }
+        else {
+            setsRegular.push(set['id'])
+        }
+
+        // create set series (ex: Sun & Moon block), and add setA_img
         if (!combinationButtons[series]) {
             combinationButtons[series] = {
                 'setA_img': set['images']['symbol'],
@@ -209,18 +227,8 @@ async function populateSets () {
             combinationButtons[series]['sets'].push(set['id'])
         }
 
-        if (series == 'Other') {
-            setsOther.push(set['id'])
-        }
-        else if (series == 'POP') {
-            setsPOP.push(set['id'])
-        }
-        else {
-            setsRegular.push(set['id'])
-        }
-
         // if set image is first in block, set setB_img
-        if(set['images']['symbol'].split('/symbol.png')[0].slice(-1) == '1') {
+        if (set['id'].slice(-1) == '1' || set['id'].slice(-2) == '1b') {
             combinationButtons[series]['setB_img'] = set['images']['symbol']
         }
 
@@ -251,7 +259,7 @@ async function populateSets () {
 
     // store base64 abbreviations for sets
     setsRegular = setsRegular.reverse()
-    setsOther = setsPOP.reverse().concat(setsOther.reverse())
+    setsOther = setsPOP.reverse().concat(setsOther.reverse()).concat(setsTrainerKit.reverse())
 
     for (i = 0; i<setsRegular.length; i++) {
         sets4096[i + 1] = setsRegular[i]
