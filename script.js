@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-LOG_normal('Version 1.4.0.5')
+LOG_normal('Version 1.4.0.6')
 
 const holoRarities = [
     'Amazing Rare',
@@ -2348,6 +2348,9 @@ function sortDeck () {
             else if (subtypes && subtypes.includes('Pokémon Tool F')) {
                 sortTypes['flare-tool'].push(card)
             }
+            else {
+                sortTypes['unknown'].push(card)
+            }
         }
         else if (supertype && supertype == 'Energy') {
             if (subtypes && subtypes.includes('Special')) {
@@ -2355,6 +2358,9 @@ function sortDeck () {
             }
             else if (subtypes && subtypes.includes('Basic')) {
                 sortTypes['basicEnergy'].push(card)
+            }
+            else {
+                sortTypes['unknown'].push(card)
             }
         }
         else {
