@@ -1,0 +1,117 @@
+<head>
+    <link rel="shortcut icon" type="image/png" href='images/pokegear.png'>
+    <title>Pokégear Dice Demo</title>
+    <meta charset="utf-8">
+    <meta name="theme-color" content="#221C55">
+</head>
+<html>
+    <body>
+        <div id='number-input-description'>
+            With one die that counts by 10s, and one die that counts by 70s, you can represent any amount of damage from 0 to 480.
+            <br><br>
+            Type a number here to see it represented by the dice.
+        </div>
+        <input id='number-input' type='text' value='80' onkeyup='updateDice(this)'>
+        <div class='lightBlueStripe' style='left: 5%; width: 20%;'></div>
+        <div class='lightBlueStripe' style='left: 35%; width: 5%;'></div>
+        <div id='die1' class='dice die1'>70</div>
+        <div class='dice-description die1'>70, 140, 210, 280, 350, 420</div>
+        <div id='die2' class='dice die2'>10</div>
+        <div class='dice-description die2'>10, 20, 30, 40, 50, 60</div>
+    </body>
+</html>
+<style>
+    :root {
+        --darkScreen: #6dcacd;
+        --lightScreen: #afe0eb;
+    }
+    @media only screen and (max-device-width: 600px) {
+        :root {
+            --cardWidth: calc(100vw/4.5);
+        }
+    }
+    body {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--darkScreen);
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+    }
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    .lightBlueStripe {
+        position: absolute;
+        height: max(200vh, 200vw);
+        transform: rotate(0.694738276197rad);
+        transform-origin: bottom left;
+        bottom: 0;
+        background-color: var(--lightScreen); 
+        z-index: -1;
+    }
+    #number-input-description {
+        position: absolute;
+        bottom: calc(50% + min(16vh, 16vw));
+        width: min(50vh, 50vw);
+        left: calc(50% - min(25vh, 25vw));
+        text-align: center;
+        font-size: min(2vh, 2vw);
+        color: #555555;
+    }
+    #number-input {
+        position: absolute;
+        top: calc(50% - min(15vh, 15vw));
+        width: min(50vh, 50vw);
+        height: min(10vh, 10vw);
+        background-color: white;
+        left: calc(50% - min(25vh, 25vw));
+        text-align: center;
+        font-size: min(5vh, 5vw);
+        color: #555555;
+    }
+    .dice {
+        position: absolute;
+        top: calc(50% + min(5vh, 5vw));
+        width: min(20vh, 20vw);
+        height: min(20vh, 20vw);
+        background-color: white;
+        color: black;
+        border-radius: 10%;
+        text-align: center;
+        line-height: min(20vh, 20vw);
+        font-size: min(10vh, 10vw);
+    }
+    .die1 {
+        right: calc(50% + min(5vh, 5vw));
+    }
+    .die2 {
+        left: calc(50% + min(5vh, 5vw));
+    }
+    .dice-description {
+        position: absolute;
+        top: calc(50% + min(26vh, 26vw));
+        width: min(20vh, 20vw);
+        text-align: center;
+        font-size: min(1.9vh, 1.9vw);
+        color: #555555;
+    }
+</style>
+<script>
+    function updateDice (elm) {
+        if (elm.value % 10 == 0 && elm.value >= 10 && elm.value <= 480) {
+            if (70 * Math.trunc(elm.value/70) > 0) {
+                document.getElementById('die1').innerHTML = 70 * Math.trunc(elm.value/70)
+            }
+            else {
+                document.getElementById('die1').innerHTML = ''
+            }
+            document.getElementById('die2').innerHTML = elm.value % 70
+        }
+        else {
+            document.getElementById('die1').innerHTML = ''
+            document.getElementById('die2').innerHTML = ''
+        }
+    }
+</script>
