@@ -95,7 +95,7 @@
         top: calc(50% + min(26vh, 26vw));
         width: min(20vh, 20vw);
         text-align: center;
-        font-size: min(1.9vh, 1.9vw);
+        font-size: min(1.8vh, 1.8vw);
         color: #555555;
     }
 </style>
@@ -108,7 +108,13 @@
             else {
                 document.getElementById('die1').innerHTML = ''
             }
-            document.getElementById('die2').innerHTML = elm.value % 70
+
+            if (elm.value % 70 > 0) {
+                document.getElementById('die2').innerHTML = elm.value % 70
+            }
+            else {
+                document.getElementById('die2').innerHTML = ''
+            }
         }
         else {
             document.getElementById('die1').innerHTML = ''
