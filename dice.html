@@ -30,13 +30,17 @@
             --cardWidth: calc(100vw/4.5);
         }
     }
+    @font-face {
+        font-family: 'Futura Std Heavy';
+        src: url('fonts/Futura\ Std\ Heavy.otf');
+    }
     body {
         position: fixed;
         width: 100%;
         height: 100%;
         overflow: hidden;
         background: var(--darkScreen);
-        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+        font-family: 'Gill Sans', sans-serif
     }
     * {
         margin: 0;
@@ -70,6 +74,7 @@
         text-align: center;
         font-size: min(5vh, 5vw);
         color: #555555;
+        font-family: 'Futura Std Heavy', 'Gill Sans', sans-serif;
     }
     .dice {
         position: absolute;
@@ -83,6 +88,7 @@
         line-height: min(20vh, 20vw);
         font-size: min(10vh, 10vw);
         filter: drop-shadow(0px 0px min(5vh, 5vw) black);
+        font-family: 'Futura Std Heavy', 'Gill Sans', sans-serif;
     }
     .die1 {
         right: calc(50% + min(5vh, 5vw));
