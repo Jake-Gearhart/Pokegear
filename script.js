@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-LOG_normal('Version 1.4.0.6')
+LOG_normal('Version 1.4.1')
 
 const holoRarities = [
     'Amazing Rare',
@@ -445,6 +445,7 @@ async function populateSets () {
     var yearLegalities = {
         'standard': standard,
         'expanded': expanded,
+        'glc': expanded,
         '2020 - 2021': ['sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swshp', 'swsh1', 'swsh2', 'swsh3', 'swsh35', 'swsh4', 'swsh45sv', 'swsh45', 'swsh5', 'swsh6', 'swsh7'],
         '2019 - 2020': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11', 'sm115', 'mcd19', 'sm12', 'swsh1', 'swsh2', 'swsh3'],
         '2018 - 2019': ['sm5', 'sm6', 'sm7', 'sm75', 'sm8', 'sm9', 'det1', 'sm10', 'sm11'],
@@ -468,19 +469,36 @@ async function populateSets () {
         '2000 - 2001': ['base1', 'base2', 'base3', 'base4', 'base5', 'gym1', 'gym2', 'neo1', 'neo2', 'si1'],
     }
     for (key in yearLegalities) {
-        leftButtons.appendChild(
-            createElement('button', null, {
-                'id': key,
-                'class': 'parameterButton parameterButtonLarge',
-                'title': key,
-                'onclick': `toggleParameterButton(this, true, ['set.id:${yearLegalities[key].join("','set.id:")}'], true)`
-            })
-        ).appendChild(
-            createElement('img', null, {
-                'class': 'parameterButtonImage parameterButtonImageLarge fadeIn',
-                'src': 'images/legalities/' + key + '.png'
-            })
-        )
+        if (key == 'glc') {
+            leftButtons.appendChild(
+                createElement('button', null, {
+                    'id': '-subtypes:%22Star%22)+(-subtypes:%22EX%22)+(-subtypes:%22BREAK%22)+(-subtypes:%22GX%22)+(-subtypes:%22Prism%20Star%22)+(-subtypes:%22V%22)+(-subtypes:%22VMAX%22)+(-subtypes:%22V-UNION%22)+(-subtypes:%22VSTAR%22)+(-subtypes:%22Radiant%22)+(-rules:%22*ACE%20SPEC*%22)+(-id:%22xy4-99%22)+(-id:%22xy7-74%22)+(-id:%22xy4-118%22)+(-id:%22sm5-114%22)+(-id:%22sm5-114%22)+(-id:%22sm10-165%22)+(-id:%22sm7-133%22)+(-id:%22sma-SV85%22',
+                    'class': 'parameterButton parameterButtonLarge',
+                    'title': key,
+                    'onclick': `toggleParameterButton(this, true, ['set.id:${yearLegalities[key].join("','set.id:")}'], true, true)`
+                })
+            ).appendChild(
+                createElement('img', null, {
+                    'class': 'parameterButtonImage parameterButtonImageLarge fadeIn',
+                    'src': 'images/legalities/' + key + '.png'
+                })
+            )
+        }
+        else {
+            leftButtons.appendChild(
+                createElement('button', null, {
+                    'id': key,
+                    'class': 'parameterButton parameterButtonLarge',
+                    'title': key,
+                    'onclick': `toggleParameterButton(this, true, ['set.id:${yearLegalities[key].join("','set.id:")}'], true)`
+                })
+            ).appendChild(
+                createElement('img', null, {
+                    'class': 'parameterButtonImage parameterButtonImageLarge fadeIn',
+                    'src': 'images/legalities/' + key + '.png'
+                })
+            )
+        }
     }
 }
 
@@ -1208,21 +1226,24 @@ function fullScreenSidebar (fullScreen) {
     }
 }
 
-function toggleParameterButton (elem, initiateSearch, group, conform) {
+function toggleParameterButton (elem, initiateSearch, group, conform, additionalBans) {
     if (!elem.classList.contains('parameterButtonSelected')) {
-        enableParameterButton(elem, initiateSearch, group, conform)
+        enableParameterButton(elem, initiateSearch, group, conform, additionalBans)
     }
     else {
-        disableParameterButton(elem, initiateSearch, group, conform)
+        disableParameterButton(elem, initiateSearch, group, conform, additionalBans)
     }
 }
 
-function enableParameterButton (elem, initiateSearch, group, conform) {
+function enableParameterButton (elem, initiateSearch, group, conform, additionalBans) {
     elem.classList.add('parameterButtonSelected')
     if (!group || group.length < 1) {
         elem.classList.add('selectedButton')
     }
     else {
+        if (additionalBans == true) {
+            elem.classList.add('selectedButton')
+        }
         for (i=0; i<group.length; i++) {
             if (conform == true) {
                 enableParameterButton(document.getElementById(group[i]), false);
@@ -1237,12 +1258,15 @@ function enableParameterButton (elem, initiateSearch, group, conform) {
     }
 }
 
-function disableParameterButton (elem, initiateSearch, group, conform) {
+function disableParameterButton (elem, initiateSearch, group, conform, additionalBans) {
     elem.classList.remove('parameterButtonSelected')
     if (!group || group.length < 1) {
         elem.classList.remove('selectedButton')
     }
     else {
+        if (additionalBans == true) {
+            elem.classList.remove('selectedButton')
+        }
         for (i=0; i<group.length; i++) {
             if (conform == true) {
                 disableParameterButton(document.getElementById(group[i]), false);
