@@ -63,5 +63,13 @@ function convertStats () {
         new_evs[ev] = Math.floor(new_evs[ev] * 65535/102)
     }
 
-    alert(`HP: ${new_evs["hp"]}\nAttack: ${new_evs["attack"]}\nDefence: ${new_evs["defence"]}\nSpecial: ${new_evs["special"]}\nSpeed: ${new_evs["speed"]}`)
+    let binary = ""
+    for (const ev in new_evs) {
+        let binaryEV = new_evs[ev].toString(2)
+        while (binaryEV.length < 16) {
+            binaryEV = "0" + binaryEV
+        }
+        binary += binaryEV
+    }
+    alert(`HP: ${new_evs["hp"]}\nAttack: ${new_evs["attack"]}\nDefence: ${new_evs["defence"]}\nSpecial: ${new_evs["special"]}\nSpeed: ${new_evs["speed"]}\nBinary: ${binary}`)
 }
