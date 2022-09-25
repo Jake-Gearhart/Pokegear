@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-LOG_normal('Version 1.4.1.1')
+LOG_normal('Version 1.4.1.2')
 
 const holoRarities = [
     'Amazing Rare',
@@ -461,7 +461,7 @@ async function populateSets () {
         '2009 - 2010': ['dp1', 'dp2', 'pop6', 'dp3', 'dp4', 'pop7', 'dp5', 'dp6', 'pop8', 'dp7', 'pl1', 'pop9', 'pl2', 'pl2', 'pl3', 'pl4', 'ru1', 'hgss1', 'hgss2'],
         '2008 - 2009': ['dp1', 'dp2', 'pop6', 'dp3', 'dp4', 'pop7', 'dp5', 'dp6', 'pop8', 'dp7', 'pl1', 'pop9', 'pl2', 'pl2'],
         '2007 - 2008': ['ex13', 'pop4', 'ex14', 'ex15', 'ex16', 'pop5', 'dp1', 'dp2', 'pop6', 'dp3', 'dp4', 'pop7', 'dp5'],
-        '2006 - 2007': ['ex8', 'ex9', 'pop2', 'ex10', 'ex11', 'ex12', 'pop3', 'ex13', 'pop4', 'ex14', 'ex15', 'ex16', 'pop5'],
+        '2006 - 2007': ['ex8', 'ex9', 'pop2', 'ex10', 'ex11', 'ex12', 'pop3', 'ex13', 'pop4', 'ex14', 'ex15', 'ex16', 'pop5', 'dp1'],
         '2005 - 2006': ['ex5', 'pop1', 'ex6', 'ex7', 'ex8', 'ex9', 'pop2', 'ex10', 'ex11', 'ex12', 'pop3', 'ex13'],
         '2004 - 2005': ['ex1', 'ex2', 'ex3', 'ex4', 'ex5', 'pop1', 'ex6', 'ex7', 'ex8', 'ex9'],
         '2003 - 2004': ['ecard1', 'ecard2', 'ecard3', 'ex1', 'ex2', 'ex3', 'ex4', 'ex5'],
