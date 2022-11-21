@@ -1,0 +1,71 @@
+:root {
+    --dark-background: #6dcacd;
+    --light-background: #afe0eb;
+    --light-casing: #4c4da0;
+    --casing: #26225d;
+    --dark-casing: #130f36;
+    --light-circle: #d0edfc;
+    --dark-circle: #b1e2f8;
+    --yellow: #f1cd4f;
+    --transition-time: 0.25s;
+    --short-transition-time: calc(var(--transition-time)/2);
+    --min-card-width: 160px;
+    --card-holo-display: inline-block;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+    object-fit: contain;
+}
+
+input[type="text"] {
+    text-align: left;
+    padding-left: 8px;
+    user-select: all;
+    -webkit-touch-callout: all;
+    -webkit-user-select: all;
+    -khtml-user-select: all;
+    -moz-user-select: all;
+    -ms-user-select: all;
+}
+
+body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--dark-background);
+    font-family: 'Gill Sans', sans-serif;
+}
+
+.background-stripe {
+    position: absolute;
+    height: max(200vh, 200vw);
+    transform: rotate(40deg);
+    transform-origin: bottom left;
+    bottom: 0;
+    background-color: var(--light-background); 
+    z-index: -1;
+}
+
+/* .fade-in {
+    animation: fadeIn calc(2 * var(--transition-time)) forwards;
+}
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+} */

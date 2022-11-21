@@ -1,0 +1,61 @@
+button {
+    width: 64px;
+    height: 64px;
+    margin: 2px;
+
+    font-size: 32px;
+    background-color: var(--casing);
+    color: var(--yellow);
+
+    border-radius: 16px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 8px solid var(--dark-casing);
+
+    transition: background-color var(--short-transition-time), transform var(--short-transition-time), width var(--short-transition-time), height var(--short-transition-time), padding-left var(--short-transition-time);
+}
+button:hover {
+    background-color: var(--light-casing);
+}
+button:active {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-bottom: 0;
+}
+
+.button {
+    width: 64px;
+    height: 64px;
+    margin: 4px;
+
+    line-height: 64px;
+    text-align: center;
+    font-size: 32px;
+    background-color: var(--casing);
+    color: var(--yellow);
+
+    border-radius: 16px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 8px solid var(--dark-casing);;
+
+    transition: background-color var(--short-transition-time), transform var(--short-transition-time), width var(--short-transition-time), height var(--short-transition-time), padding-left var(--short-transition-time);
+}
+
+.klink-animation {
+    image-rendering: pixelated;
+    background-image: url(../images/klink.png);
+    background-size: 5992px, 56px;
+    animation: spritesheet steps(107) 5350ms infinite both;
+}
+
+@keyframes spritesheet {
+    0% {
+        background-position: 4px;
+    }
+    100% {
+        background-position: 5996px;
+    }
+}

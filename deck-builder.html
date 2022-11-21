@@ -1,0 +1,57 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#26225d">    
+    <link rel="stylesheet" href="deck-builder/styles/main.css">
+    <link rel="stylesheet" href="deck-builder/styles/home.css">
+    <link rel="stylesheet" href="deck-builder/styles/filters.css">
+    <link rel="stylesheet" href="deck-builder/styles/sidebar.css">
+    <link rel="stylesheet" href="deck-builder/styles/button.css">
+    <link rel="stylesheet" href="deck-builder/styles/display.css">
+    <link rel="stylesheet" href="deck-builder/styles/card.css">
+    <title>Pokégear</title>
+    <link rel="shortcut icon" type="image/png" href="pokegear.png">
+</head>
+<html>
+    <body class="mode-normal">
+        <div class="background-stripe" style="left: 5%; width: 20%;"></div>
+        <div class="background-stripe" style="left: 35%; width: 5%;"></div>
+        <div id="main-page" onclick="document.getElementById('sidebar').close()">
+            <div id="top">
+                <div id="total-cards-in-deck" class="display">60</div>
+            </div>
+        </div>
+        <div id="filters" onmouseenter="this.open()" onmouseleave="this.mouseLeave(event)">
+            <h2>&lt;filters&gt;</h2>
+        </div>
+        <div id="sidebar" onclick="this.open()" onmouseenter="this.open()" onmouseleave="this.mouseLeave(event)">
+            <div id="sidebar-cover"></div>
+            <div id="sidebar-tab"></div>
+            <div id="sidebar-filters-tab"></div>
+            <input id="sidebar-name-input" class="button" type="text" placeholder="Name..." onmouseenter="this.mouseEnter()" onmouseleave="this.mouseLeave(event)" onkeyup="document.getElementById('sidebar-card-container').addCards()">
+            <div id="sidebar-card-container" onscroll="this.scrollCards()">
+                <div id="sidebar-card-filler-top"></div>
+                <div id="sidebar-card-spacer-top"></div>
+                <div id="sidebar-card-spacer-bottom"></div>
+            </div>
+            <div id="sidebar-card-container-size-reference">
+                <div id="sidebar-card-size-reference"></div>
+            </div>
+        </div>
+        </div>
+        <!-- <button class="klink-animation animation-paused" onmouseenter="this.classList.remove('animation-paused')" onmouseleave="this.classList.add('animation-paused')"></button> -->
+    </body>
+</html>
+<style>
+    @font-face {
+        font-family: 'Futura Std Heavy';
+        src: url('deck-builder/fonts/Futura\ Std\ Heavy.otf');
+    }
+</style>
+<script src="deck-builder/scripts/variables.js"></script>
+<script src="deck-builder/scripts/api.js"></script>
+<script src="deck-builder/scripts/card.js"></script>
+<script src="deck-builder/scripts/home.js"></script>
+<script src="deck-builder/scripts/filters.js"></script>
+<script src="deck-builder/scripts/sidebar.js"></script>
+<script src="deck-builder/scripts/main.js"></script>

@@ -1,0 +1,53 @@
+#main-page {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    transition: width var(--transition-time), height var(--transition-time);
+}
+
+@media (orientation: landscape) {
+    #main-page {
+        right: 0;
+    }
+    #main-page.half {
+        width: calc(50% - 4px);
+    }
+    #main-page.hidden {
+        width: 0%;
+        background-color: rgba(255,0,0,0.5);
+    }
+}
+@media (orientation: portrait) {
+    #main-page.half {
+        height: calc(50% - 4px);
+    }
+    #main-page.hidden {
+        height: 0%;
+        background-color: rgba(255,0,0,0.5);
+    }
+}
+
+.animation-paused {
+    animation-play-state: paused !important;
+}
+
+#top {
+    position: absolute;
+    display: flex;
+    height: 72px;
+    width: 100%;
+}
+
+#total-cards-in-deck {
+    position: absolute;
+    bottom: -4px;
+    left: calc(50% - 72px);
+    margin-top: -72;
+    height: 200%;
+    width: 144px;
+    border-radius: 144px;
+    line-height: 208px;
+    font-size: 48px;
+    font-family: 'Futura Std Heavy';
+    cursor: pointer;
+}

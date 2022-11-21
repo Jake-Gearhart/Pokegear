@@ -1,0 +1,179 @@
+#sidebar {
+    position: absolute;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: width var(--transition-time), height var(--transition-time), transform var(--transition-time), background-color var(--transition-time);
+}
+@media (orientation: landscape) {
+    #sidebar {
+        height: 100%;
+        width: calc(50% - 4px);
+        transform: translateX(-100%);
+    }
+    #sidebar.open {
+        transform: translateX(0);
+    }
+    #sidebar.fullscreen {
+        width: 100%;
+    }
+}
+@media (orientation: portrait) {
+    #sidebar {
+        height: calc(50% - 4px);
+        width: 100%;
+        bottom: 0;
+        transform: translateY(100%);
+    }
+    #sidebar.open {
+        transform: translateY(0);
+    }
+    #sidebar.fullscreen {
+        height: 100%;
+    }
+}
+
+
+
+#sidebar-cover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    opacity: 1;
+    background-color: var(--casing);
+    transition: opacity var(--transition-time);
+    pointer-events: none;
+}
+#sidebar.open > #sidebar-cover {
+    opacity: 0;
+}
+
+
+
+#sidebar-tab {
+    position: absolute;
+    background-color: var(--casing);
+    transition: width var(--transition-time), height var(--transition-time), right var(--transition-time), top var(--transition-time), border-radius var(--transition-time);
+}
+@media (orientation: landscape) {
+    #sidebar-tab {
+        width: 72px;
+        height: 100%;
+        right: -72px;
+        border-top-right-radius: 72px;
+        border-bottom-right-radius: 72px;
+    }
+    #sidebar.open > #sidebar-tab {
+        width: 8px;
+        right: -8px;
+        border-radius: 0px;
+    }
+}
+@media (orientation: portrait) {
+    #sidebar-tab {
+        width: 100%;
+        height: 72px;
+        top: -72px;
+        border-top-right-radius: 72px;
+        border-top-left-radius: 72px;
+    }
+    #sidebar.open > #sidebar-tab {
+        height: 8px;
+        top: -8px;
+        border-radius: 0px;
+    }
+}
+
+
+
+#sidebar-name-input {
+    position: absolute;
+    width: 100%;
+    height: 72px;
+    top: 0;
+    margin: 0;
+    border-radius: 0;
+    flex-grow: 1;
+    padding-left: 16px;
+    transition: width var(--transition-time), top var(--transition-time), border-radius var(--transition-time), opacity var(--transition-time);
+    z-index: 1001;
+}
+#sidebar-name-input::placeholder {
+    color: var(--yellow);
+    opacity: 75%;
+}
+#sidebar-name-input.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+@media (orientation: landscape) {
+    #filters.open ~ #sidebar:not(.fullscreen) > #sidebar-name-input {
+        width: 100vw;
+    }
+}
+@media (orientation: portrait) {
+    #sidebar:not(.fullscreen).open > #sidebar-name-input {
+        top: -8px;
+    }
+}
+
+
+
+@media (orientation: portrait) {
+    #sidebar-filters-tab {
+        position: absolute;
+        width: 72px;
+        height: 72px;
+        top: -80px;
+        border-top-right-radius: 36px;
+        background-color: var(--casing);
+    }
+    #sidebar-filters-tab:hover {
+        background-color: red;
+    }
+}
+
+
+
+#sidebar-card-container {
+    position: absolute;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--min-card-width), 1fr));
+    grid-auto-rows: min-content;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 4px;
+    padding-top: 76px;
+    transition: padding var(--transition-time);
+}
+@media (orientation: portrait) {
+    #sidebar:not(.fullscreen).open > #sidebar-card-container {
+        padding-top: 68px;
+    }
+}
+
+
+
+#sidebar-card-container-size-reference {
+    position: absolute;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--min-card-width), 1fr));
+    grid-auto-rows: min-content;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+
+
+#sidebar-card-size-reference {
+    aspect-ratio: 6.3/8.8;
+}
+
+
+
+#sidebar-card-spacer-top, #sidebar-card-spacer-bottom {
+    grid-column: 1 / -1;
+}

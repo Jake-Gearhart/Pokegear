@@ -1,0 +1,14 @@
+.display {
+    width: 64px;
+    height: 64px;
+    margin: 4px;
+
+    line-height: 64px;
+    text-align: center;
+    font-size: 32px;
+    background-color: var(--light-circle);
+    color: var(--casing);
+
+    border-radius: 64px;
+    border-bottom: 8px solid var(--dark-circle);;
+}

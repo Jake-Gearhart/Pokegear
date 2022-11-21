@@ -1,0 +1,25 @@
+#filters {
+    position: absolute;
+    width: 0;
+    height: 0;
+    right: 0;
+    opacity: 0;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: width 0s ease calc(2 * var(--transition-time)), height 0s ease calc(2 * var(--transition-time)), padding 0s ease calc(2 * var(--transition-time)), opacity var(--transition-time) ease var(--transition-time), backdrop-filter var(--transition-time) ease var(--transition-time), -webkit-backdrop-filter var(--transition-time) ease var(--transition-time);
+}
+@media (orientation: landscape) {
+    #filters {
+        padding: 4px;
+        padding-top: 76px;
+    }
+    #filters.open {
+        width: calc(50% - 4px);
+        height: 100%;
+        opacity: 1;
+        transition: width 0s ease 0s, height 0s ease 0s, padding 0s ease 0s, opacity var(--transition-time) ease 0s, backdrop-filter var(--transition-time) ease 0s, -webkit-backdrop-filter var(--transition-time) ease 0s;
+    }
+}
+@media (orientation: portrait) {
+
+}
