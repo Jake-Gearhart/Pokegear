@@ -773,7 +773,12 @@ function exportTxt(text, filename) {
 }
 
 function downloadImageLink(url, filename) {
-    fetch(url, {mode: 'no-cors'})
+    fetch(url, {
+        headers: new Headers({
+            'Origin': location.origin
+        }),
+        mode: 'cors'
+    })
     .then(response => response.blob())
     .then(blob => {
         var blobUrl = window.URL.createObjectURL(blob);
