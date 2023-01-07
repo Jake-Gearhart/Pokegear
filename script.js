@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-LOG_normal('Version 1.4.1.1')
+LOG_normal('Version 1.4.1.2')
 
 const holoRarities = [
     'Amazing Rare',
@@ -685,7 +685,7 @@ function createCard (data) {
 
     cardImageContainer.appendChild(createElement('img', null, {
         'class': 'cardImage',
-        'src': data['images']['small'],
+        'src': data['images']['small'] + '?v1.4.1.2',
         'crossOrigin': 'Anonymous'
     }))
 
@@ -731,7 +731,7 @@ function cloneCard (card, modifications) {
         else if (key == 'image') {
             newCard.prepend(
                 createElement('img', null, {
-                    'src': mod,
+                    'src': mod + '?v1.4.1.2',
                     'crossOrigin': 'Anonymous',
                     'class': 'cardImage',
                     'onload': 'cloneCardOnload(this)'
