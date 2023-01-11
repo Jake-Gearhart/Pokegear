@@ -4,7 +4,7 @@ var windowWidth = window.innerWidth
 //logs
 var logs = []
 const versionNumber = '1.4.2'
-LOG_normal(`Version ${versionNumber}`)
+document.getElementById('titleText').innerHTML = `Pokegear<wbr>.app ${versionNumber}`
 
 const holoRarities = [
     'Amazing Rare',
@@ -684,20 +684,11 @@ function createCard (data) {
         'class': 'cardImageContainer',
     }))
 
-    if (data['custom-card'] != true) {
-        cardImageContainer.appendChild(createElement('img', null, {
-            'class': 'cardImage',
-            'src': data['images']['small'] + `?v${versionNumber}`,
-            'crossOrigin': 'Anonymous'
-        }))
-    }
-    else {
-        cardImageContainer.appendChild(createElement('img', null, {
-            'class': 'cardImage',
-            'src': data['images']['small'],
-            'crossOrigin': 'Anonymous'
-        }))
-    }
+    cardImageContainer.appendChild(createElement('img', null, {
+        'class': 'cardImage',
+        'src': data['images']['small'],
+        'crossOrigin': 'Anonymous'
+    }))
 
     var holo = false
     for (var i=0; i<holoRarities.length; i++) {
@@ -741,7 +732,7 @@ function cloneCard (card, modifications) {
         else if (key == 'image') {
             newCard.prepend(
                 createElement('img', null, {
-                    'src': mod + `?v${versionNumber}`,
+                    'src': mod,
                     'crossOrigin': 'Anonymous',
                     'class': 'cardImage',
                     'onload': 'cloneCardOnload(this)'
