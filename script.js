@@ -3,7 +3,8 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-LOG_normal('Version 1.4.1.2')
+const versionNumber = '1.4.1.3'
+LOG_normal(`Version ${versionNumber}`)
 
 const holoRarities = [
     'Amazing Rare',
@@ -683,11 +684,20 @@ function createCard (data) {
         'class': 'cardImageContainer',
     }))
 
-    cardImageContainer.appendChild(createElement('img', null, {
-        'class': 'cardImage',
-        'src': data['images']['small'] + '?v1.4.1.2',
-        'crossOrigin': 'Anonymous'
-    }))
+    if (data['custom-card'] != true) {
+        cardImageContainer.appendChild(createElement('img', null, {
+            'class': 'cardImage',
+            'src': data['images']['small'] + `?v${versionNumber}`,
+            'crossOrigin': 'Anonymous'
+        }))
+    }
+    else {
+        cardImageContainer.appendChild(createElement('img', null, {
+            'class': 'cardImage',
+            'src': data['images']['small'],
+            'crossOrigin': 'Anonymous'
+        }))
+    }
 
     var holo = false
     for (var i=0; i<holoRarities.length; i++) {
@@ -731,7 +741,7 @@ function cloneCard (card, modifications) {
         else if (key == 'image') {
             newCard.prepend(
                 createElement('img', null, {
-                    'src': mod + '?v1.4.1.2',
+                    'src': mod + `?v${versionNumber}`,
                     'crossOrigin': 'Anonymous',
                     'class': 'cardImage',
                     'onload': 'cloneCardOnload(this)'
