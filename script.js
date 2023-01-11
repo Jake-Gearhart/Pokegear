@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-const versionNumber = '1.4.1.3'
+const versionNumber = '1.4.2'
 LOG_normal(`Version ${versionNumber}`)
 
 const holoRarities = [
