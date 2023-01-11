@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-const versionNumber = '1.4.2'
+const versionNumber = '1.4.3'
 document.getElementById('titleText').innerHTML = `Pokegear<wbr>.app ${versionNumber}`
 
 const holoRarities = [
@@ -902,7 +902,7 @@ function toggleIndividualCardNumbers() {
         LOG_normal('Made card count visible')
     }
     else {
-        document.documentElement.style.setProperty('--cardCountVisible', 0);
+        document.documentElement.style.setProperty('--cardCountVisible', -1);
         LOG_normal('Made card count invisible')
     }
 }
