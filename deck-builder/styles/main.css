@@ -1,0 +1,105 @@
+:root {
+    --blue: #385faa;
+    --dark-blue: #192653;
+    --darkest-blue: #050b20;
+
+    --background-stripe: #cedbed;
+    --background: #a3cde3;
+    --sidebar-divider-color: var(--dark-blue);
+
+    --yellow: #ffcb04;
+    --transition-time: 0.25s;
+    --half-transition-time: calc(var(--transition-time)/2);
+    --double-transition-time: calc(var(--transition-time)*2);
+    --min-card-width: min(160px, 25vw);
+    --card-holo-display-low-res: inline-block; /* Set to none or inline-block */
+    --card-holo-display-high-res: inline-block;
+
+    --filter-card-width-percent: 100px;
+    --filter-card-height-percent: 100px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-stripe: #112a37;
+        --background: #0c1622;
+        --sidebar-divider-color: var(--darkest-blue);
+    }
+}
+
+@font-face {
+    font-family: 'Futura Heavy';
+    src: url('../fonts/Futura-Heavy.otf');
+}
+@font-face {
+    font-family: 'Gill Sans';
+    src: url('../fonts/Gill-Sans.otf');
+}
+@font-face {
+    font-family: 'Gill Sans Bold';
+    src: url('../fonts/Gill-Sans-Bold.otf');
+}
+@font-face {
+    font-family: 'Gill Sans Condensed Bold';
+    src: url('../fonts/Gill-Sans-Condensed-Bold.otf');
+}
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+    object-fit: contain;
+
+    font-family: 'Gill Sans', sans-serif;
+}
+
+input[type='text'], input[type='number'] {
+    text-align: left;
+    padding-left: 8px;
+    user-select: all;
+    -webkit-touch-callout: all;
+    -webkit-user-select: all;
+    -khtml-user-select: all;
+    -moz-user-select: all;
+    -ms-user-select: all;
+}
+
+body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--background);
+    /* font-family: 'Gill Sans', sans-serif; */
+}
+
+.background-stripe {
+    position: absolute;
+    height: max(200vh, 200vw);
+    transform: rotate(40deg);
+    transform-origin: bottom left;
+    bottom: 0;
+    background-color: var(--background-stripe); 
+    z-index: -1;
+}
+
+/* .fade-in {
+    animation: fadeIn calc(2 * var(--transition-time)) forwards;
+}
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+} */
