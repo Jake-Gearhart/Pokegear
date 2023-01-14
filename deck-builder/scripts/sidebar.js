@@ -20,7 +20,7 @@ sidebar.close = () => {
 }
 
 sidebar.mouseLeave = (event) => {
-    if (event.x > 0 && event.y > 0 && event.x < window.innerWidth && event.y < window.innerHeight && !focused.contains(document.elementFromPoint(event.x, event.y))) {
+    if (!sidebar.classList.contains("fullscreen") && event.x > 0 && event.y > 0 && event.x < window.innerWidth && event.y < window.innerHeight && !focused.contains(document.elementFromPoint(event.x, event.y))) {
         sidebar.close()
     }
 }
