@@ -255,7 +255,7 @@ function getSidebarCards (executor) {
     }
     queryConstructor(search)
 
-    const url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.name,number&q=${query}&page=1`
+    const url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=${query}&page=1`
 
     if (sidebarCardsContainer.searchTimeout == true) { sidebarCardsContainer.queuedUrl = url }
     else {
@@ -333,10 +333,10 @@ sidebarCardsContainer.addCards = (data) => {
 }
 
 //TEMPORARY
-// sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,-set.total,number&q=set.id:ex3+OR+set.id:ex6&page=1")
-// sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,-set.total,number&q=(set.id:bw11+OR+set.id:bw10+OR+set.id:bw9+OR+set.id:bw8+OR+set.id:bw7+OR+set.id:dv1+OR+set.id:bw6+OR+set.id:bw5+OR+set.id:bw4+OR+set.id:bw3+OR+set.id:bw2+OR+set.id:bw1)+&page=1")
-// sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,-set.total,number&q=(legalities.standard:legal)&page=1")
-sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,-set.total,number&q=(set.series:%22Sword%20%26%20Shield%22)&page=1")
+// sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=set.id:ex3+OR+set.id:ex6&page=1")
+// sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(set.id:bw11+OR+set.id:bw10+OR+set.id:bw9+OR+set.id:bw8+OR+set.id:bw7+OR+set.id:dv1+OR+set.id:bw6+OR+set.id:bw5+OR+set.id:bw4+OR+set.id:bw3+OR+set.id:bw2+OR+set.id:bw1)+&page=1")
+// sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(legalities.standard:legal)&page=1")
+sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(set.series:%22Sword%20%26%20Shield%22)&page=1")
 
 sidebarCardsContainer.getCardGrid = () => {
     const columns = getComputedStyle(sidebarCardsContainer).gridTemplateColumns.split(' ')
