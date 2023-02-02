@@ -1,27 +1,30 @@
 #filters {
     position: absolute;
+    padding: 4px;
     width: 0;
     height: 0;
-    padding: 4px;
+    left: 0;
     opacity: 0;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     overflow-y: scroll;
-    transition: width 0s ease var(--transition-time), height 0s ease var(--transition-time), left var(--transition-time), opacity var(--transition-time), backdrop-filter var(--transition-time), -webkit-backdrop-filter var(--transition-time);
+    transition: width 0s ease var(--transition-time), height 0s ease var(--transition-time), left 0s ease var(--transition-time), opacity var(--transition-time), backdrop-filter var(--transition-time), -webkit-backdrop-filter var(--transition-time);
 }
 #filters > input {
     width: 100%;
 }
+#filters.open {
+    opacity: 1;
+}
 @media (orientation: landscape) {
     #filters {
-        left: calc(50% + 4px);
         padding-top: 76px;
     }
     #filters.open {
         width: calc(50% - 4px);
         height: 100%;
-        opacity: 1;
-        transition: width 0s ease 0s, height 0s ease 0s, left var(--transition-time), opacity var(--transition-time), backdrop-filter var(--transition-time), -webkit-backdrop-filter var(--transition-time);
+        left: calc(50% + 4px);
+        transition: width 0s, height 0s, left 0s, opacity var(--transition-time), backdrop-filter var(--transition-time), -webkit-backdrop-filter var(--transition-time);
     }
     #filters.fullscreen {
         left: 100%;
@@ -40,16 +43,16 @@
     max-width: 95%;
     max-height: 95%;
     transform: translate(-50%, -50%);
-    aspect-ratio: 6.3/8.8;
-}
-#filter-card img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 5%/calc(25%/7);
+    aspect-ratio: var(--card-width) / var(--card-height);
 }
 #filter-card-image {
     box-shadow: 0 0 16px rgba(0,0,0,0.25);
+}
+#filter-card-image, #filter-card-background-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--card-border-radius);
 }
 #filter-card textarea {
     position: absolute;
@@ -74,10 +77,9 @@
     height: calc(6.41 * var(--filter-card-height-percent));
     top: calc(2.87 * var(--filter-card-height-percent));
     left: calc(19.11 * var(--filter-card-width-percent));
-    font-family: 'Gill Sans Condensed Bold', sans-serif;
+    font-family: 'Gill Sans Condensed Bold';
     font-size: calc(4.8 * var(--filter-card-height-percent));
     line-height: calc(6.31 * var(--filter-card-height-percent));
-    white-space: nowrap;
     overflow-x: scroll;
     overflow-y: hidden;
     border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
@@ -88,7 +90,7 @@
     height: calc(6.41 * var(--filter-card-height-percent));
     top: calc(2.87 * var(--filter-card-height-percent));
     left: calc(74.12 * var(--filter-card-width-percent));
-    font-family: 'Futura Heavy', sans-serif;
+    font-family: 'Futura Heavy';
     font-size: calc(5.3 * var(--filter-card-height-percent));
     line-height: calc(6.31 * var(--filter-card-height-percent));
     text-align: right;
@@ -103,7 +105,7 @@
     height: calc(1.96 * var(--filter-card-height-percent));
     top: calc(47.74 * var(--filter-card-height-percent));
     left: calc(29.4 * var(--filter-card-width-percent));
-    font-family: 'Gill Sans', sans-serif;
+    font-family: 'Gill Sans';
     font-size: calc(1.5 * var(--filter-card-height-percent));
     line-height: calc(1.96 * var(--filter-card-height-percent));
     text-align: right;
@@ -129,7 +131,7 @@
     height: calc(4.3 * var(--filter-card-height-percent));
     top: calc(50.49 * var(--filter-card-height-percent));
     left: calc(32.6 * var(--filter-card-width-percent));
-    font-family: 'Gill Sans Condensed Bold', sans-serif;
+    font-family: 'Gill Sans Condensed Bold';
     font-size: calc(3.6 * var(--filter-card-height-percent));
     line-height: calc(4.3 * var(--filter-card-height-percent));
     color: #c8000b !important;
@@ -147,7 +149,7 @@
     height: calc(13.17 * var(--filter-card-height-percent));
     top: calc(54.77 * var(--filter-card-height-percent));
     left: calc(8.3 * var(--filter-card-width-percent));
-    font-family: 'Gill Sans', sans-serif;
+    font-family: 'Gill Sans';
     font-size: calc(2.49 * var(--filter-card-height-percent));
     text-align: justify;
     white-space: normal;
@@ -161,7 +163,7 @@
     height: calc(4.3 * var(--filter-card-height-percent));
     top: calc(67.93 * var(--filter-card-height-percent));
     left: calc(32.6 * var(--filter-card-width-percent));
-    font-family: 'Gill Sans Condensed Bold', sans-serif;
+    font-family: 'Gill Sans Condensed Bold';
     font-size: calc(3.6 * var(--filter-card-height-percent));
     line-height: calc(4.3 * var(--filter-card-height-percent));
     white-space: nowrap;
@@ -175,7 +177,7 @@
     height: calc(4.3 * var(--filter-card-height-percent));
     top: calc(67.93 * var(--filter-card-height-percent));
     left: calc(83.86 * var(--filter-card-width-percent));
-    font-family: 'Futura Heavy', sans-serif;
+    font-family: 'Futura Heavy';
     font-size: calc(3.6 * var(--filter-card-height-percent));
     line-height: calc(4.3 * var(--filter-card-height-percent));
     text-align: right;
@@ -190,7 +192,7 @@
     height: calc(13 * var(--filter-card-height-percent));
     top: calc(72.22 * var(--filter-card-height-percent));
     left: calc(8.3 * var(--filter-card-width-percent));
-    font-family: 'Gill Sans', sans-serif;
+    font-family: 'Gill Sans';
     font-size: calc(2.49 * var(--filter-card-height-percent));
     text-align: justify;
     white-space: normal;
@@ -204,7 +206,7 @@
     height: calc(1.96 * var(--filter-card-height-percent));
     top: calc(91.4 * var(--filter-card-height-percent));
     left: calc(11 * var(--filter-card-width-percent));
-    font-family: 'Gill Sans', sans-serif;
+    font-family: 'Gill Sans';
     font-style: italic;
     font-size: calc(1.7 * var(--filter-card-height-percent));
     line-height: calc(1.96 * var(--filter-card-height-percent));
@@ -213,4 +215,67 @@
     overflow-y: hidden;
     border-radius: calc(0.5 * var(--filter-card-height-percent)) / calc(0.5 * var(--filter-card-height-percent));
     /* background-color: rgba(255,255,255,0.5) !important; */
+}
+
+
+#filter-rules-input {
+    width: calc(51.17 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(25 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    background-color: rgba(255,0,0,0.5) !important;
+}
+#filter-card-types-input {
+    width: calc(51.17 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(30 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    background-color: rgba(255,0,0,0.5) !important;
+}
+#filter-evolves-to-input {
+    width: calc(51.17 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(35 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    background-color: rgba(255,0,0,0.5) !important;
+}
+#filter-subtypes-input {
+    width: calc(51.17 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(40 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    background-color: rgba(255,0,0,0.5) !important;
+}
+
+
+#filter-card-favorites-button {
+    position: absolute;
 }

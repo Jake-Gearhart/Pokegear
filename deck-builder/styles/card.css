@@ -1,6 +1,6 @@
 pokemon-card {
     position: relative;
-    aspect-ratio: 6.3/8.8;
+    aspect-ratio: var(--card-width)/var(--card-height);
     z-index: 0;
     transition: z-index var(--transition-time);
     /* background: linear-gradient(to bottom right, rgba(255,0,0,0.5), rgba(0,0,255,0.5)); */
@@ -24,6 +24,7 @@ pokemon-card.hovered-card {
     background-size: 100% 100%;
     background-repeat: no-repeat;
     opacity: 1;
+    border-radius: var(--card-border-radius);
 }
 
 .card-display {
@@ -35,8 +36,8 @@ pokemon-card.hovered-card {
     transform: none;
     will-change: width, height, left, top, transform;
     transition: width var(--transition-time), height var(--transition-time), top var(--transition-time), left var(--transition-time), transform var(--transition-time);
-    /* background: linear-gradient(to bottom right, rgba(255,255,0,1), rgba(0,255,255,1)); */
     pointer-events: none;
+    /* background: linear-gradient(to bottom right, rgba(255,255,0,1), rgba(0,255,255,1)); */
 }
 
 .card-image {
@@ -45,10 +46,20 @@ pokemon-card.hovered-card {
     height: 100%;
     background-image: url(../images/placeholder.png);
     background-size: 100% 100%;
-    border-radius: 5%/calc(25%/7);
     box-shadow: 0 0 16px rgba(0,0,0,0.25);
     transition: box-shadow var(--transition-time), transform var(--transition-time);
     pointer-events: all;
+}
+
+.card-image * {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+
+.card-image, .card-image * {
+    border-radius: var(--card-border-radius);
 }
 
 .hd-card-image {
@@ -59,20 +70,60 @@ pokemon-card.hovered-card {
     transition: opacity var(--transition-time);
 }
 
+.card-button-container {
+    position: absolute;
+    display: grid;
+    grid-auto-rows: min-content;
+    row-gap: 4px;
+
+    width: 50%;
+    top: 64px;
+    border-radius: 16px;
+    pointer-events: none;
+    transition: width var(--transition-time), left var(--transition-time);
+    will-change: width, left, border;
+    z-index: -1;
+    /* background-color: rgba(255,0,0,0.5); */
+}
+.card-button-container:not(.left) {
+    left: 50%;
+    justify-content: flex-end;
+}
+pokemon-card.hovered-card .card-button-container {
+    pointer-events: all;
+    width: calc(50% + 68px);
+}
+.card-button-container.left {
+    left: -68px;
+}
+pokemon-card:not(.hovered-card) .card-button-container.left {
+    left: 0;
+}
+pokemon-card:not(.hovered-card) .card-button-container button {
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    will-change: width, height, font-size, border-radius;
+}
+
+.card-add-button:before {
+    content: '+';
+}
+.card-subtract-button:before {
+    content: '–';
+}
+
 pokemon-card.hovered-card .card-image {
     box-shadow: 0 0 64px black;
     transition: box-shadow var(--transition-time), transform 0s;
 }
 
-.card-image * {
-    position: absolute;
+.card-image-container {
     width: 100%;
     height: 100%;
-    object-fit: fill;
-    border-radius: 5%/calc(25%/7);
 }
-
-pokemon-card.hovered-card {
+pokemon-card.hovered-card .card-image-container {
     animation: card-idle 5s ease-in-out infinite;
 }
 
@@ -99,7 +150,7 @@ pokemon-card.hovered-card {
     background-size: cover;
     background-image: url(../images/holofoil-low-res.gif);
     mix-blend-mode: color-dodge;
-    border-radius: 5%/calc(25%/7);
+    border-radius: var(--card-border-radius);
 }
 
 .holofoil-high-res::after {

@@ -1,4 +1,4 @@
-sidebar.setTab = () => {
+ELEMENTS.sidebar.setTab = () => {
     if (window.innerWidth > window.innerHeight) {
         // document.getElementById("sidebar-tab").innerHTML = "◣◤"
     }
@@ -7,56 +7,56 @@ sidebar.setTab = () => {
     }
 }
 
-sidebar.open = () => {
-    sidebar.classList.add("open")
-    mainPage.classList.add("half")
+ELEMENTS.sidebar.open = () => {
+    ELEMENTS.sidebar.classList.add("open")
+    ELEMENTS.mainPage.classList.add("half")
 }
 
-sidebar.close = () => {
-    sidebar.classList.remove("open")
-    mainPage.classList.remove("half")
-    sidebarTab.classList.remove('hidden')
-    sidebarTopContainer.classList.remove('hidden')
+ELEMENTS.sidebar.close = () => {
+    ELEMENTS.sidebar.classList.remove("open")
+    ELEMENTS.mainPage.classList.remove("half")
+    ELEMENTS.sidebarTab.classList.remove('hidden')
+    ELEMENTS.sidebarTopContainer.classList.remove('hidden')
 }
 
-sidebar.mouseLeave = (event) => {
-    if (!sidebar.classList.contains("fullscreen") && event.x > 0 && event.y > 0 && event.x < window.innerWidth && event.y < window.innerHeight && !focused.contains(document.elementFromPoint(event.x, event.y))) {
-        sidebar.close()
+ELEMENTS.sidebar.mouseLeave = (event) => {
+    if (!ELEMENTS.sidebar.classList.contains("fullscreen") && event.x > 0 && event.y > 0 && event.x < window.innerWidth && event.y < window.innerHeight && !focused.contains(document.elementFromPoint(event.x, event.y))) {
+        ELEMENTS.sidebar.close()
     }
 }
 
-sidebar.toggleFullscreen = () => {
-    if (!sidebar.classList.contains("fullscreen")) {
-        sidebar.classList.add("fullscreen")
-        filters.classList.add("fullscreen")
-        mainPage.classList.add("hidden")
+ELEMENTS.sidebar.toggleFullscreen = () => {
+    if (!ELEMENTS.sidebar.classList.contains("fullscreen")) {
+        ELEMENTS.sidebar.classList.add("fullscreen")
+        ELEMENTS.filters.classList.add("fullscreen")
+        ELEMENTS.mainPage.classList.add("hidden")
     }
     else {
-        sidebar.classList.remove("fullscreen")
-        filters.classList.remove("fullscreen")
-        mainPage.classList.remove("hidden")
+        ELEMENTS.sidebar.classList.remove("fullscreen")
+        ELEMENTS.filters.classList.remove("fullscreen")
+        ELEMENTS.mainPage.classList.remove("hidden")
     }
 }
 
-sidebarTopContainer.mouseEnter = () => {
+ELEMENTS.sidebarTopContainer.mouseEnter = () => {
     if (window.innerWidth > window.innerHeight) {
-        filters.open()
+        ELEMENTS.filters.open()
     }
 }
 
-sidebarTopContainer.mouseLeave = (event) => {
+ELEMENTS.sidebarTopContainer.mouseLeave = (event) => {
     if (event.x > 0 && event.y > 0 && event.x < window.innerWidth && event.y < window.innerHeight) {
-        filters.close()
+        ELEMENTS.filters.close()
     }
 }
 
-sidebarTopFullscreenButton.click = () => {
-    sidebar.toggleFullscreen()
+ELEMENTS.sidebarTopFullscreenButton.click = () => {
+    ELEMENTS.sidebar.toggleFullscreen()
 }
 
-sidebarCardsContainer.searchTimeout = false
-sidebarCardsContainer.queuedUrl = null
-
+ELEMENTS.sidebarCardsContainer.searchTimeout = false
+ELEMENTS.sidebarCardsContainer.queuedUrl = null
+ELEMENTS.sidebarCardsContainer.additionalLeftOffset = -8
 
 function getSidebarCards (executor) {
     if (executor) {
@@ -87,147 +87,152 @@ function getSidebarCards (executor) {
         })
     }
 
-    if (search['filters'].length == 0) { //Check for empty search
-        sidebarCardsContainer.clearCards()
-        sidebarCardsContainer.queueNumber++
-        sidebarCardsContainer.currentSearch = {}
-        return
-    }
+    // if (search['filters'].length == 0) { //Check for empty search
+    //     ELEMENTS.sidebarCardsContainer.clearCards()
+    //     ELEMENTS.sidebarCardsContainer.queueNumber++
+    //     ELEMENTS.sidebarCardsContainer.currentSearch = {}
+    //     return
+    // }
 
-    function filter(elm) {
-        // SPLIT MULTIPLE SEARCH TERMS
-        if (elm['searchterms']) {
-            if (elm['searchterms'].length == 1) {
-                elm['term'] = elm['searchterms'][0]
+    if (search['filters'].length > 0) {
+        function filter(elm) {
+            // SPLIT MULTIPLE SEARCH TERMS
+            if (elm['searchterms']) {
+                if (elm['searchterms'].length == 1) {
+                    elm['term'] = elm['searchterms'][0]
+                }
+                else {
+                    elm['conjunction'] = 'or'
+                    elm['filters'] = []
+                    for (let i = 0; i < elm['searchterms'].length; i++) {
+                        elm['filters'].push({
+                            'term': elm['searchterms'][i],
+                            'value': elm['value'].trim(),
+                            'strict': elm['strict'],
+                            'quotes': elm['quotes']
+                        })
+                    }
+                    delete elm['value']
+                    delete elm['strict']
+                    delete elm['quotes']
+                }
+                delete elm['searchterms']
             }
-            else {
+            // SPLIT OR GROUPS
+            if (elm['value'] && elm['value'].includes('/')) {
+                let orGroups = elm['value'].split('/')
                 elm['conjunction'] = 'or'
                 elm['filters'] = []
-                for (let i = 0; i < elm['searchterms'].length; i++) {
+                for (let i = 0; i < orGroups.length; i++) {
+                    const orGroup = orGroups[i].trim()
+                    if (orGroup.length == 0) { continue }
                     elm['filters'].push({
-                        'term': elm['searchterms'][i],
-                        'value': elm['value'].trim(),
+                        'term': elm['term'],
+                        'value': orGroup,
                         'strict': elm['strict'],
                         'quotes': elm['quotes']
                     })
                 }
+                delete elm['term']
                 delete elm['value']
                 delete elm['strict']
                 delete elm['quotes']
             }
-            delete elm['searchterms']
-        }
-        // SPLIT OR GROUPS
-        if (elm['value'] && elm['value'].includes('/')) {
-            let orGroups = elm['value'].split('/')
-            elm['conjunction'] = 'or'
-            elm['filters'] = []
-            for (let i = 0; i < orGroups.length; i++) {
-                const orGroup = orGroups[i].trim()
-                if (orGroup.length == 0) { continue }
-                elm['filters'].push({
-                    'term': elm['term'],
-                    'value': orGroup,
-                    'strict': elm['strict'],
-                    'quotes': elm['quotes']
-                })
+            // SPLIT AND GROUPS
+            if (elm['value'] && elm['value'].includes('"')) {
+                let andGroups = elm['value'].split('"')
+                elm['conjunction'] = 'and'
+                elm['filters'] = []
+                for (let i = 0; i < andGroups.length; i++) {
+                    const andGroup = andGroups[i].trim()
+                    if (andGroup.length == 0) { continue }
+                    elm['filters'].push({
+                        'term': elm['term'],
+                        'value': andGroup,
+                        'strict': i % 2 == 0 ? false : true,
+                        'quotes': elm['quotes']
+                    })
+                }
+                delete elm['term']
+                delete elm['value']
+                delete elm['strict']
+                delete elm['quotes']
             }
-            delete elm['term']
-            delete elm['value']
-            delete elm['strict']
-            delete elm['quotes']
-        }
-        // SPLIT AND GROUPS
-        if (elm['value'] && elm['value'].includes('"')) {
-            let andGroups = elm['value'].split('"')
-            elm['conjunction'] = 'and'
-            elm['filters'] = []
-            for (let i = 0; i < andGroups.length; i++) {
-                const andGroup = andGroups[i].trim()
-                if (andGroup.length == 0) { continue }
-                elm['filters'].push({
-                    'term': elm['term'],
-                    'value': andGroup,
-                    'strict': i % 2 == 0 ? false : true,
-                    'quotes': elm['quotes']
-                })
+            // SPLIT SPACE GROUPS
+            if (elm['value'] && elm['value'].includes(' ') && elm['strict'] == false) {
+                let andGroups = elm['value'].split(' ')
+                elm['conjunction'] = 'and'
+                elm['filters'] = []
+                for (let i = 0; i < andGroups.length; i++) {
+                    const andGroup = andGroups[i].trim()
+                    if (andGroups.length == 0) { continue }
+                    elm['filters'].push({
+                        'term': elm['term'],
+                        'value': andGroup,
+                        'strict': elm['strict'],
+                        'quotes': elm['quotes']
+                    })
+                }
+                delete elm['term']
+                delete elm['value']
+                delete elm['strict']
+                delete elm['quotes']
             }
-            delete elm['term']
-            delete elm['value']
-            delete elm['strict']
-            delete elm['quotes']
-        }
-        // SPLIT SPACE GROUPS
-        if (elm['value'] && elm['value'].includes(' ') && elm['strict'] == false) {
-            let andGroups = elm['value'].split(' ')
-            elm['conjunction'] = 'and'
-            elm['filters'] = []
-            for (let i = 0; i < andGroups.length; i++) {
-                const andGroup = andGroups[i].trim()
-                if (andGroups.length == 0) { continue }
-                elm['filters'].push({
-                    'term': elm['term'],
-                    'value': andGroup,
-                    'strict': elm['strict'],
-                    'quotes': elm['quotes']
-                })
+            // ADD INVERTS
+            if (elm['value']) {
+                if (elm['value'][0] == '!') {
+                    elm['value'] = elm['value'].slice(1)
+                    elm['invert'] = true
+                }
+                else {
+                    elm['invert'] = false
+                }
             }
-            delete elm['term']
-            delete elm['value']
-            delete elm['strict']
-            delete elm['quotes']
-        }
-        // ADD INVERTS
-        if (elm['value']) {
-            if (elm['value'][0] == '!') {
-                elm['value'] = elm['value'].slice(1)
-                elm['invert'] = true
-            }
-            else {
-                elm['invert'] = false
+            if (elm['filters']) {
+                for (let i = 0; i < elm['filters'].length; i++) {
+                    filter(elm['filters'][i])
+                }
             }
         }
-        if (elm['filters']) {
-            for (let i = 0; i < elm['filters'].length; i++) {
-                filter(elm['filters'][i])
-            }
-        }
-    }
-    filter(search)
+        filter(search)
 
-    // COMPRESS
-    function compress(elm) {
-        if (elm['filters'] && elm['filters'].length == 1) {
-            const filterCopy = elm['filters'][0]
-            delete elm['filters']
-            delete elm['conjunction']
-            Object.assign(elm, filterCopy)
-            if (filterCopy['filters']) { compress(elm) }
-        }
-        if (elm['filters']) {
-            for (let i = 0; i < elm['filters'].length; i++) {
-                compress(elm['filters'][i])
+        // COMPRESS
+        function compress(elm) {
+            if (elm['filters'] && elm['filters'].length == 1) {
+                const filterCopy = elm['filters'][0]
+                delete elm['filters']
+                delete elm['conjunction']
+                Object.assign(elm, filterCopy)
+                if (filterCopy['filters']) { compress(elm) }
+            }
+            if (elm['filters']) {
+                for (let i = 0; i < elm['filters'].length; i++) {
+                    compress(elm['filters'][i])
+                }
             }
         }
+        compress(search)
     }
-    compress(search)
 
     // FILTERS COMPLETED, SAVE SEARCH
 
-    if (Object.keys(search).length == 0 || (search['filters'] && search['filters'].length == 0)) { //Check for empty search
-        sidebarCardsContainer.clearCards()
-        sidebarCardsContainer.queueNumber++
-        sidebarCardsContainer.currentSearch = {}
+    let includeFavorites = false
+    if (ELEMENTS.filterCardFavoritesButton.enabled) { includeFavorites = true }
+
+    if ((Object.keys(search).length == 0 || (search['filters'] && search['filters'].length == 0)) && includeFavorites == false) { //Check for empty search
+        ELEMENTS.sidebarCardsContainer.clearCards()
+        ELEMENTS.sidebarCardsContainer.queueNumber++
+        ELEMENTS.sidebarCardsContainer.currentSearch = {}
         return
     }
 
-    if (JSON.stringify(search) == JSON.stringify(sidebarCardsContainer.currentSearch)) {
-        return
-    }
+    // if (JSON.stringify(search) == JSON.stringify(ELEMENTS.sidebarCardsContainer.currentSearch)) {
+    //     return
+    // }
 
-    sidebarCardsContainer.currentSearch = {}
-    Object.assign(sidebarCardsContainer.currentSearch, search)
-    // console.log(sidebarCardsContainer.currentSearch)
+    ELEMENTS.sidebarCardsContainer.currentSearch = {}
+    Object.assign(ELEMENTS.sidebarCardsContainer.currentSearch, search)
+    // console.log(ELEMENTS.sidebarCardsContainer.currentSearch)
 
     let query = ''
     function queryConstructor(elm) {
@@ -255,196 +260,69 @@ function getSidebarCards (executor) {
     }
     queryConstructor(search)
 
-    const url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=${query}&page=1`
+    //HERE HERE HERE HERE HERE
+    if (includeFavorites == true) {
+        if (query != '()') {
+            query += `+(id:${GLOBAL.localStorage['deck-builder']['favorite-card-ids'].join('+OR+id:')})`
+        }
+        else {
+            query = `id:${GLOBAL.localStorage['deck-builder']['favorite-card-ids'].join('+OR+id:')}`
+        }
+    }
 
-    if (sidebarCardsContainer.searchTimeout == true) { sidebarCardsContainer.queuedUrl = url }
+    // const url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=${query}&page=1`
+    const url = `https://api.pokemontcg.io/v2/cards?orderBy=subtypes,name,set.releaseDate,set.id,number&q=${query}&page=1`
+
+    if (ELEMENTS.sidebarCardsContainer.searchTimeout == true) { ELEMENTS.sidebarCardsContainer.queuedUrl = url }
     else {
-        sidebarCardsContainer.fetchCards(url, true, true)
-        sidebarCardsContainer.searchTimeout = true
+        ELEMENTS.sidebarCardsContainer.fetchCards(url, true, true)
+        ELEMENTS.sidebarCardsContainer.searchTimeout = true
         setTimeout(() => {
-            sidebarCardsContainer.searchTimeout = false
-            if (sidebarCardsContainer.queuedUrl) {
-                sidebarCardsContainer.fetchCards(sidebarCardsContainer.queuedUrl, true, true)
-                sidebarCardsContainer.queuedUrl = undefined
+            ELEMENTS.sidebarCardsContainer.searchTimeout = false
+            if (ELEMENTS.sidebarCardsContainer.queuedUrl) {
+                ELEMENTS.sidebarCardsContainer.fetchCards(ELEMENTS.sidebarCardsContainer.queuedUrl, true, true)
+                ELEMENTS.sidebarCardsContainer.queuedUrl = undefined
             }
         }, 1500);
     }
 }
 
-sidebarCardsContainer.clearCards = () => {
-    const cards = sidebarCardsContainer.getElementsByTagName("pokemon-card")
-    while (cards.length > 0) {
-        sidebarCardsContainer.removeChild(cards[0])
-    }
-    sidebarCardsContainer.scrollTop = 0
-    sidebarCardsContainer.fetchedPages = []
-    sidebarCardsContainer.totalCardCount = 0
-}
+ELEMENTS.sidebarCardsContainer.fetchCards = async function (url, clearCards, incrementQueue) {
 
-sidebarCardsContainer.fetchCards = async function (url, clearCards, incrementQueue) {
+    if (incrementQueue == true) { ELEMENTS.sidebarCardsContainer.queueNumber++ }
+    let queueNumber = ELEMENTS.sidebarCardsContainer.queueNumber
 
-    if (incrementQueue == true) { sidebarCardsContainer.queueNumber++ }
-    let queueNumber = sidebarCardsContainer.queueNumber
+    const response = await API.fetchCards(url)
 
-    sidebarCardsContainer.fetchedPages.push(url.split('page=')[1])
-    const response = await fetchCards(url)
+    if (response == 404 || response == 400) { return }
 
-    if (response == 404) {
-        // setTimeout(() => {
-        //     sidebarCardsContainer.fetchCards(url, clearCards, false)
-        // }, 1000);
-        return
-    }
-    else if (response == 400) { return }
+    if (queueNumber != ELEMENTS.sidebarCardsContainer.queueNumber) { return }
 
-    if (queueNumber != sidebarCardsContainer.queueNumber) { return }
+    if (clearCards == true) { ELEMENTS.sidebarCardsContainer.clearCards() }
 
-    if (clearCards == true) { sidebarCardsContainer.clearCards() }
-
-    sidebarCardsContainer.addCards(response)
-}
-
-sidebarCardsContainer.addCards = (data) => {
-    let sidebarCards = Array.from(sidebarCardsContainer.getElementsByTagName("pokemon-card"))
-
-    const cards = data["cards"]
-
-    //if no cards have been added, create templates for all
-    if (sidebarCards.length == 0) {
-        sidebarCardsContainer.totalCardCount = data.totalCardCount
-        sidebarCardsContainer.firstVisibleCardIndex = 0
-
-        for (let i = 0; i < data.totalCardCount; i++) {
-            const card = document.createElement("pokemon-card")
-            card.classList.add("hidden-card")
-            card.dataUrl = data["url"].split("page=")[0] + `page=${Math.floor(i / data["pageSize"]) + 1}`
-            sidebarCardsContainer.insertBefore(card, document.getElementById("sidebar-cards-spacer-bottom"));
+    // if no cards have been added, create templates for all
+    if (ELEMENTS.sidebarCardsContainer.cards.length == 0) {
+        for (let i = 0; i < response.totalCardCount; i++) {
+            const newCard = document.createElement('pokemon-card')
+            newCard.classList.add('hidden-card')
+            ELEMENTS.sidebarCardsContainer.addCard(newCard)
+            newCard.setData(null, {
+                'url': response.url.split('page=')[0] + `page=${Math.floor(i / response.pageSize) + 1}`,
+                'index': i % response.pageSize
+            })
         }
-        sidebarCards = Array.from(sidebarCardsContainer.getElementsByTagName("pokemon-card")) //update sidebarCards
     }
 
-    //set card data
-    for (let i = 0, startingIndex = data.pageSize * (data.page - 1); i < cards.length; i++) {
-        const card = sidebarCards[startingIndex + i]
-        card.setData(cards[i])
-    }
-    
-    sidebarCardsContainer.hideCardsOptimization()
+    //set card data for cards that match url
+    GLOBAL.setDataFromResponse(response)
+
+    ELEMENTS.sidebarCardsContainer.updateVisibleCards()
 }
 
 //TEMPORARY
-// sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=set.id:ex3+OR+set.id:ex6&page=1")
-// sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(set.id:bw11+OR+set.id:bw10+OR+set.id:bw9+OR+set.id:bw8+OR+set.id:bw7+OR+set.id:dv1+OR+set.id:bw6+OR+set.id:bw5+OR+set.id:bw4+OR+set.id:bw3+OR+set.id:bw2+OR+set.id:bw1)+&page=1")
-// sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(legalities.standard:legal)&page=1")
-sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(set.series:%22Sword%20%26%20Shield%22)&page=1")
-
-sidebarCardsContainer.getCardGrid = () => {
-    const columns = getComputedStyle(sidebarCardsContainer).gridTemplateColumns.split(' ')
-
-    const x = columns.length
-    const w = parseFloat(columns[0])
-
-    const h = w * 8.8 / 6.3
-    const y = Math.ceil(sidebarCardsContainer.clientHeight / h) + 1
-
-    // console.log(`sidebarCardsContainer.getCardGrid x: ${x}, y: ${y}, w: ${w}, h: ${h}`)
-    return {x, y, w, h}
-}
-
-
-
-sidebarCardsContainer.scrollCards = () => {
-    const hoveredCard = document.getElementsByClassName('hovered-card')[0]
-    if (hoveredCard) { hoveredCard.unhover() }
-
-    if (sidebarCardsContainer.resizing == true) {
-        sidebarCardsContainer.resizing = false
-        return
-    }
-
-    if (sidebarCardsContainer.previousScrollTop && sidebarCardsContainer.previousScrollTop < sidebarCardsContainer.scrollTop && sidebarCardsContainer.scrollTop - parseFloat(window.getComputedStyle(sidebarCardsContainer).paddingTop) + 4 > 0) {
-        sidebarTab.classList.add('hidden')
-        sidebarTopContainer.classList.add('hidden')
-        sidebarCardsContainer.additionalTopOffset = parseFloat(window.getComputedStyle(sidebarCardsContainer).paddingTop)
-    }
-    else if (sidebarTopContainer.classList.contains('hidden')) {
-        sidebarTab.classList.remove('hidden')
-        sidebarTopContainer.classList.remove('hidden')
-        sidebarCardsContainer.additionalTopOffset = null
-    }
-
-    sidebarCardsContainer.hideCardsOptimization()
-    sidebarCardsContainer.previousScrollTop = sidebarCardsContainer.scrollTop
-
-    const newGrid = sidebarCardsContainer.getCardGrid()
-    const x = newGrid.x
-    const h = newGrid.h
-
-    const paddingTop = parseFloat(window.getComputedStyle(sidebarCardsContainer).paddingTop)
-
-    const cards = Array.from(sidebarCardsContainer.getElementsByTagName("pokemon-card"))
-    const totalRows = Math.ceil(cards.length / x)
-
-    const previousScroll = totalRows * (sidebarCardsContainer.scrollTop - paddingTop) / (sidebarCardsContainer.scrollHeight - paddingTop)
-    sidebarCardsContainer.previousScrollDecimal = previousScroll - Math.floor(previousScroll)
-
-    const scrollPos = sidebarCardsContainer.scrollTop - paddingTop
-    const firstVisibleRow = Math.max(0, Math.floor(scrollPos / h))
-
-    sidebarCardsContainer.firstVisibleCardIndex = firstVisibleRow * x
-}
-
-
-
-//hide non-visible cards
-sidebarCardsContainer.hideCardsOptimization = () => {
-    if (sidebarCardsContainer.totalCardCount == 0) { return }
-
-    const newGrid = sidebarCardsContainer.getCardGrid()
-    const x = newGrid.x
-    const y = newGrid.y
-    const h = newGrid.h
-    const cards = Array.from(sidebarCardsContainer.getElementsByTagName("pokemon-card"))
-    const totalRows = Math.ceil(cards.length / x)
-    const paddingTop = parseFloat(window.getComputedStyle(sidebarCardsContainer).paddingTop)
-    const scrollPos = sidebarCardsContainer.scrollTop - paddingTop
-    const firstVisibleRow = Math.max(0, Math.floor(scrollPos / h))
-
-    for (let i = 0; i < Math.min(cards.length, firstVisibleRow * x); i++) {
-        cards[i].classList.add("hidden-card")
-    }
-
-    document.getElementById("sidebar-cards-spacer-top").style["height"] = `${firstVisibleRow * h}px`
-
-    for (let i = firstVisibleRow * x; i < Math.min(cards.length, (firstVisibleRow + y) * x); i++) {
-        cards[i].classList.remove("hidden-card")
-        if (!cards[i].data && !sidebarCardsContainer.fetchedPages.includes(cards[i].dataUrl.split("page=")[1])) {
-            sidebarCardsContainer.fetchCards(cards[i].dataUrl)
-        }
-    }
-
-    for (let i = (firstVisibleRow + y) * x; i < cards.length; i++) {
-        cards[i].classList.add("hidden-card")
-    }
-
-    document.getElementById("sidebar-cards-spacer-bottom").style["height"] = `${(totalRows - Math.min(firstVisibleRow + y, totalRows)) * h}px`
-}
-
-
-
-const sidebarCardsContainerObserver = new ResizeObserver(entries => {
-    if (sidebarCardsContainer.totalCardCount == 0) { return }
-    
-    const newGrid = sidebarCardsContainer.getCardGrid()
-    const x = newGrid.x
-    const h = newGrid.h
-
-    const paddingTop = parseFloat(window.getComputedStyle(sidebarCardsContainer).paddingTop)
-
-    const newScroll = Math.floor((sidebarCardsContainer.firstVisibleCardIndex + x) / x) - 1 + sidebarCardsContainer.previousScrollDecimal
-
-    sidebarCardsContainer.resizing = true
-    sidebarCardsContainer.scrollTop = newScroll * h + paddingTop
-    sidebarCardsContainer.hideCardsOptimization()
-})
-sidebarCardsContainerObserver.observe(sidebarCardsContainer)
+// ELEMENTS.sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=set.id:ex3+OR+set.id:ex6&page=1")
+// ELEMENTS.sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(set.id:bw11+OR+set.id:bw10+OR+set.id:bw9+OR+set.id:bw8+OR+set.id:bw7+OR+set.id:dv1+OR+set.id:bw6+OR+set.id:bw5+OR+set.id:bw4+OR+set.id:bw3+OR+set.id:bw2+OR+set.id:bw1)+&page=1")
+// ELEMENTS.sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(legalities.standard:legal)&page=1")
+// ELEMENTS.sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=nationalPokedexNumbers,set.releaseDate,number&q=(supertype:%22Pok%C3%A9mon%22)+(subtypes:%22Stage%202%22)&page=1")
+// ELEMENTS.sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=nationalPokedexNumbers,name,set.releaseDate&q=(set.series:%22Sword%20%26%20Shield%22)&page=1")
+ELEMENTS.sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=nationalPokedexNumbers,set.releaseDate,number&q=-types:darkness+(attacks.cost:darkness)&page=1")

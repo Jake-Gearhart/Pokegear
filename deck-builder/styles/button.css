@@ -1,7 +1,6 @@
 button, .button, input {
     width: 64px;
     height: 64px;
-    margin: 2px;
 
     font-size: 32px;
     background-color: var(--dark-blue);
@@ -13,7 +12,7 @@ button, .button, input {
     border-right: none;
     border-bottom: 8px solid var(--darkest-blue);
 
-    transition: background-color var(--half-transition-time);
+    transition: background-color var(--half-transition-time), width var(--transition-time), height var(--transition-time), font-size var(--transition-time), border-radius var(--transition-time);
 }
 button:hover, .button:hover, input:hover {
     background-color: var(--blue);

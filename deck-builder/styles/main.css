@@ -11,12 +11,17 @@
     --transition-time: 0.25s;
     --half-transition-time: calc(var(--transition-time)/2);
     --double-transition-time: calc(var(--transition-time)*2);
-    --min-card-width: min(160px, 25vw);
+    --min-card-width: min(160px, 30vw, 30vh);
     --card-holo-display-low-res: inline-block; /* Set to none or inline-block */
     --card-holo-display-high-res: inline-block;
 
     --filter-card-width-percent: 100px;
     --filter-card-height-percent: 100px;
+
+    --card-width: 868;
+    --card-height: 1212;
+    /* --card-border-radius: 5.7% / calc(5.7% * var(--card-width) / var(--card-height)); */
+    --card-border-radius: 4.5% / calc(4.5% * var(--card-width) / var(--card-height));
 }
 
 @media (prefers-color-scheme: dark) {
@@ -51,7 +56,6 @@
     padding: 0;
 
     user-select: none;
-    -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
@@ -60,6 +64,39 @@
     object-fit: contain;
 
     font-family: 'Gill Sans', sans-serif;
+
+    touch-action: manipulation;
+}
+number {
+    font-family: 'Futura Heavy';
+}
+
+textarea {
+    user-select: auto;
+    -webkit-user-select: auto;
+    -khtml-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+}
+
+img {
+    user-drag: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+}
+
+h1, h2, h3, h4, h6 {
+    font-family: 'Gill Sans Bold'
+}
+
+b {
+    font-family: 'Gill Sans Condensed Bold';
+}
+
+grid {
+    display: grid;
 }
 
 input[type='text'], input[type='number'] {
@@ -79,7 +116,6 @@ body {
     height: 100%;
     overflow: hidden;
     background-color: var(--background);
-    /* font-family: 'Gill Sans', sans-serif; */
 }
 
 .background-stripe {
@@ -91,15 +127,3 @@ body {
     background-color: var(--background-stripe); 
     z-index: -1;
 }
-
-/* .fade-in {
-    animation: fadeIn calc(2 * var(--transition-time)) forwards;
-}
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-} */

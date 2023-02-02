@@ -32,8 +32,10 @@
 #top {
     position: absolute;
     display: flex;
-    height: 64px;
+    height: 68px;
     width: 100%;
+    pointer-events: none;
+    z-index: 1001;
 }
 
 #total-cards-in-deck {
@@ -42,9 +44,9 @@
     left: calc(50% - 64px);
     margin-top: -72;
     height: 200%;
-    width: 128px;
-    border-radius: 128px;
-    line-height: 184px;
+    width: 136px;
+    border-radius: 136px;
+    line-height: 196px; /* 136 * 1.5 - 8 (border) */
     font-size: 48px;
     font-family: 'Futura Heavy';
     cursor: pointer;
