@@ -328,4 +328,4 @@ ELEMENTS.sidebarCardsContainer.fetchCards = async function (url, clearCards, inc
 // ELEMENTS.sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=nationalPokedexNumbers,set.releaseDate,number&q=-types:darkness+(attacks.cost:darkness)&page=1")
 
 
-ELEMENTS.sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(set.id:bw8+OR+set.id:bw7+OR+set.id:dv1+OR+set.id:bw6+OR+set.id:bw5+OR+set.id:bw4+OR+set.id:bw3+OR+set.id:bw2+OR+set.id:bw1)+&page=1")
+ELEMENTS.sidebarCardsContainer.fetchCards("https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=(set.id:bw7+OR+set.id:dv1+OR+set.id:bw6+OR+set.id:bw5+OR+set.id:bw4+OR+set.id:bw3+OR+set.id:bw2+OR+set.id:bw1)+&page=1")
