@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+    <meta name="theme-color" content="#192653">
+    <link rel="stylesheet" href="deck-builder/styles/main.css">
+    <link rel="stylesheet" href="deck-builder/styles/button.css">
+    <link rel="stylesheet" href="deck-builder/styles/card.css">
+    <link rel="stylesheet" href="deck-builder/styles/card-container.css">
+    <link rel="stylesheet" href="deck-builder/styles/focused.css">
+    <link rel="stylesheet" href="deck-builder/styles/deck.css">
+    <link rel="stylesheet" href="deck-builder/styles/home.css">
+    <link rel="stylesheet" href="deck-builder/styles/filters.css">
+    <link rel="stylesheet" href="deck-builder/styles/sidebar.css">
+    <link rel="stylesheet" href="deck-builder/styles/display.css">
+    <title>Pokégear</title>
+    <link rel="shortcut icon" type="image/png" href="pokegear.png">
+</head>
+<html>
+    <body class="mode-normal">
+        <div class="background-stripe" style="left: 5%; width: 20%;"></div>
+        <div class="background-stripe" style="left: 35%; width: 5%;"></div>
+        <div id="focused" class="hidden" onclick="this.click(event)">
+            <div id="focused-price">Unset</div>
+            <div id="focused-cards-container"></div>
+        </div>
+        <div id="main-page" onclick="document.getElementById('sidebar').close()">
+            <div id="top">
+                <div id="total-cards-in-deck" class="display">0</div>
+            </div>
+            <card-container id="deck-cards-container"></card-container>
+        </div>
+        <div id="filters" onmouseenter="this.open()" onmouseleave="this.mouseLeave(event)">
+            <div id="filter-card">
+                <img id="filter-card-background-image" draggable="false" src="https://images.pokemontcg.io/sm9/22_hires.png">
+                <img id="filter-card-image" draggable="false" src="deck-builder/images/filter-templates/colorless-template.png">
+                <textarea id="filter-card-name-input" class="searchTerm" searchterms="name" strict="false" quotes="true" placeholder="Name" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-hp-input" class="searchTerm" searchterms="hp" number="true" strict="true" quotes="true" placeholder="000" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-national-pokedex-number-input" class="searchTerm" searchterms="nationalPokedexNumbers" number="true" strict="true" quotes="false" placeholder="0000" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <img id="filter-card-ability-icon" src="deck-builder/images/ability.png">
+                <textarea id="filter-card-ability-name-input" class="searchTerm" searchterms="abilities.name" strict="false" quotes="true" placeholder="Ability Name" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-ability-text-input" class="searchTerm" searchterms="abilities.text" strict="false" quotes="true" strict="false" placeholder="Ability Text" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-attack-name-input" class="searchTerm" searchterms="attacks.name" strict="false" quotes="true" strict="false" placeholder="Attack Name" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-attack-damage-input" class="searchTerm" searchterms="attacks.damage" strict="true" quotes="true" placeholder="000" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-attack-text-input" class="searchTerm" searchterms="attacks.text" strict="false" quotes="true" placeholder="Attack Text" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-artist-input" class="searchTerm" searchterms="artist" strict="false" quotes="true" placeholder="Name" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <div id="filter-card-sets-container"></div>
+                <!-- <textarea id="filter-card-rules-input" class="searchTerm" searchterms="rules" strict="false" quotes="true" strict="false" placeholder="Rules" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-types-input" class="searchTerm" searchterms="types" strict="false" quotes="true" strict="false" placeholder="Type" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-evolves-to-input" class="searchTerm" searchterms="evolvesTo" strict="false" quotes="true" strict="false" placeholder="Evolves To" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-subtypes-input" class="searchTerm" searchterms="subtypes" strict="false" quotes="true" strict="false" placeholder="Subtypes" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea> -->
+
+                <!-- <button id="filter-card-favorites-button" onclick="this.click()">☆</button> -->
+            </div>
+        </div>
+        <div id="sidebar" onclick="this.open()" onmouseenter="this.open()" onmouseleave="this.mouseLeave(event)">
+            <div id="sidebar-divider"></div>
+            <div id="sidebar-top-container" onmouseenter="this.mouseEnter()" onmouseleave="this.mouseLeave(event)">
+                <input id="sidebar-top-search-input" class="button searchTerm" searchterms="name attacks.name attacks.text attacks.damage abilities.name abilities.text rules" strict="false" type="text" placeholder="Search..." oninput="getSidebarCards(this)">
+                <button id="sidebar-top-fullscreen-button" onclick="this.click()">⛶</button>
+            </div>
+            <div id="sidebar-tab"></div>
+            <card-container id="sidebar-cards-container"></card-container>
+        </div>
+    </body>
+</html>
+<script src="deck-builder/scripts/variables.js"></script>
+<script src="deck-builder/extra-cards/data.js"></script>
+<script src="deck-builder/scripts/api.js"></script>
+<script src="deck-builder/scripts/card.js"></script>
+<script src="deck-builder/scripts/card-container.js"></script>
+<script src="deck-builder/scripts/focused.js"></script>
+<script src="deck-builder/scripts/deck.js"></script>
+<script src="deck-builder/scripts/filters.js"></script>
+<script src="deck-builder/scripts/sidebar.js"></script>
+<script src="deck-builder/scripts/main.js"></script>

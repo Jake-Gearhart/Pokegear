@@ -1,0 +1,311 @@
+#filters {
+    position: absolute;
+    padding: 4px;
+    width: 0;
+    height: 0;
+    left: 0;
+    opacity: 0;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow-y: scroll;
+    transition: width 0s ease var(--transition-time), height 0s ease var(--transition-time), left 0s ease var(--transition-time), opacity var(--transition-time), backdrop-filter var(--transition-time), -webkit-backdrop-filter var(--transition-time);
+}
+#filters > input {
+    width: 100%;
+}
+#filters.open {
+    opacity: 1;
+}
+@media (orientation: landscape) {
+    #filters {
+        padding-top: 76px;
+    }
+    #filters.open {
+        width: calc(50% - 4px);
+        height: 100%;
+        left: calc(50% + 4px);
+        transition: width 0s, height 0s, left 0s, opacity var(--transition-time), backdrop-filter var(--transition-time), -webkit-backdrop-filter var(--transition-time);
+    }
+    #filters.fullscreen {
+        left: 100%;
+    }
+}
+@media (orientation: portrait) {
+
+}
+
+
+
+#filter-card {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    max-width: 95%;
+    max-height: 95%;
+    transform: translate(-50%, -50%);
+    aspect-ratio: var(--card-width) / var(--card-height);
+}
+#filter-card-image {
+    box-shadow: 0 0 16px rgba(0,0,0,0.25);
+}
+#filter-card-image, #filter-card-background-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--card-border-radius);
+}
+#filter-card textarea {
+    position: absolute;
+    background-color: unset;
+    border: none;
+    color: black;
+    resize: none;
+    /* transition: background-color var(--half-transition-time); */
+}
+#filter-card textarea::placeholder {
+    color: black;
+    opacity: 0.5;
+}
+#filter-card textarea:hover {
+    /* background-color: rgba(255,255,255,0.5); */
+    background-color: rgba(191,191,191,0.5);
+}
+
+
+#filter-card-name-input {
+    width: calc(55.02 * var(--filter-card-width-percent));
+    height: calc(6.41 * var(--filter-card-height-percent));
+    top: calc(2.87 * var(--filter-card-height-percent));
+    left: calc(19.11 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(4.8 * var(--filter-card-height-percent));
+    line-height: calc(6.31 * var(--filter-card-height-percent));
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-hp-input {
+    width: calc(12.85 * var(--filter-card-width-percent));
+    height: calc(6.41 * var(--filter-card-height-percent));
+    top: calc(2.87 * var(--filter-card-height-percent));
+    left: calc(74.12 * var(--filter-card-width-percent));
+    font-family: 'Futura Heavy';
+    font-size: calc(5.3 * var(--filter-card-height-percent));
+    line-height: calc(6.31 * var(--filter-card-height-percent));
+    text-align: right;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-national-pokedex-number-input {
+    width: calc(4.3 * var(--filter-card-width-percent));
+    height: calc(1.96 * var(--filter-card-height-percent));
+    top: calc(47.74 * var(--filter-card-height-percent));
+    left: calc(29.4 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans';
+    font-size: calc(1.5 * var(--filter-card-height-percent));
+    line-height: calc(1.96 * var(--filter-card-height-percent));
+    text-align: right;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: calc(0.5 * var(--filter-card-height-percent)) / calc(0.5 * var(--filter-card-height-percent));
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-ability-icon {
+    position: absolute;
+    width: calc(23.91 * var(--filter-card-width-percent)) !important;
+    height: auto !important;
+    top: calc(50.97 * var(--filter-card-height-percent));
+    left: calc(7.67 * var(--filter-card-width-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-ability-name-input {
+    width: calc(59.9 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(50.49 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    color: #c8000b !important;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-ability-name-input::placeholder {
+    color: #c8000b !important;
+}
+#filter-card-ability-text-input {
+    width: calc(84.2 * var(--filter-card-width-percent));
+    height: calc(13.17 * var(--filter-card-height-percent));
+    top: calc(54.77 * var(--filter-card-height-percent));
+    left: calc(8.3 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans';
+    font-size: calc(2.49 * var(--filter-card-height-percent));
+    text-align: justify;
+    white-space: normal;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-attack-name-input {
+    width: calc(51.17 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(67.93 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-attack-damage-input {
+    width: calc(8.71 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(67.93 * var(--filter-card-height-percent));
+    left: calc(83.86 * var(--filter-card-width-percent));
+    font-family: 'Futura Heavy';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    text-align: right;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-attack-text-input {
+    width: calc(84.2 * var(--filter-card-width-percent));
+    height: calc(13 * var(--filter-card-height-percent));
+    top: calc(72.22 * var(--filter-card-height-percent));
+    left: calc(8.3 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans';
+    font-size: calc(2.49 * var(--filter-card-height-percent));
+    text-align: justify;
+    white-space: normal;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-artist-input {
+    width: calc(35 * var(--filter-card-width-percent));
+    height: calc(1.96 * var(--filter-card-height-percent));
+    top: calc(91.4 * var(--filter-card-height-percent));
+    left: calc(11 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans';
+    font-style: italic;
+    font-size: calc(1.7 * var(--filter-card-height-percent));
+    line-height: calc(1.96 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: calc(0.5 * var(--filter-card-height-percent)) / calc(0.5 * var(--filter-card-height-percent));
+    /* background-color: rgba(255,255,255,0.5) !important; */
+}
+#filter-card-sets-container {
+    position: absolute;
+    width: calc(5.60 * var(--filter-card-width-percent));
+    height: calc(2.06 * var(--filter-card-height-percent));
+    top: calc(93.99 * var(--filter-card-height-percent));
+    left: calc(9.55 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: calc(0.15 * var(--filter-card-height-percent)) / calc(0.15 * var(--filter-card-height-percent));
+    border-radius: none;
+    box-shadow: 0 0 0 calc(0.15 * var(--filter-card-height-percent)) white,
+                0 0 0 calc(0.3 * var(--filter-card-height-percent)) black;
+    background-color: black !important;
+    transition: width var(--transition-time), height var(--transition-time), left var(--transition-time), top var(--transition-time), border-radius var(--transition-time), background-color var(--transition-time);
+}
+
+#filter-card-sets-container:hover {
+    width: calc(65.5 * var(--filter-card-height-percent));
+    height: calc(46.2 * var(--filter-card-height-percent));
+    top: calc(50.8 * var(--filter-card-height-percent)); /* old top - (new height - old height)*/
+    left: calc(3.05 * var(--filter-card-height-percent));
+    border-radius: calc(1 * var(--filter-card-height-percent)) / calc(1 * var(--filter-card-height-percent));
+    /* background-color: rgba(0,0,0,0.5) !important; */
+}
+
+
+/* filter: invert() opacity(0.75) drop-shadow(0 0 0 #ff00ff) brightness(1.5) saturate(2) invert() */
+
+
+/* TEMPORARY */
+#filter-card-rules-input {
+    width: calc(51.17 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(25 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    background-color: rgba(255,0,0,0.5) !important;
+}
+#filter-card-types-input {
+    width: calc(51.17 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(30 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    background-color: rgba(255,0,0,0.5) !important;
+}
+#filter-card-evolves-to-input {
+    width: calc(51.17 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(35 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    background-color: rgba(255,0,0,0.5) !important;
+}
+#filter-card-subtypes-input {
+    width: calc(51.17 * var(--filter-card-width-percent));
+    height: calc(4.3 * var(--filter-card-height-percent));
+    top: calc(40 * var(--filter-card-height-percent));
+    left: calc(32.6 * var(--filter-card-width-percent));
+    font-family: 'Gill Sans Condensed Bold';
+    font-size: calc(3.6 * var(--filter-card-height-percent));
+    line-height: calc(4.3 * var(--filter-card-height-percent));
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border-radius: var(--filter-card-height-percent)/var(--filter-card-height-percent);
+    background-color: rgba(255,0,0,0.5) !important;
+}
+
+
+#filter-card-favorites-button {
+    position: absolute;
+}

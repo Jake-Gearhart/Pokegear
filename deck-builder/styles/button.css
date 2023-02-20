@@ -1,0 +1,30 @@
+button, .button, input {
+    width: 64px;
+    height: 64px;
+
+    font-size: 32px;
+    background-color: var(--dark-blue);
+    color: var(--yellow);
+
+    border-radius: 16px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 8px solid var(--darkest-blue);
+
+    transition: background-color var(--half-transition-time), width var(--transition-time), height var(--transition-time), font-size var(--transition-time), border-radius var(--transition-time);
+}
+button:hover, .button:hover, input:hover {
+    background-color: var(--blue);
+    border-bottom: 8px solid var(--dark-blue);
+}
+button:active {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-bottom: 0;
+}
+
+input::placeholder {
+    color: var(--yellow);
+    opacity: 75%;
+}

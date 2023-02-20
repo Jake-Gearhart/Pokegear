@@ -1,0 +1,17 @@
+card-container {
+    position: absolute;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--min-card-width), 1fr));
+    grid-auto-rows: min-content;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 4px;
+}
+
+.card-container-spacer-top, .card-container-spacer-bottom {
+    grid-column: 1 / -1;
+    will-change: height;
+    /* background: linear-gradient(to bottom right, rgba(255,0,0,0.5), rgba(0,0,255,0.5)); */
+}
