@@ -5,7 +5,7 @@
 
     --background-stripe: #cedbed;
     --background: #a3cde3;
-    --sidebar-divider-color: var(--dark-blue);
+    --side-panel-divider-color: var(--dark-blue);
 
     --yellow: #ffcb04;
     --transition-time: 0.25s;
@@ -28,7 +28,7 @@
     :root {
         --background-stripe: #112a37;
         --background: #0c1622;
-        --sidebar-divider-color: var(--darkest-blue);
+        --side-panel-divider-color: var(--darkest-blue);
     }
 }
 

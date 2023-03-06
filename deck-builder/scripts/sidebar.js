@@ -1,54 +1,76 @@
-ELEMENTS.sidebar.setTab = () => {
-    if (window.innerWidth > window.innerHeight) {
-        // document.getElementById("sidebar-tab").innerHTML = "◣◤"
+class SidePanel extends HTMLElement {
+    constructor () {
+        super()
     }
-    else {
-        // document.getElementById("sidebar-tab").innerHTML = "◢◣"
-    }
-}
 
-ELEMENTS.sidebar.open = () => {
-    ELEMENTS.sidebar.classList.add("open")
-    ELEMENTS.mainPage.classList.add("half")
-}
+    connectedCallback() {
+        this.addEventListener('click', this.open)
 
-ELEMENTS.sidebar.close = () => {
-    ELEMENTS.sidebar.classList.remove("open")
-    ELEMENTS.mainPage.classList.remove("half")
-    ELEMENTS.sidebarTab.classList.remove('hidden')
-    ELEMENTS.sidebarTopContainer.classList.remove('hidden')
-}
+        this.addEventListener('mouseenter', this.open)
 
-ELEMENTS.sidebar.mouseLeave = (event) => {
-    if (!ELEMENTS.sidebar.classList.contains("fullscreen") && event.x > 0 && event.y > 0 && event.x < window.innerWidth && event.y < window.innerHeight && !focused.contains(document.elementFromPoint(event.x, event.y))) {
-        ELEMENTS.sidebar.close()
+        this.addEventListener('mouseleave', (event) => {
+            if (!this.classList.contains("fullscreen") && event.x > 0 && event.y > 0 && event.x < window.innerWidth && event.y < window.innerHeight && !focused.contains(document.elementFromPoint(event.x, event.y))) {
+                this.close()
+            }
+        })
+    }
+
+    setTab () {
+        // if (window.innerWidth > window.innerHeight) {
+        //     // document.getElementById("sidebar-tab").innerHTML = "◣◤"
+        // }
+        // else {
+        //     // document.getElementById("sidebar-tab").innerHTML = "◢◣"
+        // }
+    }
+
+    open () {
+        this.classList.add("open")
+        ELEMENTS.mainPage.classList.add("half")
+    }
+
+    close () {
+        this.classList.remove("open")
+        ELEMENTS.mainPage.classList.remove("half")
+        ELEMENTS.sidebarTab.classList.remove('hidden')
+        ELEMENTS.sidebarTopContainer.classList.remove('hidden')
+    }
+
+    toggleFullscreen () {
+        if (!ELEMENTS.sidebar.classList.contains("fullscreen")) {
+            ELEMENTS.sidebar.classList.add("fullscreen")
+            ELEMENTS.filters.classList.add("fullscreen")
+            ELEMENTS.mainPage.classList.add("hidden")
+        }
+        else {
+            ELEMENTS.sidebar.classList.remove("fullscreen")
+            ELEMENTS.filters.classList.remove("fullscreen")
+            ELEMENTS.mainPage.classList.remove("hidden")
+        }
     }
 }
+customElements.define("side-panel", SidePanel)
 
-ELEMENTS.sidebar.toggleFullscreen = () => {
-    if (!ELEMENTS.sidebar.classList.contains("fullscreen")) {
-        ELEMENTS.sidebar.classList.add("fullscreen")
-        ELEMENTS.filters.classList.add("fullscreen")
-        ELEMENTS.mainPage.classList.add("hidden")
+class SidePanelTopContainer extends HTMLElement {
+    constructor() {
+        super()
     }
-    else {
-        ELEMENTS.sidebar.classList.remove("fullscreen")
-        ELEMENTS.filters.classList.remove("fullscreen")
-        ELEMENTS.mainPage.classList.remove("hidden")
+
+    connectedCallback () {
+        this.addEventListener('mouseenter', () => {
+            if (window.innerWidth > window.innerHeight) {
+                ELEMENTS.filters.open()
+            }
+        })
+
+        this.addEventListener('mouseleave', (event) => {
+            if (event.x > 0 && event.y > 0 && event.x < window.innerWidth && event.y < window.innerHeight) {
+                ELEMENTS.filters.close()
+            }
+        })
     }
 }
-
-ELEMENTS.sidebarTopContainer.mouseEnter = () => {
-    if (window.innerWidth > window.innerHeight) {
-        ELEMENTS.filters.open()
-    }
-}
-
-ELEMENTS.sidebarTopContainer.mouseLeave = (event) => {
-    if (event.x > 0 && event.y > 0 && event.x < window.innerWidth && event.y < window.innerHeight) {
-        ELEMENTS.filters.close()
-    }
-}
+customElements.define("side-panel-top-container", SidePanelTopContainer)
 
 ELEMENTS.sidebarTopFullscreenButton.click = () => {
     ELEMENTS.sidebar.toggleFullscreen()
@@ -64,7 +86,7 @@ function getSidebarCards (executor) {
             executor.value = executor.value.replace(/[^0-9/!*]/g, '')
         }
         else {
-            executor.value = executor.value.replace(/[^A-Za-z0-9\s/'"´é!*-]/g, '')
+            executor.value = executor.value.replace(/[^A-Za-z0-9\s/'"´é!*-,()]/g, '')
         }
     }
 
@@ -270,8 +292,8 @@ function getSidebarCards (executor) {
         }
     }
 
-    // const url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=${query}&page=1`
-    const url = `https://api.pokemontcg.io/v2/cards?orderBy=subtypes,name,set.releaseDate,set.id,number&q=${query}&page=1`
+    const url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=${query}&page=1`
+    // const url = `https://api.pokemontcg.io/v2/cards?orderBy=subtypes,name,set.releaseDate,set.id,number&q=${query}&page=1`
 
     if (ELEMENTS.sidebarCardsContainer.searchTimeout == true) { ELEMENTS.sidebarCardsContainer.queuedUrl = url }
     else {

@@ -9,12 +9,10 @@ class Card extends HTMLElement {
         if (!this.loaded == true) {
             this.loaded = true
 
-            this.display = document.createElement("div")
-            this.display.classList.add("card-display")
+            this.display = document.createElement("card-display")
             this.appendChild(this.display)
     
-            this.imageContainer = document.createElement("div")
-            this.imageContainer.classList.add("card-image-container")
+            this.imageContainer = document.createElement("card-image-container")
             this.display.appendChild(this.imageContainer)
 
             this.image = document.createElement("div")
@@ -22,7 +20,7 @@ class Card extends HTMLElement {
             this.imageContainer.appendChild(this.image)
     
             if (!ELEMENTS.focusedCardsContainer.contains(this)) {
-                this.setAttribute("onmouseleave", "this.unhover()")
+                this.addEventListener("mouseleave", this.unhover)
                 this.image.setAttribute("onclick", "this.click()")
                 this.image.click = () => this.click()
             }
@@ -153,8 +151,7 @@ class Card extends HTMLElement {
             this.glare.classList.add("card-glare")
             this.image.appendChild(this.glare)
     
-            this.buttonContainer = document.createElement("div")
-            this.buttonContainer.classList.add("card-button-container")
+            this.buttonContainer = document.createElement("card-button-container")
             this.display.appendChild(this.buttonContainer)
     
             this.addButton = document.createElement("button")
@@ -179,7 +176,6 @@ class Card extends HTMLElement {
 
         if (!this.dataHoverSetup == true && this.data) {
             this.dataHoverSetup = true
-            // '✧'
 
             this.favoriteButton = document.createElement("button")
             this.favoriteButton.classList.add("card-favorite-button")
@@ -228,6 +224,14 @@ class Card extends HTMLElement {
                 if (this.holo == true) this.holoButton.innerHTML = '✦'
                 else this.holoButton.innerHTML = '✧'
             }
+
+            this.imageButton = document.createElement("button")
+            this.imageButton.classList.add("card-image-button")
+            this.imageButton.addEventListener('click', () => {
+                console.log('Downloading image')
+                downloadImageLink(this.data.images.large, `${this.data.id}.png`)
+            })
+            this.buttonContainer.appendChild(this.imageButton)
         }
 
         if (!this.classList.contains("hovered-card")) {

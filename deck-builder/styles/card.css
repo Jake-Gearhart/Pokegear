@@ -27,7 +27,7 @@ pokemon-card.hovered-card {
     border-radius: var(--card-border-radius);
 }
 
-.card-display {
+card-display {
     position: absolute;
     width: calc(100% * 417/434);
     height: calc(100% * 589/606);
@@ -70,7 +70,7 @@ pokemon-card.hovered-card {
     transition: opacity var(--transition-time);
 }
 
-.card-button-container {
+card-button-container {
     position: absolute;
     display: grid;
     grid-auto-rows: min-content;
@@ -85,21 +85,21 @@ pokemon-card.hovered-card {
     z-index: -1;
     /* background-color: rgba(255,0,0,0.5); */
 }
-.card-button-container:not(.left) {
+card-button-container:not(.left) {
     left: 50%;
     justify-content: flex-end;
 }
-pokemon-card.hovered-card .card-button-container {
+pokemon-card.hovered-card card-button-container {
     pointer-events: all;
     width: calc(50% + 68px);
 }
-.card-button-container.left {
+card-button-container.left {
     left: -68px;
 }
-pokemon-card:not(.hovered-card) .card-button-container.left {
+pokemon-card:not(.hovered-card) card-button-container.left {
     left: 0;
 }
-pokemon-card:not(.hovered-card) .card-button-container button {
+pokemon-card:not(.hovered-card) card-button-container button {
     font-size: 16px;
     width: 32px;
     height: 32px;
@@ -113,17 +113,20 @@ pokemon-card:not(.hovered-card) .card-button-container button {
 .card-subtract-button:before {
     content: '–';
 }
+.card-image-button:before {
+    content: '📷';
+}
 
 pokemon-card.hovered-card .card-image {
     box-shadow: 0 0 64px black;
     transition: box-shadow var(--transition-time), transform 0s;
 }
 
-.card-image-container {
+card-image-container {
     width: 100%;
     height: 100%;
 }
-pokemon-card.hovered-card .card-image-container {
+pokemon-card.hovered-card card-image-container {
     animation: card-idle 5s ease-in-out infinite;
 }
 

@@ -90,3 +90,27 @@ function toggleCardHolo () {
         console.log("Card Holo Effect On")
     }
 }
+
+function downloadImageLink(url, filename) {
+    fetch(url, {
+        headers: new Headers({
+            'Origin': location.origin
+        }),
+        mode: 'cors'
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        var blobUrl = window.URL.createObjectURL(blob);
+        downloadTempButton(filename, blobUrl)
+    })
+    .catch(error => console.error(error));
+}
+
+function downloadTempButton (filename, data) {
+    var temp = document.createElement('a');
+    temp.download = filename;
+    temp.href = data;
+    document.body.appendChild(temp);
+    temp.click();
+    temp.remove();
+}

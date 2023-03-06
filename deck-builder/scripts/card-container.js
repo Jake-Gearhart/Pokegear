@@ -7,18 +7,16 @@ class CardContainer extends HTMLElement {
     }
     
     connectedCallback () {
-        this.setAttribute('onscroll', 'this.scroll()')
+        this.addEventListener('scroll', this.scroll)
 
         this.addSpacers()
     }
 
     addSpacers () {
-        this.spacerTop = document.createElement('div')
-        this.spacerTop.classList.add('card-container-spacer-top')
+        this.spacerTop = document.createElement('card-container-spacer-top')
         this.appendChild(this.spacerTop)
 
-        this.spacerBottom = document.createElement('div')
-        this.spacerBottom.classList.add('card-container-spacer-bottom')
+        this.spacerBottom = document.createElement('card-container-spacer-bottom')
         this.appendChild(this.spacerBottom)
     }
 

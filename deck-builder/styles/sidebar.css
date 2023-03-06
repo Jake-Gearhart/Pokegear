@@ -1,4 +1,4 @@
-#sidebar {
+side-panel {
     position: absolute;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -6,69 +6,69 @@
     transition: width var(--transition-time), height var(--transition-time), transform var(--transition-time);
 }
 @media (orientation: landscape) {
-    #sidebar {
+    side-panel {
         height: 100%;
         width: calc(50% + 4px);
         transform: translateX(-100%);
     }
-    #sidebar.open {
+    side-panel.open {
         transform: translateX(0);
     }
-    #sidebar.fullscreen {
+    side-panel.fullscreen {
         width: 100%;
     }
 }
 @media (orientation: portrait) {
-    #sidebar {
+    side-panel {
         height: calc(50% + 4px);
         width: 100%;
         bottom: 0;
         transform: translateY(100%);
     }
-    #sidebar.open {
+    side-panel.open {
         transform: translateY(0);
     }
-    #sidebar.fullscreen {
+    side-panel.fullscreen {
         height: 100%;
     }
 }
 
 
 
-#sidebar-tab {
+side-panel-tab {
     position: absolute;
     background-color: var(--dark-blue);
     border-bottom: 8px solid var(--darkest-blue);
     transition: width var(--transition-time), height var(--transition-time), right var(--transition-time), background-color var(--half-transition-time);
 }
-#sidebar-tab.hidden {
+side-panel-tab.hidden {
     opacity: 0;
     pointer-events: none;
 }
 @media (orientation: landscape) {
-    #sidebar-tab {
+    side-panel-tab {
         width: 68px;
         height: 100%;
         right: -68px;
         border-top-right-radius: 68px;
         border-bottom-right-radius: 68px;
     }
-    #sidebar.open #sidebar-tab {
+    side-panel.open side-panel-tab {
         height: 68px;
     }
-    #filters.open ~ #sidebar #sidebar-tab {
+    #filters.open ~ side-panel side-panel-tab {
         right: calc(-100% - 76px);
     }
 }
 @media (orientation: portrait) {
-    #sidebar-tab {
+    side-panel-tab {
         width: 100%;
         height: 64px;
         top: -64px;
         border-top-right-radius: 64px;
         border-top-left-radius: 64px;
     }
-    #sidebar.open #sidebar-tab {
+    side-panel.open side-panel-tab {
         height: 8px;
         top: -8px;
         border-radius: 0px;
@@ -77,19 +77,19 @@
 
 
 
-#sidebar-top-container {
+side-panel-top-container {
     position: absolute;
     width: 100%;
     height: 68px;
     z-index: 1001;
     transition: opacity var(--transition-time);
 }
-#sidebar-top-container.hidden {
+side-panel-top-container.hidden {
     opacity: 0;
     pointer-events: none;
 }
 @media (orientation: portrait) {
-    #sidebar:not(.fullscreen).open #sidebar-top-container {
+    #sidebar:not(.fullscreen).open side-panel-top-container {
         top: -8px;
     }
 }
@@ -128,24 +128,24 @@
     transition: width var(--transition-time), top var(--transition-time), border-radius var(--transition-time), background-color var(--half-transition-time);
 }
 @media (orientation: landscape) {
-    #filters.open ~ #sidebar #sidebar-top-search-input {
+    #filters.open ~ side-panel #sidebar-top-search-input {
         width: 100vw;
     }
 }
-#sidebar-top-container:has(#sidebar-top-search-input:hover) ~ #sidebar-tab {
+side-panel-top-container:has(#sidebar-top-search-input:hover) ~ side-panel-tab {
     background-color: var(--blue);
     border-bottom: 8px solid var(--dark-blue);
 }
 
 
 
-#sidebar-divider {
+side-panel-divider {
     position: absolute;
-    background-color: var(--sidebar-divider-color);
+    background-color: var(--side-panel-divider-color);
     transition: width var(--transition-time), height var(--transition-time), right var(--transition-time), top var(--transition-time), border-radius var(--transition-time);
 }
 @media (orientation: landscape) {
-    #sidebar-divider {
+    side-panel-divider {
         width: 8px;
         height: 100%;
         right: 0;

@@ -47,18 +47,20 @@ focused.setFocusedCard = (card) => {
                 const priceTitleElm = document.createElement('div')
                 priceTitleElm.innerText = price.replace(/^\w/, text => text.toUpperCase()).split(/(?=[A-Z])/).join(' ')
 
-                const priceValueElm = document.createElement('number')
                 const priceValue = card.data['tcgplayer']['prices'][category][price]
-                priceValueElm.innerText = `$${priceValue.toFixed(2)}`
-                priceValueElm.style['color'] = `hsl(${120 - 120 * (Math.log10(Math.min(priceValue, 100) + 1) / 2)}, 87.5%, 50%)`
+                if (priceValue) {
+                    const priceValueElm = document.createElement('number')
+                    priceValueElm.innerText = `$${priceValue.toFixed(2)}`
+                    priceValueElm.style['color'] = `hsl(${120 - 120 * (Math.log10(Math.min(priceValue, 100) + 1) / 2)}, 87.5%, 50%)`
 
-                if (price == 'market') {
-                    priceTable.prepend(priceValueElm)
-                    priceTable.prepend(priceTitleElm)
-                }
-                else {
-                    priceTable.appendChild(priceTitleElm)
-                    priceTable.appendChild(priceValueElm)
+                    if (price == 'market') {
+                        priceTable.prepend(priceValueElm)
+                        priceTable.prepend(priceTitleElm)
+                    }
+                    else {
+                        priceTable.appendChild(priceTitleElm)
+                        priceTable.appendChild(priceValueElm)
+                    }
                 }
             }
         }
