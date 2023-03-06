@@ -24,9 +24,9 @@
             <div id="focused-price">Unset</div>
             <div id="focused-cards-container"></div>
         </div>
-        <div id="main-page" onclick="document.getElementById('sidebar').close()">
+        <div id="main-page" onclick="ELEMENTS.sidebar.close()">
             <div id="top">
-                <div id="total-cards-in-deck" class="display">v0.1</div>
+                <div id="total-cards-in-deck" class="display">0</div>
             </div>
             <card-container id="deck-cards-container"></card-container>
         </div>
@@ -36,7 +36,7 @@
                 <img id="filter-card-image" draggable="false" src="deck-builder/images/filter-templates/colorless-template.png">
                 <textarea id="filter-card-name-input" class="searchTerm" searchterms="name" strict="false" quotes="true" placeholder="Name" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
                 <textarea id="filter-card-hp-input" class="searchTerm" searchterms="hp" number="true" strict="true" quotes="true" placeholder="000" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
-                <textarea id="filter-card-national-pokedex-number-input" class="searchTerm" searchterms="nationalPokedexNumbers" number="true" strict="true" quotes="false" placeholder="0000" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <!-- <textarea id="filter-card-national-pokedex-number-input" class="searchTerm" searchterms="nationalPokedexNumbers" number="true" strict="true" quotes="false" placeholder="0000" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea> -->
                 <img id="filter-card-ability-icon" src="deck-builder/images/ability.png">
                 <textarea id="filter-card-ability-name-input" class="searchTerm" searchterms="abilities.name" strict="false" quotes="true" placeholder="Ability Name" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
                 <textarea id="filter-card-ability-text-input" class="searchTerm" searchterms="abilities.text" strict="false" quotes="true" strict="false" placeholder="Ability Text" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
@@ -45,27 +45,26 @@
                 <textarea id="filter-card-attack-text-input" class="searchTerm" searchterms="attacks.text" strict="false" quotes="true" placeholder="Attack Text" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
                 <textarea id="filter-card-artist-input" class="searchTerm" searchterms="artist" strict="false" quotes="true" placeholder="Name" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
                 <div id="filter-card-sets-container"></div>
-                <!-- <textarea id="filter-card-rules-input" class="searchTerm" searchterms="rules" strict="false" quotes="true" strict="false" placeholder="Rules" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
+                <textarea id="filter-card-rules-input" class="searchTerm" searchterms="rules" strict="false" quotes="true" strict="false" placeholder="Rules" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
                 <textarea id="filter-card-types-input" class="searchTerm" searchterms="types" strict="false" quotes="true" strict="false" placeholder="Type" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
                 <textarea id="filter-card-evolves-to-input" class="searchTerm" searchterms="evolvesTo" strict="false" quotes="true" strict="false" placeholder="Evolves To" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
-                <textarea id="filter-card-subtypes-input" class="searchTerm" searchterms="subtypes" strict="false" quotes="true" strict="false" placeholder="Subtypes" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea> -->
+                <textarea id="filter-card-subtypes-input" class="searchTerm" searchterms="subtypes" strict="false" quotes="true" strict="false" placeholder="Subtypes" autocomplete="off" spellcheck="false" oninput="getSidebarCards(this)"></textarea>
 
-                <!-- <button id="filter-card-favorites-button" onclick="this.click()">☆</button> -->
+                <button id="filter-card-favorites-button" onclick="this.click()">☆</button>
             </div>
         </div>
-        <div id="sidebar" onclick="this.open()" onmouseenter="this.open()" onmouseleave="this.mouseLeave(event)">
-            <div id="sidebar-divider"></div>
-            <div id="sidebar-top-container" onmouseenter="this.mouseEnter()" onmouseleave="this.mouseLeave(event)">
+        <side-panel>
+            <side-panel-divider></side-panel-divider>
+            <side-panel-top-container>
                 <input id="sidebar-top-search-input" class="button searchTerm" searchterms="name attacks.name attacks.text attacks.damage abilities.name abilities.text rules" strict="false" type="text" placeholder="Search..." oninput="getSidebarCards(this)">
                 <button id="sidebar-top-fullscreen-button" onclick="this.click()">⛶</button>
-            </div>
-            <div id="sidebar-tab"></div>
+            </side-panel-top-container>
+            <side-panel-tab></side-panel-tab>
             <card-container id="sidebar-cards-container"></card-container>
-        </div>
+        </side-panel>
     </body>
 </html>
 <script src="deck-builder/scripts/variables.js"></script>
-<script src="deck-builder/extra-cards/data.js"></script>
 <script src="deck-builder/scripts/api.js"></script>
 <script src="deck-builder/scripts/card.js"></script>
 <script src="deck-builder/scripts/card-container.js"></script>
