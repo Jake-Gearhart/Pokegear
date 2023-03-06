@@ -231,6 +231,21 @@ class Card extends HTMLElement {
                 console.log('Downloading image')
                 downloadImageLink(this.data.images.large, `${this.data.id}.png`)
             })
+            this.imageButton.addEventListener('contextmenu', (event) => {
+                event.preventDefault()
+                fetch(this.data.images.large, {
+                    headers: new Headers({
+                        'Origin': location.origin
+                    }),
+                    mode: 'cors'
+                })
+                .then(response => response.blob())
+                .then(blob => {
+                    const item = new ClipboardItem({[blob.type]: blob});
+                    navigator.clipboard.write([item]);
+                })
+                .catch(error => console.error(error));
+            })
             this.buttonContainer.appendChild(this.imageButton)
         }
 
