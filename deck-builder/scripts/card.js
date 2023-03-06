@@ -232,34 +232,6 @@ class Card extends HTMLElement {
                 downloadImageLink(this.data.images.large, `${this.data.id}.png`)
             })
             this.buttonContainer.appendChild(this.imageButton)
-
-            this.imageButton2 = document.createElement("button")
-            this.imageButton2.classList.add("card-image-button")
-            this.imageButton2.addEventListener('click', () => {
-                console.log('Copying image to clipboard.')
-                this.imageButton2.disabled = true;
-                fetch(this.data.images.large, {
-                    headers: new Headers({
-                        'Origin': location.origin
-                    }),
-                    mode: 'cors'
-                })
-                .then(response => response.blob())
-                .then(blob => {
-                    const item = new ClipboardItem({[blob.type]: blob});
-                    navigator.clipboard.write([item]);
-                    this.imageButton2.innerText = 'Copied!';
-                    setTimeout(() => {
-                        this.imageButton2.innerText = 'Copy to Clipboard';
-                        this.imageButton2.disabled = false;
-                    }, 2000); // reset button text and enable after 2 seconds
-                })
-                .catch(error => {
-                    this.imageButton2.innerText = 'Error!';
-                    console.error(error);
-                });
-            })
-            this.buttonContainer.appendChild(this.imageButton2)
         }
 
         if (!this.classList.contains("hovered-card")) {
