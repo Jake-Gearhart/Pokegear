@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id="outer-perspective-container">
+            <div id="inner-perspective-container">
+                <img src="https://images.pokemontcg.io/bw5/62_hires.png" style="position: absolute; width: var(--card-width); left: 10%; transform: rotate(180deg)">
+                <img src="https://images.pokemontcg.io/xy3/20_hires.png" style="position: absolute; width: var(--card-width); bottom: 0; left: 10%">
+            </div>
+        </div>
+        <div style="display: flex">
+            <div id="perspective-slider-value">Perspective: 1100px</div>
+            <input type="range" min="0" max="5000" value="1100" oninput="changePerspective(this)">
+            <div id="card-width-slider-value">Card Width: 12%</div>
+            <input type="range" min="0" max="100" value="12" oninput="changeCardWidth(this)">
+        </div>
+    </body>
+</html>
+<style>
+    :root {
+        --board-perspective: 1100px;
+        --board-rotation-angle: 0deg;
+        --board-translationY: 0;
+        --board-top: auto;
+
+        --card-width: 12%;
+    }  
+
+    #outer-perspective-container {
+        position: absolute;
+        width: 88%;
+        height: 80%;
+        left: 6%;
+        bottom: 15%;
+        perspective-origin: 50% 0;
+        perspective: var(--board-perspective);
+        background-color: rgba(255,0,0,0.5);
+        pointer-events: none;
+    }
+
+    #inner-perspective-container {
+        position: absolute;
+        width: 88vw;
+        height: 88vw; /* Same number as the width of the outer container, and both use vw as units */
+        top: var(--board-top);
+        bottom: 0;
+        transform-origin: center bottom;
+        transform: rotateX(var(--board-rotation-angle)) translateY(var(--board-translationY));
+        background-color: rgba(0,0,255,0.5);
+    }
+</style>
+<script>
+    const css = document.documentElement.style
+    function changePerspective(slider) {
+        css.setProperty('--board-perspective', `${slider.value}px`);
+        document.getElementById('perspective-slider-value').innerHTML = `Perspective: ${slider.value}px`
+    }
+
+    const perspectiveContainer = document.getElementById('outer-perspective-container')
+    function changeBoardAngle() {
+        const ratio = perspectiveContainer.clientHeight / perspectiveContainer.clientWidth
+        if (ratio < 1) {
+            const result = 90 - Math.asin(ratio) * 180/Math.PI
+            css.setProperty('--board-rotation-angle', `${result}deg`)
+            css.setProperty('--board-translationY', '0')
+            css.setProperty('--board-top', 'auto')
+        }
+        else {
+            css.setProperty('--board-rotation-angle', '0')
+            css.setProperty('--board-translationY', '-50%')
+            css.setProperty('--board-top', '50%')
+        }
+    }
+    changeBoardAngle()
+
+    window.addEventListener('resize', changeBoardAngle);
+
+    function changeCardWidth(slider) {
+        css.setProperty('--card-width', `${slider.value}%`);
+        document.getElementById('card-width-slider-value').innerHTML = `Card Width: ${slider.value}%`
+    }
+</script>
