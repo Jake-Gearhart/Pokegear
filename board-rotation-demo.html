@@ -11,7 +11,7 @@
 </html>
 <style>
     :root {
-        --board-depth-transform: -0.001;
+        --board-depth-transform: 0;
         --board-vertical-transform: 0;
     }
 
@@ -35,22 +35,23 @@
         background-color: rgb(50, 136, 217);
     }
 
+    img:hover {
+        filter: invert();
+    }
 </style>
 <script>
-    const css = document.documentElement.style
-
     function updateBoardTransformMatrix () {
         const boardContainer = document.getElementById('board-container')
         const w = boardContainer.clientWidth
         const h = boardContainer.clientHeight
 
         if (w > h) {
-            css.setProperty('--board-depth-transform', -Math.asin((w - h) / (w * h)))
-            css.setProperty('--board-vertical-transform', 0)
+            document.documentElement.style.setProperty('--board-depth-transform', -Math.asin((w - h) / (w * h)))
+            document.documentElement.style.setProperty('--board-vertical-transform', 0)
         }
         else {
-            css.setProperty('--board-depth-transform', 0)
-            css.setProperty('--board-vertical-transform', (w - h)/2)
+            document.documentElement.style.setProperty('--board-depth-transform', 0)
+            document.documentElement.style.setProperty('--board-vertical-transform', (w - h)/2)
         }
     }
     updateBoardTransformMatrix()
