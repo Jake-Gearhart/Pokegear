@@ -1,79 +1,59 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <div id="outer-perspective-container">
-            <div id="inner-perspective-container">
-                <img src="https://images.pokemontcg.io/bw5/62_hires.png" style="position: absolute; width: var(--card-width); left: 10%; transform: rotate(180deg)">
-                <img src="https://images.pokemontcg.io/xy3/20_hires.png" style="position: absolute; width: var(--card-width); bottom: 0; left: 10%">
+        <div id="board-container">
+            <div id="board">
+                <img src="https://images.pokemontcg.io/bw5/62_hires.png" style="position: absolute; width: 15%; left: 15%; transform: rotate(180deg)">
+                <img src="https://images.pokemontcg.io/xy3/20_hires.png" style="position: absolute; width: 15%; bottom: 0; left: 15%">
             </div>
         </div>
-        <div id="perspective-slider-value">Perspective: 1400px</div>
-        <input type="range" min="0" max="5000" value="1400" oninput="changePerspective(this)">
-        <div id="card-width-slider-value">Card Width: 12%</div>
-        <input type="range" min="0" max="100" value="12" oninput="changeCardWidth(this)">
     </body>
 </html>
 <style>
     :root {
-        --board-perspective: 1100px;
-        --board-rotation-angle: 0deg;
-        --board-translationY: 0;
-        --board-top: auto;
+        --board-depth-transform: -0.001;
+        --board-vertical-transform: 0;
+    }
 
-        --card-width: 12%;
-    }  
-
-    #outer-perspective-container {
+    #board-container {
         position: absolute;
         width: 100%;
-        height: 100%;
+        height: 80%;
         left: 0;
-        top: 0;
-        perspective-origin: 50% 0;
-        perspective: var(--board-perspective);
-        background-color: rgba(255,0,0,0.5);
-        pointer-events: none;
+        bottom: 15%;
+        background-color: black;
     }
 
-    #inner-perspective-container {
+    #board {
         position: absolute;
-        width: 100vw;
-        height: 100vw; /* Same number as the width of the outer container, and both use vw as units */
-        top: var(--board-top);
+        width: 100vw; /* width and height must be equal to parent's width */
+        height: 100vw;
+        left: 0;
         bottom: 0;
         transform-origin: center bottom;
-        transform: rotateX(var(--board-rotation-angle)) translateY(var(--board-translationY));
-        background-color: rgba(0,0,255,0.5);
+        transform: matrix3d(1,0,0,0,0,1,0,var(--board-depth-transform),0,0,1,0,0,var(--board-vertical-transform),0,1);
+        background-color: rgb(50, 136, 217);
     }
+
 </style>
 <script>
     const css = document.documentElement.style
-    function changePerspective(slider) {
-        css.setProperty('--board-perspective', `${slider.value}px`);
-        document.getElementById('perspective-slider-value').innerHTML = `Perspective: ${slider.value}px`
-    }
 
-    const perspectiveContainer = document.getElementById('outer-perspective-container')
-    function changeBoardAngle() {
-        const ratio = perspectiveContainer.clientHeight / perspectiveContainer.clientWidth
-        if (ratio < 1) {
-            const result = 90 - Math.asin(ratio) * 180/Math.PI
-            css.setProperty('--board-rotation-angle', `${result}deg`)
-            css.setProperty('--board-translationY', '0')
-            css.setProperty('--board-top', 'auto')
+    function updateBoardTransformMatrix () {
+        const boardContainer = document.getElementById('board-container')
+        const w = boardContainer.clientWidth
+        const h = boardContainer.clientHeight
+
+        if (w > h) {
+            css.setProperty('--board-depth-transform', -Math.asin((w - h) / (w * h)))
+            css.setProperty('--board-vertical-transform', 0)
         }
         else {
-            css.setProperty('--board-rotation-angle', '0')
-            css.setProperty('--board-translationY', '-50%')
-            css.setProperty('--board-top', '50%')
+            css.setProperty('--board-depth-transform', 0)
+            css.setProperty('--board-vertical-transform', (w - h)/2)
         }
     }
-    changeBoardAngle()
+    updateBoardTransformMatrix()
 
-    window.addEventListener('resize', changeBoardAngle);
-
-    function changeCardWidth(slider) {
-        css.setProperty('--card-width', `${slider.value}%`);
-        document.getElementById('card-width-slider-value').innerHTML = `Card Width: ${slider.value}%`
-    }
+    window.addEventListener('resize', updateBoardTransformMatrix)
 </script>
