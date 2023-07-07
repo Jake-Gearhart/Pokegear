@@ -97,7 +97,9 @@ var setIdTranslations = {
     'p6': 'pop6',
     'p7': 'pop7',
     'p8': 'pop8',
-    'p9': 'pop9'
+    'p9': 'pop9',
+    'svi': 'sv1',
+    'pal': 'sv2'
 }
 
 var ptcgoCodeTranslations = {
