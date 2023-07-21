@@ -292,8 +292,8 @@ function getSidebarCards (executor) {
         }
     }
 
-    // const url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=${query}&page=1`
-    const url = `https://api.pokemontcg.io/v2/cards?orderBy=subtypes,name,set.releaseDate,set.id,number&q=${query}&page=1`
+    const url = `https://api.pokemontcg.io/v2/cards?orderBy=set.releaseDate,set.id,number&q=${query}&page=1`
+    // const url = `https://api.pokemontcg.io/v2/cards?orderBy=subtypes,name,set.releaseDate,set.id,number&q=${query}&page=1`
 
     if (ELEMENTS.sidebarCardsContainer.searchTimeout == true) { ELEMENTS.sidebarCardsContainer.queuedUrl = url }
     else {
