@@ -2048,48 +2048,48 @@ function exportDeckImage () {
     // ctx.fill()
     // ctx.closePath()
 
-        // cyan
-    var radius = 0
-    var innerHeight = height - borderSize*2
-    var innerWidth = width - borderSize*2
-    ctx.beginPath()
-    // ctx.fillStyle = '#6dcacd'
-    ctx.fillStyle = '#a3cde3'
-    ctx.moveTo(borderSize + radius, borderSize);
-    ctx.lineTo(borderSize + innerWidth - radius, borderSize);
-    ctx.quadraticCurveTo(borderSize + innerWidth, borderSize, borderSize + innerWidth, borderSize + radius);
-    ctx.lineTo(borderSize + innerWidth, borderSize + innerHeight - radius);
-    ctx.quadraticCurveTo(borderSize + innerWidth, borderSize + innerHeight, borderSize + innerWidth - radius, borderSize + innerHeight);
-    ctx.lineTo(borderSize + radius, borderSize + innerHeight);
-    ctx.quadraticCurveTo(borderSize, borderSize + innerHeight, borderSize, borderSize + innerHeight - radius);
-    ctx.lineTo(borderSize, borderSize + radius);
-    ctx.quadraticCurveTo(borderSize, borderSize, borderSize + radius, borderSize);
-    ctx.fill()
-    ctx.closePath()
+    //     // cyan
+    // var radius = 0
+    // var innerHeight = height - borderSize*2
+    // var innerWidth = width - borderSize*2
+    // ctx.beginPath()
+    // // ctx.fillStyle = '#6dcacd'
+    // ctx.fillStyle = '#a3cde3'
+    // ctx.moveTo(borderSize + radius, borderSize);
+    // ctx.lineTo(borderSize + innerWidth - radius, borderSize);
+    // ctx.quadraticCurveTo(borderSize + innerWidth, borderSize, borderSize + innerWidth, borderSize + radius);
+    // ctx.lineTo(borderSize + innerWidth, borderSize + innerHeight - radius);
+    // ctx.quadraticCurveTo(borderSize + innerWidth, borderSize + innerHeight, borderSize + innerWidth - radius, borderSize + innerHeight);
+    // ctx.lineTo(borderSize + radius, borderSize + innerHeight);
+    // ctx.quadraticCurveTo(borderSize, borderSize + innerHeight, borderSize, borderSize + innerHeight - radius);
+    // ctx.lineTo(borderSize, borderSize + radius);
+    // ctx.quadraticCurveTo(borderSize, borderSize, borderSize + radius, borderSize);
+    // ctx.fill()
+    // ctx.closePath()
 
-        // light blue stripe 1
-    ctx.beginPath()
-    // ctx.fillStyle = '#afe0eb'
-    ctx.fillStyle = '#cedbed'
-    ctx.moveTo(borderSize + innerWidth * 3/32, borderSize + innerHeight)
-    ctx.lineTo(borderSize + innerWidth * 3/32 + innerHeight * 5/6, borderSize)
-    ctx.lineTo(borderSize + innerWidth * 3/32 + innerHeight * 5/6 + innerWidth/4, borderSize)
-    ctx.lineTo(borderSize + innerWidth * 3/32 + innerWidth/4, borderSize + innerHeight)
-    ctx.lineTo(borderSize + innerWidth * 3/32, borderSize + innerHeight)
-    ctx.fill()
-    ctx.closePath()
+    //     // light blue stripe 1
+    // ctx.beginPath()
+    // // ctx.fillStyle = '#afe0eb'
+    // ctx.fillStyle = '#cedbed'
+    // ctx.moveTo(borderSize + innerWidth * 3/32, borderSize + innerHeight)
+    // ctx.lineTo(borderSize + innerWidth * 3/32 + innerHeight * 5/6, borderSize)
+    // ctx.lineTo(borderSize + innerWidth * 3/32 + innerHeight * 5/6 + innerWidth/4, borderSize)
+    // ctx.lineTo(borderSize + innerWidth * 3/32 + innerWidth/4, borderSize + innerHeight)
+    // ctx.lineTo(borderSize + innerWidth * 3/32, borderSize + innerHeight)
+    // ctx.fill()
+    // ctx.closePath()
 
-        // light blue stripe 2
-    ctx.beginPath()
-    // ctx.fillStyle = '#afe0eb'
-    ctx.fillStyle = '#cedbed'
-    ctx.moveTo(borderSize + innerWidth * 12/32, borderSize + innerHeight)
-    ctx.lineTo(borderSize + innerWidth * 12/32 + innerHeight * 5/6, borderSize)
-    ctx.lineTo(borderSize + innerWidth * 12/32 + innerHeight * 5/6 + innerWidth/16, borderSize)
-    ctx.lineTo(borderSize + innerWidth * 12/32 + innerWidth/16, borderSize + innerHeight)
-    ctx.lineTo(borderSize + innerWidth * 12/32, borderSize + innerHeight)
-    ctx.fill()
-    ctx.closePath()
+    //     // light blue stripe 2
+    // ctx.beginPath()
+    // // ctx.fillStyle = '#afe0eb'
+    // ctx.fillStyle = '#cedbed'
+    // ctx.moveTo(borderSize + innerWidth * 12/32, borderSize + innerHeight)
+    // ctx.lineTo(borderSize + innerWidth * 12/32 + innerHeight * 5/6, borderSize)
+    // ctx.lineTo(borderSize + innerWidth * 12/32 + innerHeight * 5/6 + innerWidth/16, borderSize)
+    // ctx.lineTo(borderSize + innerWidth * 12/32 + innerWidth/16, borderSize + innerHeight)
+    // ctx.lineTo(borderSize + innerWidth * 12/32, borderSize + innerHeight)
+    // ctx.fill()
+    // ctx.closePath()
     
     var cards = document.getElementById('deckCards').children
     var cardSpacing = 8.8 * 30/1024
