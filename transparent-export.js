@@ -3,7 +3,7 @@ var windowWidth = window.innerWidth
 
 //logs
 var logs = []
-const versionNumber = '1.4.3'
+const versionNumber = '1.4.4'
 document.getElementById('titleText').innerHTML = `Pokegear<wbr>.app ${versionNumber}`
 
 const holoRarities = [
