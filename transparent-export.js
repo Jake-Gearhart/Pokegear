@@ -2184,7 +2184,13 @@ function exportDeckImage () {
             }
         }
         img.crossOrigin = 'Anonymous'
-        img.src = JSON.parse(cards[i].getElementsByClassName('data')[0].getAttribute('images'))['large']
+        const images = JSON.parse(cards[i].getElementsByClassName('data')[0].getAttribute('images'))
+        if (images['large']) {
+            img.src = images['large']
+        }
+        else {
+            img.src = images['small']
+        }
     }
 }
 
